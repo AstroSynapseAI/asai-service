@@ -16,14 +16,15 @@ import (
 )
 
 type SearchAgent struct {
-	Memory schema.Memory	
+	Memory  schema.Memory
+	Context any	
 }
 
 func NewSearchAgent(options ...SearchAgentOptions) *SearchAgent {
 	return applySearchOptions()
 }
 
-func (agent *SearchAgent)Prompt(input string) string {
+func (agent *SearchAgent) Prompt(input string) string {
 	llm, err := openai.NewChat(
 		openai.WithModel("gpt-4"),
 	)
@@ -77,5 +78,18 @@ func (agent *SearchAgent)Prompt(input string) string {
 	}
 	
 	return answer
+}
+
+func (agent *SearchAgent) Name() string {
+	return "Search Agent"
+	
+}
+
+func (agent *SearchAgent) Description() string {
+	return `
+		Search Agent is an agent specialized for searching and scarping the web.
+		The agent can use DuckDuckGo and SerpApi Google API tools to search the web, 
+		and web scraping tool for reading and scraping various valid urls.
+	`
 }
 
