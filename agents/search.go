@@ -1,50 +1,57 @@
 package agents
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/AstroSynapseAI/engine-service/templates"
 	"github.com/AstroSynapseAI/engine-service/tools"
-	a "github.com/tmc/langchaingo/agents"
-	"github.com/tmc/langchaingo/chains"
+	"github.com/tmc/langchaingo/agents"
 	"github.com/tmc/langchaingo/llms/openai"
+	"github.com/tmc/langchaingo/memory"
 	"github.com/tmc/langchaingo/prompts"
 	"github.com/tmc/langchaingo/schema"
-	t "github.com/tmc/langchaingo/tools"
 	"github.com/tmc/langchaingo/tools/duckduckgo"
+
+	lc_tools "github.com/tmc/langchaingo/tools"
 )
 
 type SearchAgent struct {
-	Memory  schema.Memory
-	Context any	
+	memory   schema.Memory
+	context  any	
+	executor agents.Executor
 }
 
-func NewSearchAgent(options ...SearchAgentOptions) *SearchAgent {
-	return applySearchOptions()
-}
+func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
+	// create a new search agent
+	searchAgent := &SearchAgent{
+		memory: memory.NewSimple(),
+	}
 
-func (agent *SearchAgent) Prompt(input string) string {
+	// apply search agent options
+	for _, option := range options {
+		option(searchAgent)
+	}
+
 	llm, err := openai.NewChat(
 		openai.WithModel("gpt-4"),
 	)
 	if err != nil {
 		fmt.Println(err)
-		return ""
+		return nil, err
 	}
 
 	ddg, err := duckduckgo.New(5, "")
 	if err != nil {
 		fmt.Println(err)
-		return ""
+		return nil, err
 	}
 
-	searchTools := []t.Tool{ddg}
+	searchTools := []lc_tools.Tool{ddg}
 
 	searchTmplt, err := templates.Load("search.txt")
 	if err != nil {
 		fmt.Println(err)
-		return ""
+		return nil, err
 	}
 
 	promptTmplt := prompts.PromptTemplate{
@@ -57,32 +64,27 @@ func (agent *SearchAgent) Prompt(input string) string {
 		},
 	}
 
-	executor, err := a.Initialize(
+	agent := agents.NewOneShotAgent(
 		llm,
 		searchTools,
-		a.ZeroShotReactDescription,
-		a.WithMemory(agent.Memory),
-		a.WithPrompt(promptTmplt),
-		a.WithMaxIterations(3),
+		agents.WithMemory(searchAgent.memory),
+		agents.WithPrompt(promptTmplt),
+		agents.WithMaxIterations(3),
 	)
 
-	if err != nil {
-		fmt.Println(err)
-		return ""
-	}
+	executor := agents.NewExecutor(agent, searchTools)
 
-	answer, err := chains.Run(context.Background(), executor, input)
-	if err != nil {
-		fmt.Println(err)
-		return ""
-	}
-	
-	return answer
+	searchAgent.executor = executor
+
+	return searchAgent, nil
+}
+
+func (agent *SearchAgent) Executor() agents.Executor {
+	return agent.executor
 }
 
 func (agent *SearchAgent) Name() string {
-	return "Search Agent"
-	
+	return "Search Agent"	
 }
 
 func (agent *SearchAgent) Description() string {
@@ -92,4 +94,3 @@ func (agent *SearchAgent) Description() string {
 		and web scraping tool for reading and scraping various valid urls.
 	`
 }
-
