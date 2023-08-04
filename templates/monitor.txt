@@ -6,6 +6,8 @@ User input: {{.input}}
 
 Conversation History: {{.history}}
 
+Search Results: {{.searchResults}}
+
 Respond: 
 yes - if search should be performed
 no - if search should not be performed

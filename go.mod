@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/gocolly/colly v1.2.0
-	github.com/tmc/langchaingo v0.0.0-20230729232647-7df4fe5fb8fe
+	github.com/tmc/langchaingo v0.0.0-20230802030916-271e9bd7e7c5
 )
 
 require (

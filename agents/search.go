@@ -21,6 +21,10 @@ type SearchAgent struct {
 	executor agents.Executor
 }
 
+// NewSearchAgent creates a new search agent with the given options.
+//
+// options: Variadic parameter to customize the search agent.
+// Returns a pointer to a SearchAgent and an error if any.
 func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 	// create a new search agent
 	searchAgent := &SearchAgent{
@@ -32,6 +36,7 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 		option(searchAgent)
 	}
 
+	// create new llm handle
 	llm, err := openai.NewChat(
 		openai.WithModel("gpt-4"),
 	)
@@ -40,20 +45,31 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 		return nil, err
 	}
 
+	// create DuckDuckGo search API Tool
 	ddg, err := duckduckgo.New(5, "")
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
 
-	searchTools := []lc_tools.Tool{ddg}
+	// create web scraping tool
+	scraper, err := tools.NewScraper()
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
 
+	// create search agent tools
+	searchTools := []lc_tools.Tool{ddg, scraper}
+
+	// load custom search agent template
 	searchTmplt, err := templates.Load("search.txt")
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
 
+	// create search prompt template
 	promptTmplt := prompts.PromptTemplate{
 		Template:       searchTmplt,
 		TemplateFormat: prompts.TemplateFormatGoTemplate,
@@ -64,6 +80,7 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 		},
 	}
 
+	// create the search prompt
 	agent := agents.NewOneShotAgent(
 		llm,
 		searchTools,
@@ -72,21 +89,32 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 		agents.WithMaxIterations(3),
 	)
 
+	// create agents executor chain	
 	executor := agents.NewExecutor(agent, searchTools)
-
 	searchAgent.executor = executor
 
 	return searchAgent, nil
 }
 
+// Executor returns the executor of the SearchAgent.
+//
+// This function does not take any parameters.
+// It returns an agents.Executor.
 func (agent *SearchAgent) Executor() agents.Executor {
 	return agent.executor
 }
 
+// Name returns the name of the SearchAgent.
+//
+// It does not take any parameters.
+// It returns a string.
 func (agent *SearchAgent) Name() string {
 	return "Search Agent"	
 }
 
+// Description returns the description of the SearchAgent.
+//
+// It returns a string that describes the SearchAgent and its capabilities.
 func (agent *SearchAgent) Description() string {
 	return `
 		Search Agent is an agent specialized for searching and scarping the web.

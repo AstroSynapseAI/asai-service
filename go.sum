@@ -95,6 +95,8 @@ github.com/temoto/robotstxt v1.1.2 h1:W2pOjSJ6SWvldyEuiFXNxz3xZ8aiWX5LbfDiOFd7Fx
 github.com/temoto/robotstxt v1.1.2/go.mod h1:+1AmkuG3IYkh1kv0d2qEB9Le88ehNO0zwOr3ujewlOo=
 github.com/tmc/langchaingo v0.0.0-20230729232647-7df4fe5fb8fe h1:+XVrCjh3rPibfISkUFG2Ck5NLKODQ9cFdmraFye1bGA=
 github.com/tmc/langchaingo v0.0.0-20230729232647-7df4fe5fb8fe/go.mod h1:8T+nNIGBr3nYQEYFmF/YaT8t8YTKLvFYZBuVZOAYn5E=
+github.com/tmc/langchaingo v0.0.0-20230802030916-271e9bd7e7c5 h1:js7vYDJGzUGVSt0YlIusUc5BXYVECu3LUI/asby5Ggo=
+github.com/tmc/langchaingo v0.0.0-20230802030916-271e9bd7e7c5/go.mod h1:8T+nNIGBr3nYQEYFmF/YaT8t8YTKLvFYZBuVZOAYn5E=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 go.starlark.net v0.0.0-20230302034142-4b1e35fe2254 h1:Ss6D3hLXTM0KobyBYEAygXzFfGcjnmfEJOBgSbemCtg=
 go.starlark.net v0.0.0-20230302034142-4b1e35fe2254/go.mod h1:jxU+3+j+71eXOW14274+SmmuW82qJzl6iZSeqEtTGds=
