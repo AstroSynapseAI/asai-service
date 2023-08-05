@@ -103,9 +103,10 @@ func (chain AsaiChain) Call(ctx context.Context, inputValues map[string]any, _ .
 	}
 
 	chain.Memory.Buffer().SaveContext(
-		map[string]any{"Human": userInput},
-		map[string]any{"AI": answer},
+		map[string]any{"humanInput": userInput},
+		map[string]any{"aiOutput": answer},
 	)
+
 	return map[string]any{"output": answer}, nil
 }
 

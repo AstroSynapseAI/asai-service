@@ -9,6 +9,7 @@ import (
 
 	"github.com/AstroSynapseAI/engine-service/agents"
 	"github.com/AstroSynapseAI/engine-service/chains"
+	"github.com/AstroSynapseAI/engine-service/config"
 	"github.com/AstroSynapseAI/engine-service/memory"
 	"github.com/GoLangWebSDK/rest"
 	lc_chains "github.com/tmc/langchaingo/chains"
@@ -18,8 +19,10 @@ var asaiMemory *memory.AsaiMemory
 var asaiChain  *chains.AsaiChain
 
 func init() {
+	config.LoadEnvironment()
 
-	asaiMemory = memory.NewMemory("")
+	dsn := config.SetupPostgreDSN()
+	asaiMemory = memory.NewMemory(dsn)
 
 	searchAgent, err := agents.NewSearchAgent(
 		agents.WithMemory(asaiMemory.Buffer()),
