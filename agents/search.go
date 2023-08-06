@@ -2,9 +2,11 @@ package agents
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/AstroSynapseAI/engine-service/templates"
 	"github.com/AstroSynapseAI/engine-service/tools"
+	"github.com/AstroSynapseAI/engine-service/tools/google"
 	"github.com/tmc/langchaingo/agents"
 	"github.com/tmc/langchaingo/llms/openai"
 	"github.com/tmc/langchaingo/memory"
@@ -17,7 +19,6 @@ import (
 
 type SearchAgent struct {
 	memory   schema.Memory
-	context  any	
 	executor agents.Executor
 }
 
@@ -45,8 +46,16 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 		return nil, err
 	}
 
-	// create DuckDuckGo search API Tool
-	ddg, err := duckduckgo.New(5, "")
+	// create google search API Tool
+	apiKey := os.Getenv("SERPAPI_API_KEY")
+	google, err := google.New(apiKey, google.DefualtMaxResults)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	
+	// create DuckDuckGo search API Tool 
+	ddg, err := duckduckgo.New(5, duckduckgo.DefaultUserAgent)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -60,7 +69,7 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 	}
 
 	// create search agent tools
-	searchTools := []lc_tools.Tool{ddg, scraper}
+	searchTools := []lc_tools.Tool{google, ddg, scraper}
 
 	// load custom search agent template
 	searchTmplt, err := templates.Load("search.txt")

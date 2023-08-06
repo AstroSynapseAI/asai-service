@@ -57,7 +57,7 @@ func main() {
 
 		err := ctx.JsonDecode(&request)
 		if err != nil {
-			fmt.Println("Bad Request: %v", err)
+			fmt.Println("Bad Request: %w", err)
 			ctx.JsonResponse(400, err)
 			return
 		}

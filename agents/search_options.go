@@ -11,9 +11,3 @@ func WithMemory(memory schema.Memory) SearchAgentOptions {
 		agent.memory = memory
 	}
 }
-
-func WithContext(context any) SearchAgentOptions {
-	return func(agent *SearchAgent) {
-		agent.context = context
-	}
-}
