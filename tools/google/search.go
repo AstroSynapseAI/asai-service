@@ -20,11 +20,14 @@ func New(apiKey string, maxResults int) (*Tool, error) {
 }
 
 func (tool Tool) Name() string {
-	return "Google Search API Tool"
+	return "Google Search SerpAPI Tool"
 }
 
 func (tool Tool) Description() string {
-	return "Google Search API Tool"
+	return `
+	A  wrapper around Google Search SerpAPI Tool.
+	Will return a structured list of search results.
+	Input should be a search query.`
 }
 
 func (tool Tool) Call(ctx context.Context, input string) (string, error) {

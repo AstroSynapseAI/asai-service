@@ -3,11 +3,16 @@ module github.com/AstroSynapseAI/engine-service
 go 1.20
 
 require (
+	github.com/GoLangWebSDK/rest v0.0.0-20230522143808-2e1e35b013d6
 	github.com/gocolly/colly v1.2.0
 	github.com/tmc/langchaingo v0.0.0-20230802030916-271e9bd7e7c5
+	gopkg.in/yaml.v2 v2.3.0
+	gorm.io/driver/postgres v1.5.2
+	gorm.io/gorm v1.25.2
 )
 
 require (
+	github.com/GoLangWebSDK/dmp v0.0.0-20230509224727-3282d28a8e5a // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
 	github.com/Masterminds/sprig/v3 v3.2.3 // indirect
@@ -17,16 +22,29 @@ require (
 	github.com/antchfx/xmlquery v1.3.17 // indirect
 	github.com/antchfx/xpath v1.2.4 // indirect
 	github.com/dlclark/regexp2 v1.8.1 // indirect
+	github.com/go-gormigrate/gormigrate/v2 v2.0.2 // indirect
+	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/uuid v1.3.0 // indirect
+	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/huandu/xstrings v1.3.3 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
+	github.com/jackc/pgpassfile v1.0.0 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
+	github.com/jackc/pgx/v5 v5.4.1 // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/kennygrant/sanitize v1.2.4 // indirect
+	github.com/kr/text v0.2.0 // indirect
+	github.com/mattn/go-colorable v0.1.12 // indirect
+	github.com/mattn/go-isatty v0.0.14 // indirect
+	github.com/mattn/go-sqlite3 v1.14.17 // indirect
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.0 // indirect
 	github.com/pkoukk/tiktoken-go v0.1.2 // indirect
+	github.com/rs/zerolog v1.29.1 // indirect
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
@@ -39,4 +57,6 @@ require (
 	golang.org/x/text v0.9.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
+	gorm.io/driver/mysql v1.5.0 // indirect
+	gorm.io/driver/sqlite v1.5.0 // indirect
 )

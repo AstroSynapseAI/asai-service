@@ -1,6 +1,4 @@
-CURRENT DATE: {{.date}}
-
-Based on user input and conversation history decide if internet search should be performed. Respond only with "yes" or "no".
+Based on user input, conversation history, and search results determine if internet search was performed.
 
 User input: {{.input}}
 
@@ -9,7 +7,5 @@ Conversation History: {{.history}}
 Search Results: {{.searchResults}}
 
 Respond: 
-yes - if search should be performed
-no - if search should not be performed
-
-
+yes [if search was performed]
+no  [if search was not be performed]

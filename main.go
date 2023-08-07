@@ -12,7 +12,6 @@ import (
 	"github.com/AstroSynapseAI/engine-service/config"
 	"github.com/AstroSynapseAI/engine-service/memory"
 	"github.com/GoLangWebSDK/rest"
-	lc_chains "github.com/tmc/langchaingo/chains"
 )
 
 var asaiMemory *memory.AsaiMemory
@@ -64,7 +63,7 @@ func main() {
 
 		asaiMemory.SetSessionID(request.SessionId)
 
-		response, err := lc_chains.Run(context.Background(), asaiChain, request.UserPrompt)
+		response, err := chains.RunAsai(context.Background(), asaiChain, request.UserPrompt)
 		if err != nil {
 			fmt.Println(err)
 			ctx.JsonResponse(500, err)
