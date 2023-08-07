@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"gopkg.in/yaml.v2"
@@ -10,6 +9,9 @@ import (
 
 func LoadEnvironment() {
 	env := os.Getenv("ENVIRONMENT")
+
+	fmt.Println("Current Environment:", env)
+
 	if env == "HEROKU DEV" {
 		setupHerokuDev()
 		return
@@ -30,12 +32,13 @@ func setupHerokuDev() {
 // No parameters.
 // No return values.
 func setupLocalDev() {
+	fmt.Println("Setup local dev")
 	var Config struct {
 		OpenAPIKey string `yaml:"open_api_key"`
 		SerpAPIKey string `yaml:"serpapi_api_key"`
 	}
 
-	keys, err := ioutil.ReadFile("./keys.yaml")
+	keys, err := os.ReadFile("./config/keys.yaml")
 	if err != nil {
 		panic(err)
 	}

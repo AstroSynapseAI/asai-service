@@ -23,6 +23,12 @@ func init() {
 	dsn := config.SetupPostgreDSN()
 	asaiMemory = memory.NewMemory(dsn)
 
+}
+
+func main() {
+	router := rest.NewRouter()
+	ctrl := rest.NewController(router)
+
 	searchAgent, err := agents.NewSearchAgent(
 		agents.WithMemory(asaiMemory.Buffer()),
 	)
@@ -32,18 +38,6 @@ func init() {
 		return
 	}
 
-	asaiChain = chains.NewAsaiChain(
-		chains.WithMemory(asaiMemory),
-		chains.WithSearchAgent(searchAgent),
-	)
-}
-
-func main() {
-	fmt.Println("main")
-	
-	router := rest.NewRouter()
-	ctrl := rest.NewController(router)
-
 	ctrl.Post("/api/chat/msg", func(ctx *rest.Context) {
 		ctx.SetContentType("application/json")
 		
@@ -51,7 +45,6 @@ func main() {
 		var request struct {
 			SessionId  string `json:"session_id"`
 			UserPrompt string `json:"user_prompt"`
-			History    string `json:"history"`
 		}
 
 		err := ctx.JsonDecode(&request)
@@ -62,6 +55,11 @@ func main() {
 		}
 
 		asaiMemory.SetSessionID(request.SessionId)
+
+		asaiChain = chains.NewAsaiChain(
+			chains.WithMemory(asaiMemory),
+			chains.WithSearchAgent(searchAgent),
+		)
 
 		response, err := chains.RunAsai(context.Background(), asaiChain, request.UserPrompt)
 		if err != nil {

@@ -7,7 +7,7 @@ import (
 
 type AsaiMemory struct {
 	buffer 		schema.Memory
-	chatHistory PersistentChatHistory
+	chatHistory *PersistentChatHistory
 }
 
 // NewMemory creates a new instance of AsaiMemory.
@@ -19,6 +19,7 @@ func NewMemory(dsn string) *AsaiMemory {
 
 	return &AsaiMemory{
 		buffer: buffer,
+		chatHistory: chatHistory,
 	}
 }
 

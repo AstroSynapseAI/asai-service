@@ -2,6 +2,7 @@ package chains
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/AstroSynapseAI/engine-service/agents"
@@ -39,10 +40,14 @@ func NewAsaiChain(options ...ChainOptions) *AsaiChain {
 func (chain AsaiChain) Call(ctx context.Context, inputValues map[string]any, _ ...chains.ChainCallOption) (map[string]any, error) {
 	// perform search
 	userInput := inputValues["input"]
-	searchResults, err := chains.Run(ctx, chain.SearchAgent.Executor(), userInput)
+	searchResults, err := chains.Predict(ctx, chain.SearchAgent.Executor(), inputValues)
+	if err != nil {
+		fmt.Println("Search chain run error:", err)
+		return nil, err
+	}
 
 	// check if search was performed
-	llm, err := openai.New(
+	llm, err := openai.NewChat(
 		openai.WithModel("gpt-4"),
 	)
 
@@ -70,6 +75,7 @@ func (chain AsaiChain) Call(ctx context.Context, inputValues map[string]any, _ .
 
 	searchPerformed, err := chains.Predict(ctx, monitor, monitorInput)
 	if err != nil {
+		fmt.Println("Monitor chain run error:", err)
 		return nil, err
 	}
 
