@@ -1,4 +1,4 @@
-package agents
+package search
 
 import (
 	"github.com/tmc/langchaingo/schema"

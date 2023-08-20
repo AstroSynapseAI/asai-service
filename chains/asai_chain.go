@@ -5,125 +5,90 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/AstroSynapseAI/engine-service/agents"
+	"github.com/AstroSynapseAI/engine-service/agents/search"
+	"github.com/AstroSynapseAI/engine-service/config"
 	"github.com/AstroSynapseAI/engine-service/memory"
 	"github.com/AstroSynapseAI/engine-service/templates"
+
+	asaiTools "github.com/AstroSynapseAI/engine-service/tools"
+
+	"github.com/tmc/langchaingo/agents"
 	"github.com/tmc/langchaingo/chains"
 	"github.com/tmc/langchaingo/llms/openai"
 	"github.com/tmc/langchaingo/prompts"
-	"github.com/tmc/langchaingo/schema"
+	"github.com/tmc/langchaingo/tools"
 )
 
 type AsaiChain struct {
 	Memory 	 	*memory.AsaiMemory
-	SearchAgent	*agents.SearchAgent
-	OutputKey	string
-	InputKey	string
-	
+	Agents 		[]tools.Tool	
 }
 
-var _ chains.Chain = &AsaiChain{}
-
-func NewAsaiChain(options ...ChainOptions) *AsaiChain {
-	asaiChain := &AsaiChain{
-		OutputKey: "output",
-		InputKey: "input",
-	}
+func NewAsaiChain() (*AsaiChain, error) {
+	dsn := config.SetupPostgreDSN()
+	asaiMemory := memory.NewMemory(dsn)
 	
-	for _, option := range options {
-		option(asaiChain)
-	}
-
-	return asaiChain
-}
-
-func (chain AsaiChain) Call(ctx context.Context, inputValues map[string]any, _ ...chains.ChainCallOption) (map[string]any, error) {
-	// perform search
-	userInput := inputValues["input"]
-	searchResults, err := chains.Predict(ctx, chain.SearchAgent.Executor(), inputValues)
+	// create search agent
+	searchAgent, err := search.NewSearchAgent()
+	
 	if err != nil {
-		fmt.Println("Search chain run error:", err)
+		fmt.Println(err)
 		return nil, err
 	}
 
-	// check if search was performed
+	// create borowser agent
+
+	// create librarian agent
+
+	return &AsaiChain{
+		Memory: asaiMemory,
+		Agents: []tools.Tool{
+			searchAgent,
+		},
+	}, nil
+}
+
+func (chain AsaiChain) SetSessionID(id string) {
+	chain.Memory.SetSessionID(id)	
+}
+
+func (chain AsaiChain) Run(ctx context.Context, input string) (string, error) {
+	// create llm handle
 	llm, err := openai.NewChat(
 		openai.WithModel("gpt-4"),
 	)
 
+	// load Asai persona prompt template
+	template, err := templates.Load("persona.txt")
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	buffer, err := chain.Memory.Buffer().LoadMemoryVariables(inputValues)
-	if err != nil {
-		return nil, err
+	promptTmplt := prompts.PromptTemplate{
+		Template:       template,
+		TemplateFormat: prompts.TemplateFormatGoTemplate,
+		InputVariables: []string{"input", "agent_scratchpad"},
+		PartialVariables: map[string]interface{}{
+			"tool_names":        asaiTools.Names(chain.Agents),
+			"tool_descriptions": asaiTools.Descriptions(chain.Agents),
+			"today":             time.Now().Format("January 02, 2006"),
+			"history":           "",
+		},
 	}
 
-	monitorTemplate, err := templates.Load("monitor.txt")
-	if err != nil {
-		return nil, err
-	}
-
-	monitorPrompt := prompts.NewPromptTemplate(monitorTemplate, []string{"input", "history", "searchResults"})
-	monitor := chains.NewLLMChain(llm, monitorPrompt)
-	monitorInput := map[string]interface{}{
-		"input":  userInput,
-		"history": buffer["history"],
-		"searchResults": searchResults,
-	}
-
-	searchPerformed, err := chains.Predict(ctx, monitor, monitorInput)
-	if err != nil {
-		fmt.Println("Monitor chain run error:", err)
-		return nil, err
-	}
-
-	// answer the prompt
-	personaTemplate, err := templates.Load("persona.txt")
-	if err != nil {
-		return nil, err
-	}
-
-	personaPrompt := prompts.NewPromptTemplate(personaTemplate, []string{
-		"input", 
-		"history", 
-		"searchPerformed", 
-		"searchResults", 
-		"date",
-	})
-
-	asaiChat := chains.NewLLMChain(llm, personaPrompt)
-
-	input := map[string]interface{}{
-		"input":  userInput,
-		"history": buffer["history"],
-		"searchPerformed": searchPerformed,
-		"searchResults": searchResults,
-		"date": time.Now().Format("January 02, 2006"),
-	}
-
-	answer, err := chains.Predict(ctx, asaiChat, input)
-	if err != nil {
-		return nil, err
-	}
-
-	chain.Memory.Buffer().SaveContext(
-		map[string]any{"humanInput": userInput},
-		map[string]any{"aiOutput": answer},
+	// create asai agent
+	asaiAgent := agents.NewConversationalAgent(llm, chain.Agents)
+	executor := agents.NewExecutor(
+		asaiAgent, 
+		chain.Agents,
+		agents.WithPrompt(promptTmplt),	
+		agents.WithMemory(chain.Memory.Buffer()),
 	)
+	
+	response, err := chains.Run(ctx, executor, input)
+	if err != nil {
+		return "", err
+	}
 
-	return map[string]any{"output": answer}, nil
-}
-
-func (chain AsaiChain) GetInputKeys() []string {
-	return []string{chain.InputKey}
-}
-
-func (chain AsaiChain) GetOutputKeys() []string {
-	return []string{chain.OutputKey}
-}
-
-func (chain AsaiChain) GetMemory() schema.Memory {
-	return chain.Memory.Buffer()
+	return response, nil
 }

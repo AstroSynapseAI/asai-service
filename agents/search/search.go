@@ -1,6 +1,7 @@
-package agents
+package search
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -16,6 +17,8 @@ import (
 
 	lc_tools "github.com/tmc/langchaingo/tools"
 )
+
+var _ lc_tools.Tool = &SearchAgent{}
 
 type SearchAgent struct {
 	memory   schema.Memory
@@ -61,15 +64,8 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 		return nil, err
 	}
 
-	// create web scraping tool
-	scraper, err := tools.NewScraper()
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-
 	// create search agent tools
-	searchTools := []lc_tools.Tool{google, ddg, scraper}
+	searchTools := []lc_tools.Tool{google, ddg}
 
 	// load custom search agent template
 	searchTmplt, err := templates.Load("search.txt")
@@ -104,6 +100,10 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 
 	return searchAgent, nil
 }
+
+func (agent *SearchAgent) Call(ctx context.Context, input string) (string, error) {
+	return "", nil
+} 
 
 // Executor returns the executor of the SearchAgent.
 //

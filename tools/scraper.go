@@ -19,7 +19,7 @@ type Scraper struct {
 	Delay     int64
 }
 
-var _ tools.Tool = Scraper{}
+var _ tools.Tool = &Scraper{}
 
 func NewScraper(maxDepth ...int) (*Scraper, error) {
 	depth := 1

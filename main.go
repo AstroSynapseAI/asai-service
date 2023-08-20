@@ -7,36 +7,27 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/AstroSynapseAI/engine-service/agents"
 	"github.com/AstroSynapseAI/engine-service/chains"
 	"github.com/AstroSynapseAI/engine-service/config"
-	"github.com/AstroSynapseAI/engine-service/memory"
 	"github.com/GoLangWebSDK/rest"
 )
 
-var asaiMemory *memory.AsaiMemory
 var asaiChain  *chains.AsaiChain
 
 func init() {
+	var err error
 	config.LoadEnvironment()
 
-	dsn := config.SetupPostgreDSN()
-	asaiMemory = memory.NewMemory(dsn)
-
+	asaiChain, err = chains.NewAsaiChain()
+	if err != nil {
+		fmt.Println("Failed to create AsaiChain:", err)
+		return
+	}
 }
 
 func main() {
 	router := rest.NewRouter()
 	ctrl := rest.NewController(router)
-
-	searchAgent, err := agents.NewSearchAgent(
-		agents.WithMemory(asaiMemory.Buffer()),
-	)
-
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
 
 	ctrl.Post("/api/chat/msg", func(ctx *rest.Context) {
 		ctx.SetContentType("application/json")
@@ -54,14 +45,9 @@ func main() {
 			return
 		}
 
-		asaiMemory.SetSessionID(request.SessionId)
+		asaiChain.SetSessionID(request.SessionId)
 
-		asaiChain = chains.NewAsaiChain(
-			chains.WithMemory(asaiMemory),
-			chains.WithSearchAgent(searchAgent),
-		)
-
-		response, err := chains.RunAsai(context.Background(), asaiChain, request.UserPrompt)
+		response, err := asaiChain.Run(context.Background(), request.UserPrompt)
 		if err != nil {
 			fmt.Println(err)
 			ctx.JsonResponse(500, err)
