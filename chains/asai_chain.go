@@ -9,6 +9,8 @@ import (
 	"github.com/AstroSynapseAI/engine-service/config"
 	"github.com/AstroSynapseAI/engine-service/memory"
 	"github.com/AstroSynapseAI/engine-service/templates"
+	"github.com/AstroSynapseAI/engine-service/tools/documents"
+	"github.com/AstroSynapseAI/engine-service/tools/scraper"
 
 	asaiTools "github.com/AstroSynapseAI/engine-service/tools"
 
@@ -30,20 +32,32 @@ func NewAsaiChain() (*AsaiChain, error) {
 	
 	// create search agent
 	searchAgent, err := search.NewSearchAgent()
-	
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
 
-	// create borowser agent
+	// create browser agent
+	// currently using the scrapper tool as an agent until the browsing
+	// get's more complex. ie. introduction of headless browser
+	scraperAgent, err := scraper.NewScraper()
+	if err != nil {
+		return nil, err
+	}
 
-	// create librarian agent
+	// create library agent
+	// currently using a simple tool for extracting documents
+	libraryAgent, err := documents.NewLoader()
+	if err != nil {
+		return nil, err
+	}
 
 	return &AsaiChain{
 		Memory: asaiMemory,
 		Agents: []tools.Tool{
 			searchAgent,
+			scraperAgent,
+			libraryAgent,
 		},
 	}, nil
 }
@@ -64,15 +78,16 @@ func (chain AsaiChain) Run(ctx context.Context, input string) (string, error) {
 		return "", err
 	}
 
+	// create agent prompt template
 	promptTmplt := prompts.PromptTemplate{
 		Template:       template,
 		TemplateFormat: prompts.TemplateFormatGoTemplate,
 		InputVariables: []string{"input", "agent_scratchpad"},
 		PartialVariables: map[string]interface{}{
-			"tool_names":        asaiTools.Names(chain.Agents),
-			"tool_descriptions": asaiTools.Descriptions(chain.Agents),
-			"today":             time.Now().Format("January 02, 2006"),
-			"history":           "",
+			"agent_names":        asaiTools.Names(chain.Agents),
+			"agent_descriptions": asaiTools.Descriptions(chain.Agents),
+			"today":              time.Now().Format("January 02, 2006"),
+			"history":            "",
 		},
 	}
 
@@ -85,6 +100,7 @@ func (chain AsaiChain) Run(ctx context.Context, input string) (string, error) {
 		agents.WithMemory(chain.Memory.Buffer()),
 	)
 	
+	// run the agent
 	response, err := chains.Run(ctx, executor, input)
 	if err != nil {
 		return "", err
