@@ -52,9 +52,15 @@ func main() {
 			fmt.Println(err)
 			ctx.JsonResponse(500, err)
 			return
-		} 
+		}
 
-		ctx.JsonResponse(200, response)
+		var responseJson struct {
+			Content string `json:"content"`
+		}
+
+		responseJson.Content = response
+
+		ctx.JsonResponse(200, responseJson)
 	})
 
 	router.Mux.StrictSlash(true)

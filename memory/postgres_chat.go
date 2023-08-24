@@ -41,7 +41,6 @@ type PersistentChatHistory struct {
 var _ schema.ChatMessageHistory = &PersistentChatHistory{}
 
 func NewPersistentChatHistory(dsn string) *PersistentChatHistory {
-
 	history := &PersistentChatHistory{}
 	
 	gorm, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -58,7 +57,6 @@ func NewPersistentChatHistory(dsn string) *PersistentChatHistory {
 		return nil
 	}
 
-	fmt.Println("Chat history created!")
 	return history
 }
 
@@ -67,13 +65,10 @@ func (history *PersistentChatHistory) GetSessionID() string {
 }
 
 func (history *PersistentChatHistory) SetSessionID(id string) {
-	fmt.Println("Set session id", id)
 	history.sessionID = id
 }
 
 func (history *PersistentChatHistory) Messages() ([]schema.ChatMessage, error) {
-	fmt.Println("Get messages")
-	fmt.Println("session id:", history.sessionID)
 	if history.sessionID == "" {
 		return []schema.ChatMessage{}, ErrMissingSessionID
 	}

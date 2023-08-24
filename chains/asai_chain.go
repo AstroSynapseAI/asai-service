@@ -86,7 +86,7 @@ func (chain AsaiChain) Run(ctx context.Context, input string) (string, error) {
 		PartialVariables: map[string]interface{}{
 			"agent_names":        asaiTools.Names(chain.Agents),
 			"agent_descriptions": asaiTools.Descriptions(chain.Agents),
-			"today":              time.Now().Format("January 02, 2006"),
+			"date":              time.Now().Format("January 02, 2006"),
 			"history":            "",
 		},
 	}

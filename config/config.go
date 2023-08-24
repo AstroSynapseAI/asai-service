@@ -32,7 +32,6 @@ func setupHerokuDev() {
 // No parameters.
 // No return values.
 func setupLocalDev() {
-	fmt.Println("Setup local dev")
 	var Config struct {
 		OpenAPIKey string `yaml:"open_api_key"`
 		SerpAPIKey string `yaml:"serpapi_api_key"`

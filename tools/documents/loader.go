@@ -10,7 +10,7 @@ import (
 	"github.com/tmc/langchaingo/tools"
 )
 
-const DefualtRootPath = "./data/documents"
+const DefualtRootPath = "./data/documents/"
 
 var _ tools.Tool = &DocumentsTool{} 
 var ErrFileLoad = "Error while loading requested file"
@@ -32,6 +32,9 @@ func NewLoader(options ...DocuemntsToolOption) (*DocumentsTool, error) {
 }
 
 func (tool *DocumentsTool) Call(ctx context.Context, input string) (string, error) {
+	fmt.Println("Retrieving documents with input...")
+	fmt.Println(input)
+
 	var toolInput struct {
 		FileName string
 		Query    string
@@ -66,11 +69,9 @@ func (agent *DocumentsTool) Description() string {
 		**Usage Example**:
 		1. Identify the appropriate document from the library list based on the user's query.
 		2. Use the "FileName" parameter to request the document in the JSON format:
-		\[
-		\{
-			"FileName": "filename.txt",
-		\}
-		\]
+		{
+			"FileName": "filename.txt"
+		}		
 		3. Receive the content of the file as output.
 		4. Integrate the content into your response in a coherent and natural way.
 		
