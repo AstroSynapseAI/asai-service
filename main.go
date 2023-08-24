@@ -29,6 +29,8 @@ func main() {
 	router := rest.NewRouter()
 	ctrl := rest.NewController(router)
 
+	router.Mux.StrictSlash(true)
+
 	ctrl.Post("/api/chat/msg", func(ctx *rest.Context) {
 		ctx.SetContentType("application/json")
 		
@@ -63,17 +65,13 @@ func main() {
 		ctx.JsonResponse(200, responseJson)
 	})
 
-	router.Mux.StrictSlash(true)
-
 	port := os.Getenv("PORT")
-
 	if port == "" {
 		router.Listen(":8082")
 		return
 	}
 
 	listener, err := net.Listen("tcp", ":"+port)
-
 	if err != nil {
 		fmt.Println("Failed to listen:", err)
 		return
@@ -81,7 +79,6 @@ func main() {
 
 	// Start the HTTP server using the router and the listener
 	err = http.Serve(listener, router.Mux)
-
 	if err != nil {
 		fmt.Println("Failed to serve:", err)
 		return

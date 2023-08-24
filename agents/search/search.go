@@ -76,10 +76,11 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 	promptTmplt := prompts.PromptTemplate{
 		Template:       searchTmplt,
 		TemplateFormat: prompts.TemplateFormatGoTemplate,
-		InputVariables: []string{"input", "history", "agent_scratchpad", "today"},
+		InputVariables: []string{"input", "agent_scratchpad", "today"},
 		PartialVariables: map[string]interface{}{
 			"tool_names":        asaiTools.Names(searchTools),
 			"tool_descriptions": asaiTools.Descriptions(searchTools),
+			"history":            "",
 		},
 	}
 
@@ -104,7 +105,13 @@ func (agent *SearchAgent) Executor() agents.Executor {
 }
 
 func (agent *SearchAgent) Call(ctx context.Context, input string) (string, error) {
-	return chains.Run(ctx, agent.executor, input)
+	fmt.Println("Searching...")
+	reponse, err := chains.Run(ctx, agent.executor, input)
+	if err != nil {
+		fmt.Println("Searching error:", err)
+		return "", err
+	}
+	return reponse, nil
 } 
 
 func (agent *SearchAgent) Name() string {

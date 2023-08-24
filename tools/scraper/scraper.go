@@ -49,6 +49,8 @@ func (scraper Scraper) Description() string {
 }
 
 func (scraper Scraper) Call(ctx context.Context, input string) (string, error) {
+	fmt.Println("Scraping with input...")
+	fmt.Println(input)
 	_, err := url.ParseRequestURI(input)
 	if err != nil {
 		return "", fmt.Errorf("%s: %w", ErrScrapingFailed, err)
