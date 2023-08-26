@@ -67,7 +67,6 @@ func (chain AsaiChain) SetSessionID(id string) {
 }
 
 func (chain AsaiChain) Run(ctx context.Context, input string) (string, error) {
-	fmt.Print("Running Asai Chain...")
 	// create llm handle
 	llm, err := openai.NewChat(
 		openai.WithModel("gpt-4"),
