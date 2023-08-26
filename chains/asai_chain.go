@@ -93,7 +93,6 @@ func (chain AsaiChain) Run(ctx context.Context, input string) (string, error) {
 
 	// create asai agent
 	asaiAgent := agents.NewConversationalAgent(llm, chain.Agents)
-	asaiAgent.Chain = chains.NewLLMChain(llm, promptTmplt)
 	executor := agents.NewExecutor(
 		asaiAgent, 
 		chain.Agents,
