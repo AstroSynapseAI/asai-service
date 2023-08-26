@@ -40,7 +40,7 @@ func NewAsaiChain() (*AsaiChain, error) {
 	// create browser agent
 	// currently using the scrapper tool as an agent until the browsing
 	// get's more complex. ie. introduction of headless browser
-	scraperAgent, err := scraper.NewScraper()
+	scraperAgent, err := scraper.New()
 	if err != nil {
 		return nil, err
 	}

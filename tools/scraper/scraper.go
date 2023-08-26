@@ -2,6 +2,7 @@ package scraper
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"strings"
@@ -11,64 +12,106 @@ import (
 	"github.com/tmc/langchaingo/tools"
 )
 
-const ErrScrapingFailed = "scraper could not read URL, or scraping is not allowed for provided URL"
+const (
+	DefualtMaxDept   = 1
+	DefualtParallels = 2
+	DefualtDelay     = 3
+	DefualtAsync     = true
+)
+
+var (
+	ErrParsingURIFailed = errors.New("parsing URL failed")
+	ErrScrapingFailed   = errors.New("scraping failed")
+)
+
 
 type Scraper struct {
 	MaxDepth  int
 	Parallels int
 	Delay     int64
+	Blacklist []string
+	Async     bool
 }
 
-var _ tools.Tool = &Scraper{}
+var _ tools.Tool = Scraper{}
 
-func NewScraper(maxDepth ...int) (*Scraper, error) {
-	depth := 1
-	parallels := 2
-	delay := 3
-
-	if len(maxDepth) > 0 {
-		depth = maxDepth[0]
+// New creates a new instance of Scraper with the provided options.
+//
+// The options parameter is a variadic argument allowing the user to specify
+// custom configuration options for the Scraper. These options can be
+// functions that modify the Scraper's properties.
+//
+// The function returns a pointer to a Scraper instance and an error. The
+// error value is nil if the Scraper is created successfully.
+func New(options ...Options) (*Scraper, error) {
+	scraper := &Scraper{
+		MaxDepth:  DefualtMaxDept,
+		Parallels: DefualtParallels,
+		Delay:     int64(DefualtDelay),
+		Async:     DefualtAsync,
+		Blacklist: []string{
+			"login",
+			"signup",
+			"signin",
+			"register",
+			"logout",
+			"download",
+			"redirect",
+		},
 	}
 
-	return &Scraper{
-		MaxDepth:  depth,
-		Parallels: parallels,
-		Delay:     int64(delay),
-	}, nil
+	for _, opt := range options {
+		opt(scraper)
+	}
+
+	return scraper, nil
 }
 
-func (scraper Scraper) Name() string {
+// Name returns the name of the Scraper.
+//
+// No parameters.
+// Returns a string.
+func (s Scraper) Name() string {
 	return "Web Scraper"
 }
 
-func (scraper Scraper) Description() string {
+// Description returns the description of the Go function.
+//
+// There are no parameters.
+// It returns a string.
+func (s Scraper) Description() string {
 	return `
 		Web Scraper will scan a url and return the content of the web page.
 		Input should be a working url.
 	`
 }
 
-func (scraper Scraper) Call(ctx context.Context, input string) (string, error) {
-	fmt.Println("Scraping with input...")
-	fmt.Println(input)
+// Call scrapes a website and returns the site data.
+//
+// The function takes a context.Context object for managing the execution
+// context and a string input representing the URL of the website to be scraped.
+// It returns a string containing the scraped data and an error if any.
+//
+//nolint:all
+func (s Scraper) Call(ctx context.Context, input string) (string, error) {
 	_, err := url.ParseRequestURI(input)
 	if err != nil {
-		return "", fmt.Errorf("%s: %w", ErrScrapingFailed, err)
+		return fmt.Sprintf("%s: %s", ErrParsingURIFailed, err), nil
 	}
 
 	c := colly.NewCollector(
-		colly.MaxDepth(scraper.MaxDepth),
-		colly.Async(true),
+		colly.MaxDepth(s.MaxDepth),
+		colly.Async(s.Async),
 	)
 
 	err = c.Limit(&colly.LimitRule{
 		DomainGlob:  "*",
-		Parallelism: scraper.Parallels,
-		Delay:       time.Duration(scraper.Delay) * time.Second,
+		Parallelism: s.Parallels,
+		Delay:       time.Duration(s.Delay) * time.Second,
 	})
 
 	if err != nil {
-		return "", fmt.Errorf("%s: %w", ErrScrapingFailed, err)
+		return "", err
 	}
 
 	var siteData strings.Builder
@@ -139,38 +182,26 @@ func (scraper Scraper) Call(ctx context.Context, input string) (string, error) {
 		}
 
 		// Check for redundant pages
-		blacklist := []string{
-			"login",
-			"signup",
-			"signin",
-			"register",
-			"logout",
-			"download",
-			"redirect",
-		}
-		for _, item := range blacklist {
+		for _, item := range s.Blacklist {
 			if strings.Contains(u.Path, item) {
 				return
 			}
 		}
 
 		// Normalize the path to treat '/' and '/index.html' as the same path
-		if u.Path == "/index.html" || u.Path == "" {
+		if u.Path == "/index.html" || u.Path == "/index.html/" || u.Path == "" {
 			u.Path = "/"
 		}
 
 		// Only visit the page if it hasn't been visited yet
 		if !scrapedLinks[u.String()] {
-			err := c.Visit(u.String())
-			if err != nil {
-				siteData.WriteString(fmt.Sprintf("\nError following link %s: %v", link, err))
-			}
+			c.Visit(u.String())
 		}
 	})
 
 	err = c.Visit(input)
 	if err != nil {
-		return "", fmt.Errorf("%s: %w", ErrScrapingFailed, err)
+		return fmt.Sprintf("%s: %s", ErrScrapingFailed, err), nil
 	}
 
 	select {
