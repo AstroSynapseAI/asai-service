@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/GoLangWebSDK/rest v0.0.0-20230522143808-2e1e35b013d6
 	github.com/gocolly/colly v1.2.0
+	github.com/gorilla/websocket v1.5.0
 	github.com/tmc/langchaingo v0.0.0-20230802030916-271e9bd7e7c5
 	gopkg.in/yaml.v2 v2.3.0
 	gorm.io/driver/postgres v1.5.2
