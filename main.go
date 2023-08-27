@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/AstroSynapseAI/engine-service/chains"
@@ -125,12 +126,14 @@ func DiscordMsgHandler(session *discordgo.Session, msg *discordgo.MessageCreate)
 	sessionID := msg.Author.ID
 	userPrompt := msg.Content
 
-	asaiChain.SetSessionID(sessionID)
-	response, err := asaiChain.Run(context.Background(), userPrompt)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	if strings.Contains(msg.Content, "@"+session.State.User.ID) {
+		asaiChain.SetSessionID(sessionID)
+		response, err := asaiChain.Run(context.Background(), userPrompt)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 
-	session.ChannelMessageSend(msg.ChannelID, response)
+		session.ChannelMessageSend(msg.ChannelID, response)
+	}
 }
