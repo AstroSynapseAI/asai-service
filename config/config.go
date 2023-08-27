@@ -24,7 +24,7 @@ func LoadEnvironment() {
 }
 
 func setupHerokuDev() {
-	
+
 }
 
 // setupLocalDev initializes the local development environment by setting the necessary environment variables.
@@ -33,8 +33,9 @@ func setupHerokuDev() {
 // No return values.
 func setupLocalDev() {
 	var Config struct {
-		OpenAPIKey string `yaml:"open_api_key"`
-		SerpAPIKey string `yaml:"serpapi_api_key"`
+		OpenAPIKey    string `yaml:"open_api_key"`
+		SerpAPIKey    string `yaml:"serpapi_api_key"`
+		DiscordApiKey string `yaml:"discord_api_key"`
 	}
 
 	keys, err := os.ReadFile("./config/keys.yaml")
@@ -60,9 +61,16 @@ func setupLocalDev() {
 		fmt.Println("Error setting environment variable:", err)
 		return
 	}
+
+	//Set the Discord API key as env variable
+	err = os.Setenv("DISCORD_API_KEY", Config.DiscordApiKey)
+	if err != nil {
+		fmt.Println("Error setting environment variable:", err)
+		return
+	}
 }
 
-func SetupPostgreDSN() string  {
+func SetupPostgreDSN() string {
 	if os.Getenv("ENVIRONMENT") == "HEROKU DEV" {
 		return os.Getenv("DATABASE_URL")
 	}
