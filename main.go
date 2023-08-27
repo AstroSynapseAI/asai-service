@@ -37,6 +37,16 @@ func init() {
 }
 
 func main() {
+	// Initialize the Discord client
+	discordClient.AddHandler(DiscordMsgHandler)
+	discordClient.Identify.Intents = discordgo.IntentsGuildMessages
+
+	err := discordClient.Open()
+	if err != nil {
+		fmt.Println("Failed to open Discord connection:", err)
+		return
+	}
+
 	router := rest.NewRouter()
 	ctrl := rest.NewController(router)
 
@@ -60,16 +70,6 @@ func main() {
 	err = http.Serve(listener, router.Mux)
 	if err != nil {
 		fmt.Println("Failed to serve:", err)
-		return
-	}
-
-	// Initialize the Discord client
-	discordClient.AddHandler(DiscordMsgHandler)
-	discordClient.Identify.Intents = discordgo.IntentsGuildMessages
-
-	err = discordClient.Open()
-	if err != nil {
-		fmt.Println("Failed to open Discord connection:", err)
 		return
 	}
 
