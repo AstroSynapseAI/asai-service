@@ -22,14 +22,14 @@ import (
 )
 
 type AsaiChain struct {
-	Memory 	 	*memory.AsaiMemory
-	Agents 		[]tools.Tool	
+	Memory *memory.AsaiMemory
+	Agents []tools.Tool
 }
 
 func NewAsaiChain() (*AsaiChain, error) {
 	dsn := config.SetupPostgreDSN()
 	asaiMemory := memory.NewMemory(dsn)
-	
+
 	// create search agent
 	searchAgent, err := search.NewSearchAgent()
 	if err != nil {
@@ -63,7 +63,7 @@ func NewAsaiChain() (*AsaiChain, error) {
 }
 
 func (chain AsaiChain) SetSessionID(id string) {
-	chain.Memory.SetSessionID(id)	
+	chain.Memory.SetSessionID(id)
 }
 
 func (chain AsaiChain) Run(ctx context.Context, input string) (string, error) {
@@ -86,20 +86,22 @@ func (chain AsaiChain) Run(ctx context.Context, input string) (string, error) {
 		PartialVariables: map[string]interface{}{
 			"agent_names":        asaiTools.Names(chain.Agents),
 			"agent_descriptions": asaiTools.Descriptions(chain.Agents),
-			"date":              time.Now().Format("January 02, 2006"),
+			"date":               time.Now().Format("January 02, 2006"),
 			"history":            "",
 		},
 	}
 
 	// create asai agent
 	asaiAgent := agents.NewConversationalAgent(llm, chain.Agents)
+	asaiAgent.Chain = chains.NewLLMChain(llm, promptTmplt)
+
 	executor := agents.NewExecutor(
-		asaiAgent, 
+		asaiAgent,
 		chain.Agents,
-		agents.WithPrompt(promptTmplt),	
+		agents.WithPrompt(promptTmplt),
 		agents.WithMemory(chain.Memory.Buffer()),
 	)
-	
+
 	// run the agent
 	response, err := chains.Run(ctx, executor, input)
 	if err != nil {
