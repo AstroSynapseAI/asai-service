@@ -71,6 +71,9 @@ func (chain AsaiChain) Run(ctx context.Context, input string) (string, error) {
 	llm, err := openai.NewChat(
 		openai.WithModel("gpt-4"),
 	)
+	if err != nil {
+		return "", err
+	}
 
 	// load Asai persona prompt template
 	template, err := templates.Load("persona.txt")
