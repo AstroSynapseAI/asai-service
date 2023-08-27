@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/AstroSynapseAI/engine-service/chains"
 	"github.com/AstroSynapseAI/engine-service/config"
@@ -45,6 +46,8 @@ func main() {
 			return
 		}
 		defer conn.Close()
+
+		conn.SetPongHandler(func(string) error { conn.SetReadDeadline(time.Now().Add(60 * time.Second)); return nil })
 
 		// Launch each client's message loop in its own goroutine.
 		go func() {
