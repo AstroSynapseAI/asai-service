@@ -38,7 +38,7 @@ func init() {
 }
 
 func main() {
-	Initialize the Discord client
+	// Initialize the Discord client
 	discordClient.AddHandler(DiscordMsgHandler)
 	discordClient.Identify.Intents = discordgo.IntentsGuildMessages
 
