@@ -6,7 +6,7 @@ require (
 	github.com/GoLangWebSDK/rest v0.0.0-20230522143808-2e1e35b013d6
 	github.com/bwmarrin/discordgo v0.27.1
 	github.com/gocolly/colly v1.2.0
-	github.com/tmc/langchaingo v0.0.0-20230802030916-271e9bd7e7c5
+	github.com/tmc/langchaingo v0.0.0-20230827001633-72b07a1c060f
 	gopkg.in/yaml.v2 v2.3.0
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.2
@@ -53,7 +53,7 @@ require (
 	github.com/temoto/robotstxt v1.1.2 // indirect
 	go.starlark.net v0.0.0-20230302034142-4b1e35fe2254 // indirect
 	golang.org/x/crypto v0.9.0 // indirect
-	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
+	golang.org/x/exp v0.0.0-20230510235704-dd950f8aeaea // indirect
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect

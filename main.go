@@ -39,14 +39,14 @@ func init() {
 
 func main() {
 	// Initialize the Discord client
-	discordClient.AddHandler(DiscordMsgHandler)
-	discordClient.Identify.Intents = discordgo.IntentsGuildMessages
+	// discordClient.AddHandler(DiscordMsgHandler)
+	// discordClient.Identify.Intents = discordgo.IntentsGuildMessages
 
-	err := discordClient.Open()
-	if err != nil {
-		fmt.Println("Failed to open Discord connection:", err)
-		return
-	}
+	// err := discordClient.Open()
+	// if err != nil {
+	// 	fmt.Println("Failed to open Discord connection:", err)
+	// 	return
+	// }
 
 	router := rest.NewRouter()
 	ctrl := rest.NewController(router)

@@ -1,6 +1,7 @@
 package memory
 
 import (
+	"context"
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
@@ -12,8 +13,8 @@ import (
 )
 
 var (
-	ErrDBConnection 	= errors.New("can't connect to database")
-	ErrDBMigration 		= errors.New("can't migrate database")
+	ErrDBConnection     = errors.New("can't connect to database")
+	ErrDBMigration      = errors.New("can't migrate database")
 	ErrMissingSessionID = errors.New("session id can not be empty")
 )
 
@@ -27,12 +28,12 @@ type ChatHistory struct {
 type Messages []Message
 
 type Message struct {
-	Type 	string `json:"type"`
+	Type    string `json:"type"`
 	Content string `json:"text"`
 }
 
 type PersistentChatHistory struct {
-	db	 	  *gorm.DB
+	db        *gorm.DB
 	records   *ChatHistory
 	messages  []schema.ChatMessage
 	sessionID string
@@ -42,7 +43,7 @@ var _ schema.ChatMessageHistory = &PersistentChatHistory{}
 
 func NewPersistentChatHistory(dsn string) *PersistentChatHistory {
 	history := &PersistentChatHistory{}
-	
+
 	gorm, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		fmt.Println(err)
@@ -61,14 +62,14 @@ func NewPersistentChatHistory(dsn string) *PersistentChatHistory {
 }
 
 func (history *PersistentChatHistory) GetSessionID() string {
-	return history.sessionID	
+	return history.sessionID
 }
 
 func (history *PersistentChatHistory) SetSessionID(id string) {
 	history.sessionID = id
 }
 
-func (history *PersistentChatHistory) Messages() ([]schema.ChatMessage, error) {
+func (history *PersistentChatHistory) Messages(context.Context) ([]schema.ChatMessage, error) {
 	if history.sessionID == "" {
 		return []schema.ChatMessage{}, ErrMissingSessionID
 	}
@@ -79,7 +80,7 @@ func (history *PersistentChatHistory) Messages() ([]schema.ChatMessage, error) {
 	}
 
 	history.messages = []schema.ChatMessage{}
-	
+
 	if history.records.ChatHistory != nil {
 		for i := range *history.records.ChatHistory {
 			msg := (*history.records.ChatHistory)[i]
@@ -89,7 +90,7 @@ func (history *PersistentChatHistory) Messages() ([]schema.ChatMessage, error) {
 			}
 
 			if msg.Type == "ai" {
-				history.messages = append(history.messages , schema.AIChatMessage{Content: msg.Content})
+				history.messages = append(history.messages, schema.AIChatMessage{Content: msg.Content})
 			}
 		}
 	}
@@ -97,40 +98,40 @@ func (history *PersistentChatHistory) Messages() ([]schema.ChatMessage, error) {
 	return history.messages, nil
 }
 
-func (history *PersistentChatHistory) AddMessage(message schema.ChatMessage) error {
+func (history *PersistentChatHistory) AddMessage(ctx context.Context, message schema.ChatMessage) error {
 	if history.sessionID == "" {
 		return ErrMissingSessionID
 	}
-	
+
 	history.messages = append(history.messages, message)
 	bufferString, err := schema.GetBufferString(history.messages, "Human", "AI")
 	if err != nil {
 		return err
 	}
 
-	history.records.SessionID 	 = history.sessionID
-	history.records.ChatHistory  = history.loadNewMessages()
+	history.records.SessionID = history.sessionID
+	history.records.ChatHistory = history.loadNewMessages()
 	history.records.BufferString = bufferString
 
-	err =  history.db.Save(&history.records).Error
+	err = history.db.Save(&history.records).Error
 	if err != nil {
 		return err
 	}
 
-	return nil	
-}
-
-func (history *PersistentChatHistory) AddAIMessage(message string) error {
-	history.AddMessage(schema.AIChatMessage{Content: message})	
 	return nil
 }
 
-func (history *PersistentChatHistory) AddUserMessage(message string) error {
-	history.AddMessage(schema.HumanChatMessage{Content: message})
+func (history *PersistentChatHistory) AddAIMessage(ctx context.Context, message string) error {
+	history.AddMessage(ctx, schema.AIChatMessage{Content: message})
 	return nil
 }
 
-func (history *PersistentChatHistory) SetMessages(messages []schema.ChatMessage) error {
+func (history *PersistentChatHistory) AddUserMessage(ctx context.Context, message string) error {
+	history.AddMessage(ctx, schema.HumanChatMessage{Content: message})
+	return nil
+}
+
+func (history *PersistentChatHistory) SetMessages(ctx context.Context, messages []schema.ChatMessage) error {
 	if history.sessionID == "" {
 		return ErrMissingSessionID
 	}
@@ -141,18 +142,21 @@ func (history *PersistentChatHistory) SetMessages(messages []schema.ChatMessage)
 		return err
 	}
 
-	history.records.SessionID 	 = history.sessionID
-	history.records.ChatHistory  = history.loadNewMessages()
+	history.records.SessionID = history.sessionID
+	history.records.ChatHistory = history.loadNewMessages()
 	history.records.BufferString = bufferString
 
-	err =  history.db.Save(&history.records).Error
+	err = history.db.Save(&history.records).Error
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func (history *PersistentChatHistory) Clear() error {
+func (history *PersistentChatHistory) Clear(context.Context) error {
 	history.messages = []schema.ChatMessage{}
-	
+
 	err := history.db.Where(ChatHistory{SessionID: history.sessionID}).Delete(&history.records).Error
 	if err != nil {
 		return err
@@ -165,11 +169,11 @@ func (history *PersistentChatHistory) loadNewMessages() *Messages {
 	newMsgs := Messages{}
 	for _, msg := range history.messages {
 		newMsgs = append(newMsgs, Message{
-			Type: string(msg.GetType()),
+			Type:    string(msg.GetType()),
 			Content: msg.GetContent(),
 		})
 	}
-	
+
 	return &newMsgs
 }
 
