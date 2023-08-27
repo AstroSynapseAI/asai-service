@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -10,9 +11,10 @@ import (
 	"github.com/AstroSynapseAI/engine-service/chains"
 	"github.com/AstroSynapseAI/engine-service/config"
 	"github.com/GoLangWebSDK/rest"
+	"github.com/gorilla/websocket"
 )
 
-var asaiChain  *chains.AsaiChain
+var asaiChain *chains.AsaiChain
 
 func init() {
 	var err error
@@ -29,11 +31,79 @@ func main() {
 	router := rest.NewRouter()
 	ctrl := rest.NewController(router)
 
+	var upgrader = websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+	}
+
 	router.Mux.StrictSlash(true)
+
+	router.Mux.HandleFunc("/ws/chat", func(w http.ResponseWriter, r *http.Request) {
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		defer conn.Close()
+
+		// Launch each client's message loop in its own goroutine.
+		go func() {
+			for {
+				messageType, message, err := conn.ReadMessage()
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+
+				var request struct {
+					Action string `json:"action"`
+					Data   struct {
+						SessionId  string `json:"session_id"`
+						UserPrompt string `json:"user_prompt"`
+					} `json:"data"`
+				}
+
+				err = json.Unmarshal(message, &request)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+
+				if request.Action != "chat_message" {
+					return
+				}
+
+				asaiChain.SetSessionID(request.Data.SessionId)
+				asaiResponse, err := asaiChain.Run(context.Background(), request.Data.UserPrompt)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+
+				var response struct {
+					Content string `json:"content"`
+				}
+
+				response.Content = asaiResponse
+
+				responseJson, err := json.Marshal(&response)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+
+				// Hardcode the message type to websocket.TextMessage
+				if err := conn.WriteMessage(messageType, responseJson); err != nil {
+					fmt.Println(err)
+					return
+				}
+			}
+		}()
+	})
 
 	ctrl.Post("/api/chat/msg", func(ctx *rest.Context) {
 		ctx.SetContentType("application/json")
-		
+
 		// Parse the incoming http request
 		var request struct {
 			SessionId  string `json:"session_id"`
