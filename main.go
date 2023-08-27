@@ -100,6 +100,17 @@ func PostHandler(ctx *rest.Context) {
 		return
 	}
 
+	// testTool, _ := scraper.New()
+	// contents, err := testTool.Call(context.Background(), request.UserPrompt)
+	// if err != nil {
+	// 	fmt.Println("Scraping error: ", err)
+	// 	ctx.JsonResponse(500, err)
+	// 	return
+	// }
+
+	// fmt.Println("Web page contents:")
+	// fmt.Println(contents)
+
 	asaiChain.SetSessionID(request.SessionId)
 
 	response, err := asaiChain.Run(context.Background(), request.UserPrompt)

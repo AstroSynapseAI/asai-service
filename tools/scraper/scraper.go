@@ -24,7 +24,6 @@ var (
 	ErrScrapingFailed   = errors.New("scraping failed")
 )
 
-
 type Scraper struct {
 	MaxDepth  int
 	Parallels int
@@ -83,6 +82,8 @@ func (s Scraper) Description() string {
 	return `
 		Web Scraper will scan a url and return the content of the web page.
 		Input should be a working url.
+
+		Example: https://homepage.com
 	`
 }
 
@@ -94,6 +95,7 @@ func (s Scraper) Description() string {
 //
 //nolint:all
 func (s Scraper) Call(ctx context.Context, input string) (string, error) {
+	fmt.Println("Scraping web page:", input)
 	_, err := url.ParseRequestURI(input)
 	if err != nil {
 		return fmt.Sprintf("%s: %s", ErrParsingURIFailed, err), nil

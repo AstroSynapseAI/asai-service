@@ -54,8 +54,8 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 		fmt.Println(err)
 		return nil, err
 	}
-	
-	// create DuckDuckGo search API Tool 
+
+	// create DuckDuckGo search API Tool
 	ddg, err := duckduckgo.New(20, duckduckgo.DefaultUserAgent)
 	if err != nil {
 		fmt.Println(err)
@@ -80,7 +80,7 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 		PartialVariables: map[string]interface{}{
 			"tool_names":        asaiTools.Names(searchTools),
 			"tool_descriptions": asaiTools.Descriptions(searchTools),
-			"history":            "",
+			"history":           "",
 		},
 	}
 
@@ -93,7 +93,7 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 		agents.WithMaxIterations(3),
 	)
 
-	// create agents executor chain	
+	// create agents executor chain
 	executor := agents.NewExecutor(agent, searchTools)
 	searchAgent.executor = executor
 
@@ -105,17 +105,17 @@ func (agent *SearchAgent) Executor() agents.Executor {
 }
 
 func (agent *SearchAgent) Call(ctx context.Context, input string) (string, error) {
-	fmt.Println("Searching...")
+	fmt.Println("Search Agent called...")
 	reponse, err := chains.Run(ctx, agent.executor, input)
 	if err != nil {
 		fmt.Println("Searching error:", err)
 		return "", err
 	}
 	return reponse, nil
-} 
+}
 
 func (agent *SearchAgent) Name() string {
-	return "Search Agent"	
+	return "Search Agent"
 }
 
 func (agent *SearchAgent) Description() string {
