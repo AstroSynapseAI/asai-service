@@ -36,6 +36,11 @@ func (tool Tool) Call(ctx context.Context, input string) (string, error) {
 		if errors.Is(err, ErrNoGoodResult) {
 			return "No good Google search results was found", nil
 		}
+
+		if errors.Is(err, ErrAPIError) {
+			return "Google SerpAPI respnded with an error", nil
+		}
+		
 		return "", err
 	}
 

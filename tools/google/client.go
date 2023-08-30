@@ -47,25 +47,25 @@ func (s *Client) Search(ctx context.Context, query string) (string, error) {
 	reqURL := fmt.Sprintf("%s?%s", _url, params.Encode())
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, reqURL, nil)
 	if err != nil {
-		return "", fmt.Errorf("creating request in serpapi: %w", err)
+		return "", err
 	}
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("doing response in serpapi: %w", err)
+		return "", err
 	}
 	defer res.Body.Close()
 
 	buf := new(bytes.Buffer)
 	_, err = io.Copy(buf, res.Body)
 	if err != nil {
-		return "", fmt.Errorf("coping data in serpapi: %w", err)
+		return "", err
 	}
 
 	var result map[string]interface{}
 	err = json.Unmarshal(buf.Bytes(), &result)
 	if err != nil {
-		return "", fmt.Errorf("unmarshal data in serpapi: %w", err)
+		return "", err
 	}
 
 	if errorValue, ok := result["error"]; ok {
