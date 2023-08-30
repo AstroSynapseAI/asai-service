@@ -49,14 +49,14 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 
 	// create google search API Tool
 	apiKey := os.Getenv("SERPAPI_API_KEY")
-	google, err := google.New(apiKey, 20)
+	google, err := google.New(apiKey, 10)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
 
 	// create DuckDuckGo search API Tool
-	ddg, err := duckduckgo.New(20, duckduckgo.DefaultUserAgent)
+	ddg, err := duckduckgo.New(10, duckduckgo.DefaultUserAgent)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
