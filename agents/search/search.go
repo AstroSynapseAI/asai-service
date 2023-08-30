@@ -103,8 +103,7 @@ func (agent *SearchAgent) Call(ctx context.Context, input string) (string, error
 	fmt.Println("Search Agent called...")
 	reponse, err := chains.Run(ctx, agent.Executor, input)
 	if err != nil {
-		fmt.Println("Searching error:", err)
-		return "", err
+		return "Search Agent encountered an error: " + err.Error(), nil
 	}
 	return reponse, nil
 }
