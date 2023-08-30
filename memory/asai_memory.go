@@ -17,7 +17,9 @@ const DefaultMemoryBufferTokenSize = 4024
 //
 // It takes a dsn postgred string as a parameter and returns a pointer to AsaiMemory.
 func NewMemory(dsn string) *AsaiMemory {
-	llm, _ := openai.New()
+	llm, _ := openai.New(
+		openai.WithModel("gpt-4"),
+	)
 	chatHistory := NewPersistentChatHistory(dsn)
 
 	buffer := memory.NewConversationTokenBuffer(

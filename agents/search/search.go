@@ -23,14 +23,14 @@ import (
 var _ tools.Tool = &SearchAgent{}
 
 type SearchAgent struct {
-	memory   schema.Memory
-	executor agents.Executor
+	Memory   schema.Memory
+	Executor agents.Executor
 }
 
 func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 	// create a new search agent
 	searchAgent := &SearchAgent{
-		memory: memory.NewSimple(),
+		Memory: memory.NewSimple(),
 	}
 
 	// apply search agent options
@@ -88,25 +88,20 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 	agent := agents.NewOneShotAgent(
 		llm,
 		searchTools,
-		agents.WithMemory(searchAgent.memory),
+		agents.WithMemory(searchAgent.Memory),
 		agents.WithPrompt(promptTmplt),
 		agents.WithMaxIterations(3),
 	)
 
 	// create agents executor chain
-	executor := agents.NewExecutor(agent, searchTools)
-	searchAgent.executor = executor
-
+	searchAgent.Executor = agents.NewExecutor(agent, searchTools)
+	
 	return searchAgent, nil
-}
-
-func (agent *SearchAgent) Executor() agents.Executor {
-	return agent.executor
 }
 
 func (agent *SearchAgent) Call(ctx context.Context, input string) (string, error) {
 	fmt.Println("Search Agent called...")
-	reponse, err := chains.Run(ctx, agent.executor, input)
+	reponse, err := chains.Run(ctx, agent.Executor, input)
 	if err != nil {
 		fmt.Println("Searching error:", err)
 		return "", err
