@@ -101,7 +101,6 @@ func (chain AsaiChain) Run(ctx context.Context, input string) (string, error) {
 	executor := agents.NewExecutor(
 		asaiAgent,
 		chain.Agents,
-		agents.WithPrompt(promptTmplt),
 		agents.WithMemory(chain.Memory.Buffer()),
 	)
 

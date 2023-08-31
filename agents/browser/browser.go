@@ -2,28 +2,34 @@ package browser
 
 import (
 	"context"
+	"strings"
 
-	"github.com/AstroSynapseAI/engine-service/templates"
 	"github.com/AstroSynapseAI/engine-service/tools/scraper"
-	"github.com/tmc/langchaingo/agents"
 	"github.com/tmc/langchaingo/chains"
+	"github.com/tmc/langchaingo/documentloaders"
 	"github.com/tmc/langchaingo/llms/openai"
 	"github.com/tmc/langchaingo/memory"
-	"github.com/tmc/langchaingo/prompts"
 	"github.com/tmc/langchaingo/schema"
+	"github.com/tmc/langchaingo/textsplitter"
 	"github.com/tmc/langchaingo/tools"
-
-	asaiTools "github.com/AstroSynapseAI/engine-service/tools"
 )
 
-var _ tools.Tool = &BrowserAgent{} 
+var _ tools.Tool = &BrowserAgent{}
+
+const (
+	
+	ErrScraping 		= "Browser Agent failed to scrape web"
+	ErrLoadingDocuments = "Browser Agent failed to load web into documents"
+)
 
 type BrowserAgent struct {
-	Memory schema.Memory
-	Executor agents.Executor
+	llm 	*openai.LLM
+	Scraper *scraper.Scraper
+	Memory 	schema.Memory
 } 
 
 func New(options ...BrowserAgentOptions) (*BrowserAgent, error) {
+	var err error
 	browserAgent := &BrowserAgent{
 		Memory: memory.NewSimple(),
 	}
@@ -32,48 +38,39 @@ func New(options ...BrowserAgentOptions) (*BrowserAgent, error) {
 		option(browserAgent)
 	}
 
-	scraper, err := scraper.New()
+	browserAgent.llm, err = openai.New(openai.WithModel("gpt-4"))
 	if err != nil {
 		return nil, err
 	}
 
-	browserTools := []tools.Tool{scraper}
-
-	browserTmplt, err := templates.Load("name.txt")	
+	browserAgent.Scraper, err = scraper.New()
 	if err != nil {
 		return nil, err
 	}
-
-	promptTmplt := prompts.PromptTemplate{
-		Template:       browserTmplt,
-		TemplateFormat: prompts.TemplateFormatGoTemplate,
-		InputVariables: []string{"input", "agent_scratchpad", "today"},
-		PartialVariables: map[string]interface{}{
-			"tool_names":        asaiTools.Names(browserTools),
-			"tool_descriptions": asaiTools.Descriptions(browserTools),
-			"history":           "",
-		},
-	}
-
-	llm, err := openai.New(openai.WithModel("gpt-4"))
-	if err != nil {
-		return nil, err
-	}
-
-	agent := agents.NewOneShotAgent(
-		llm, 
-		browserTools, 
-		agents.WithMemory(browserAgent.Memory),
-		agents.WithPrompt(promptTmplt),
-	)
-	
-	browserAgent.Executor = agents.NewExecutor(agent, browserTools)
 	
 	return browserAgent, nil
 }
 
 func (agent *BrowserAgent) Call(ctx context.Context, input string) (string, error) {
-	return chains.Run(ctx, agent.Executor, input)
+	webContent, err := agent.Scraper.Call(ctx, input)
+	if err != nil {
+		return ErrScraping, nil
+	}
+
+	webDocuments, err := agent.loadWebContent(ctx, webContent)
+	if err != nil {
+		return ErrLoadingDocuments, nil
+	}
+
+	summaryChain := chains.LoadStuffSummarization(agent.llm)
+	summary, err := chains.Call(
+		ctx,
+		summaryChain,
+		map[string]any{"input_documents": webDocuments},
+	)
+
+	response := summary["text"].(string)
+	return response, nil
 } 
 
 func (agent *BrowserAgent) Name() string {
@@ -84,4 +81,30 @@ func (agent *BrowserAgent) Description() string {
 	return `
 		Web Browser Agent is an agent specialized in scraping and reading the web pages.
 	`
+}
+
+func (agent *BrowserAgent) loadWebContent(ctx context.Context, input string) ([]schema.Document, error) {
+	webContent, err := agent.Scraper.Call(ctx, input)
+	if err != nil {
+		return []schema.Document{}, err
+	}
+
+	webContentReader := strings.NewReader(webContent)
+
+	loader := documentloaders.NewText(webContentReader)
+	if err != nil {
+		return []schema.Document{}, err
+	}
+
+	spliter := textsplitter.NewTokenSplitter()
+	spliter.ChunkSize = 7500
+	spliter.ChunkOverlap = 1024
+	spliter.ModelName = "gpt-4"
+
+	webDocuments, err := loader.LoadAndSplit(ctx, spliter)
+	if err != nil {
+		return []schema.Document{}, err
+	}
+
+	return webDocuments, nil
 }
