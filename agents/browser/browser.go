@@ -2,6 +2,9 @@ package browser
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/AstroSynapseAI/engine-service/tools/scraper"
@@ -19,6 +22,7 @@ var _ tools.Tool = &BrowserAgent{}
 
 const (
 	
+	ErrParsingInput		  = "Browser Agent failed to parse input"
 	ErrScraping 		  = "Browser Agent failed to scrape web"
 	ErrLoadingDocuments   = "Browser Agent failed to load web into documents"
 	SummarisationTemplate = `
@@ -26,7 +30,11 @@ const (
 
 		"{{.context}}"
 
-		Structure the content in the following format:
+		If query is provided, focus on the content related to the query. 
+
+		Query: {{.query}}
+
+		Structure the report in the following format:
 
 		WEBSITE SUMMARY:
 		[Place the summary of the entire website here]
@@ -74,28 +82,6 @@ func New(options ...BrowserAgentOptions) (*BrowserAgent, error) {
 	return browserAgent, nil
 }
 
-func (agent *BrowserAgent) Call(ctx context.Context, input string) (string, error) {
-	
-	webDocuments, err := agent.loadWebContent(ctx, input)
-	if err != nil {
-		return ErrLoadingDocuments, nil
-	}
-
-	llmChain := chains.NewLLMChain(agent.llm, prompts.NewPromptTemplate(
-		SummarisationTemplate, []string{"context"},
-	))
-
-	summaryChain := chains.NewStuffDocuments(llmChain)
-	summary, err := chains.Call(
-		ctx,
-		summaryChain,
-		map[string]any{"input_documents": webDocuments},
-	)
-
-	response := summary["text"].(string)
-	return response, nil
-} 
-
 func (agent *BrowserAgent) Name() string {
 	return "Web Browser Agent"	
 }
@@ -103,11 +89,60 @@ func (agent *BrowserAgent) Name() string {
 func (agent *BrowserAgent) Description() string {
 	return `
 		Web Browser Agent is an agent specialized in scraping and reading the web pages.
+		It will read and summarize the content of the web page and return it as output.
+		
+		Input should be a json string containing the url of the web page a query string.  
+		The query string, if sey will tell the agent what to search for within the web page.
+
+		Input JSON Format:
+		{
+			"url": "[url of the web page]", 
+			"query": "[query string]"
+		}
 	`
 }
 
-func (agent *BrowserAgent) loadWebContent(ctx context.Context, input string) ([]schema.Document, error) {
-	webContent, err := agent.Scraper.Call(ctx, input)
+func (agent *BrowserAgent) Call(ctx context.Context, input string) (string, error) {
+	jsonString, err := extractJSON(input)
+	if err != nil {
+		return ErrParsingInput, nil
+	}
+
+	var jsonInput struct {
+		URL string `json:"url"`
+		Query string `json:"query"`
+	}
+
+	err = json.Unmarshal([]byte(jsonString), &jsonInput)
+	if err != nil {
+		return ErrParsingInput, nil
+	}
+	
+	webDocuments, err := agent.loadWebContent(ctx, jsonInput.URL)
+	if err != nil {
+		return ErrLoadingDocuments, nil
+	}
+
+	llmChain := chains.NewLLMChain(agent.llm, prompts.NewPromptTemplate(
+		SummarisationTemplate, []string{"context", "query"},
+	))
+
+	summaryChain := chains.NewStuffDocuments(llmChain)
+	summary, err := chains.Call(
+		ctx,
+		summaryChain,
+		map[string]any{
+			"input_documents": webDocuments, 
+			"query": jsonInput.Query,
+		},
+	)
+
+	response := summary["text"].(string)
+	return response, nil
+} 
+
+func (agent *BrowserAgent) loadWebContent(ctx context.Context, url string) ([]schema.Document, error) {
+	webContent, err := agent.Scraper.Call(ctx, url)
 	if err != nil {
 		return []schema.Document{}, err
 	}
@@ -130,4 +165,13 @@ func (agent *BrowserAgent) loadWebContent(ctx context.Context, input string) ([]
 	}
 
 	return webDocuments, nil
+}
+
+func extractJSON(input string) (string, error) {
+	re := regexp.MustCompile(`\{(?:[^{}]|(?R))*\}`)
+	jsonString := re.FindString(input)
+	if jsonString == "" {
+		return "", fmt.Errorf("No JSON object found")
+	}
+	return jsonString, nil
 }
