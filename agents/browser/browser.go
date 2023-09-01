@@ -9,6 +9,7 @@ import (
 	"github.com/tmc/langchaingo/documentloaders"
 	"github.com/tmc/langchaingo/llms/openai"
 	"github.com/tmc/langchaingo/memory"
+	"github.com/tmc/langchaingo/prompts"
 	"github.com/tmc/langchaingo/schema"
 	"github.com/tmc/langchaingo/textsplitter"
 	"github.com/tmc/langchaingo/tools"
@@ -18,8 +19,30 @@ var _ tools.Tool = &BrowserAgent{}
 
 const (
 	
-	ErrScraping 		= "Browser Agent failed to scrape web"
-	ErrLoadingDocuments = "Browser Agent failed to load web into documents"
+	ErrScraping 		  = "Browser Agent failed to scrape web"
+	ErrLoadingDocuments   = "Browser Agent failed to load web into documents"
+	SummarisationTemplate = `
+		Please write a detailed report of the following website and its pages that will not exceed 4048 tokens:
+
+		"{{.context}}"
+
+		Structure the content in the following format:
+
+		WEBSITE SUMMARY:
+		[Place the summary of the entire website here]
+
+		PAGE SUMMARIES:
+		- [Page 1 Title]: [Summary of Page 1]
+		- [Page N Title]: [Summary of Page N]
+		...(Create a summary for every sub-page on the website)
+
+		LINK INDEX:
+		- Link 1: [Description of Link 1]
+		- Link N: [Description of Link N]
+		...(Depending on relevance, you can add none or N number of links)
+
+		FINAL THOUGHTS:
+		[Place any final thoughts or a concluding summary here]`
 )
 
 type BrowserAgent struct {
@@ -52,17 +75,17 @@ func New(options ...BrowserAgentOptions) (*BrowserAgent, error) {
 }
 
 func (agent *BrowserAgent) Call(ctx context.Context, input string) (string, error) {
-	webContent, err := agent.Scraper.Call(ctx, input)
-	if err != nil {
-		return ErrScraping, nil
-	}
-
-	webDocuments, err := agent.loadWebContent(ctx, webContent)
+	
+	webDocuments, err := agent.loadWebContent(ctx, input)
 	if err != nil {
 		return ErrLoadingDocuments, nil
 	}
 
-	summaryChain := chains.LoadStuffSummarization(agent.llm)
+	llmChain := chains.NewLLMChain(agent.llm, prompts.NewPromptTemplate(
+		SummarisationTemplate, []string{"context"},
+	))
+
+	summaryChain := chains.NewStuffDocuments(llmChain)
 	summary, err := chains.Call(
 		ctx,
 		summaryChain,
