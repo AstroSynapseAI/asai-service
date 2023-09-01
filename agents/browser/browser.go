@@ -21,10 +21,10 @@ import (
 var _ tools.Tool = &BrowserAgent{}
 
 const (
-	
-	ErrParsingInput		  = "Browser Agent failed to parse input"
-	ErrScraping 		  = "Browser Agent failed to scrape web"
+	ErrParsingInput       = "Browser Agent failed to parse input"
+	ErrScraping           = "Browser Agent failed to scrape web"
 	ErrLoadingDocuments   = "Browser Agent failed to load web into documents"
+	ErrSummarising        = "Browser Agent failed to summarise web"
 	SummarisationTemplate = `
 		Please write a detailed report of the following website and its pages that will not exceed 4048 tokens:
 
@@ -54,10 +54,10 @@ const (
 )
 
 type BrowserAgent struct {
-	llm 	*openai.LLM
+	llm     *openai.LLM
 	Scraper *scraper.Scraper
-	Memory 	schema.Memory
-} 
+	Memory  schema.Memory
+}
 
 func New(options ...BrowserAgentOptions) (*BrowserAgent, error) {
 	var err error
@@ -78,12 +78,12 @@ func New(options ...BrowserAgentOptions) (*BrowserAgent, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return browserAgent, nil
 }
 
 func (agent *BrowserAgent) Name() string {
-	return "Web Browser Agent"	
+	return "Web Browser Agent"
 }
 
 func (agent *BrowserAgent) Description() string {
@@ -92,7 +92,8 @@ func (agent *BrowserAgent) Description() string {
 		It will read and summarize the content of the web page and return it as output.
 		
 		Input should be a json string containing the url of the web page a query string.  
-		The query string, if sey will tell the agent what to search for within the web page.
+		The query string, if set, will tell the agent what to search for within the web page, 
+		leave blank for a general summary.
 
 		Input JSON Format:
 		{
@@ -109,7 +110,7 @@ func (agent *BrowserAgent) Call(ctx context.Context, input string) (string, erro
 	}
 
 	var jsonInput struct {
-		URL string `json:"url"`
+		URL   string `json:"url"`
 		Query string `json:"query"`
 	}
 
@@ -117,7 +118,7 @@ func (agent *BrowserAgent) Call(ctx context.Context, input string) (string, erro
 	if err != nil {
 		return ErrParsingInput, nil
 	}
-	
+
 	webDocuments, err := agent.loadWebContent(ctx, jsonInput.URL)
 	if err != nil {
 		return ErrLoadingDocuments, nil
@@ -132,14 +133,18 @@ func (agent *BrowserAgent) Call(ctx context.Context, input string) (string, erro
 		ctx,
 		summaryChain,
 		map[string]any{
-			"input_documents": webDocuments, 
-			"query": jsonInput.Query,
+			"input_documents": webDocuments,
+			"query":           jsonInput.Query,
 		},
 	)
 
+	if err != nil {
+		return ErrSummarising, nil
+	}
+
 	response := summary["text"].(string)
 	return response, nil
-} 
+}
 
 func (agent *BrowserAgent) loadWebContent(ctx context.Context, url string) ([]schema.Document, error) {
 	webContent, err := agent.Scraper.Call(ctx, url)
@@ -168,10 +173,11 @@ func (agent *BrowserAgent) loadWebContent(ctx context.Context, url string) ([]sc
 }
 
 func extractJSON(input string) (string, error) {
-	re := regexp.MustCompile(`\{(?:[^{}]|(?R))*\}`)
+	re := regexp.MustCompile(`(?s)\{.*\}`)
 	jsonString := re.FindString(input)
 	if jsonString == "" {
-		return "", fmt.Errorf("No JSON object found")
+		return "", fmt.Errorf("invalid JSON object found in Browser Agent input")
 	}
+
 	return jsonString, nil
 }

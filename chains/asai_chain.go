@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/AstroSynapseAI/engine-service/agents/browser"
 	"github.com/AstroSynapseAI/engine-service/agents/search"
 	"github.com/AstroSynapseAI/engine-service/config"
 	"github.com/AstroSynapseAI/engine-service/memory"
 	"github.com/AstroSynapseAI/engine-service/templates"
 	"github.com/AstroSynapseAI/engine-service/tools/documents"
-	"github.com/AstroSynapseAI/engine-service/tools/scraper"
 
 	asaiTools "github.com/AstroSynapseAI/engine-service/tools"
 
@@ -38,9 +38,7 @@ func NewAsaiChain() (*AsaiChain, error) {
 	}
 
 	// create browser agent
-	// currently using the scrapper tool as an agent until the browsing
-	// get's more complex. ie. introduction of headless browser
-	scraperAgent, err := scraper.New()
+	scraperAgent, err := browser.New()
 	if err != nil {
 		return nil, err
 	}
