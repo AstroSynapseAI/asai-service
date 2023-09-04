@@ -64,7 +64,7 @@ func main() {
 
 	ctrl.Post("/api/chat/msg", PostHandler)
 
-	router.Mux.HandleFunc("/api/socket/msg", StreamHandler)
+	router.Mux.HandleFunc("/api/chat/socket", StreamHandler)
 
 	port := os.Getenv("PORT")
 	if port == "" {
