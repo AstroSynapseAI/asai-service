@@ -10,10 +10,14 @@ import (
 	"github.com/tmc/langchaingo/tools"
 )
 
-const DefualtRootPath = "./data/documents/"
+const (
+	DefualtRootPath = "./data/documents/"
+
+	ErrInvalidInput = "Invalid input"
+	ErrFileLoad 	= "Error while loading requested file"	
+) 
 
 var _ tools.Tool = &DocumentsTool{} 
-var ErrFileLoad = "Error while loading requested file"
 
 type DocumentsTool struct {
 	RootPath string
@@ -30,33 +34,6 @@ func NewLoader(options ...DocuemntsToolOption) (*DocumentsTool, error) {
 	
 	return documents, nil
 }
-
-func (tool *DocumentsTool) Call(ctx context.Context, input string) (string, error) {
-	fmt.Println("Retrieving documents with input...")
-	fmt.Println(input)
-
-	var toolInput struct {
-		FileName string
-		Query    string
-	}
-
-	re := regexp.MustCompile(`(?s)\{.*\}`)
-	jsonString := re.FindString(input)
-
-	err := json.Unmarshal([]byte(jsonString), &toolInput)
-	if err != nil {
-		return "", err
-	}
-	
-	path := tool.RootPath + toolInput.FileName
-
-	fileContents, err := os.ReadFile(path)
-	if err != nil {
-		return fmt.Sprintf("%v: %s", ErrFileLoad, err), nil
-	}
-
-	return string(fileContents), nil
-} 
 
 func (agent *DocumentsTool) Name() string {
 	return "Library Agent"	
@@ -99,3 +76,30 @@ func (agent *DocumentsTool) Description() string {
 		If you encounter an error or cannot fetch the requested document, inform the user and offer alternative assistance or information.
 	`
 }
+
+func (tool *DocumentsTool) Call(ctx context.Context, input string) (string, error) {
+	fmt.Println("Retrieving documents with input...")
+	fmt.Println(input)
+
+	var toolInput struct {
+		FileName string
+		Query    string
+	}
+
+	re := regexp.MustCompile(`(?s)\{.*\}`)
+	jsonString := re.FindString(input)
+
+	err := json.Unmarshal([]byte(jsonString), &toolInput)
+	if err != nil {
+		return fmt.Sprintf("%v: %s", ErrInvalidInput, err), nil
+	}
+	
+	path := tool.RootPath + toolInput.FileName
+
+	fileContents, err := os.ReadFile(path)
+	if err != nil {
+		return fmt.Sprintf("%v: %s", ErrFileLoad, err), nil
+	}
+
+	return string(fileContents), nil
+} 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -14,10 +15,18 @@ import (
 	"github.com/AstroSynapseAI/engine-service/config"
 	"github.com/GoLangWebSDK/rest"
 	"github.com/bwmarrin/discordgo"
+	"github.com/gorilla/websocket"
+	options "github.com/tmc/langchaingo/chains"
 )
 
 var asaiChain *chains.AsaiChain
 var discordClient *discordgo.Session
+
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
 
 func init() {
 	var err error
@@ -54,6 +63,8 @@ func main() {
 	router.Mux.StrictSlash(true)
 
 	ctrl.Post("/api/chat/msg", PostHandler)
+
+	router.Mux.HandleFunc("/api/socket/msg", StreamHandler)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -135,5 +146,50 @@ func DiscordMsgHandler(session *discordgo.Session, msg *discordgo.MessageCreate)
 		}
 
 		session.ChannelMessageSend(msg.ChannelID, response)
+	}
+}
+
+func StreamHandler(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		fmt.Println("Failed to initate socket:", err)
+		return
+	}
+
+	defer conn.Close()
+
+	var request struct {
+		SessionId  string `json:"session_id"`
+		UserPrompt string `json:"user_prompt"`
+	}
+
+	for	{
+		msgType, p, err := conn.ReadMessage()
+		if err != nil {
+			fmt.Println("Failed to read message:", err)
+			return
+		}
+
+		err = json.Unmarshal(p, &request)
+		if err != nil {
+			fmt.Println("Failed to parse JSON:", err)
+			conn.WriteMessage(websocket.TextMessage, []byte("Failed to parse JSON"))
+			continue
+		}
+
+		asaiChain.SetSessionID(request.SessionId)
+
+		_, err = asaiChain.Run(context.Background(), 
+			request.UserPrompt, 
+			options.WithStreamingFunc(func(ctx context.Context, chunk []byte) error { 
+				conn.WriteMessage(msgType, chunk)
+				return nil 
+			}),
+		)
+		
+		if err != nil {
+			fmt.Println(err)
+			conn.WriteMessage(websocket.TextMessage, []byte("Error during chain run"))
+		}
 	}
 }

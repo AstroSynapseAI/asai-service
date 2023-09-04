@@ -64,7 +64,7 @@ func (chain AsaiChain) SetSessionID(id string) {
 	chain.Memory.SetSessionID(id)
 }
 
-func (chain AsaiChain) Run(ctx context.Context, input string) (string, error) {
+func (chain AsaiChain) Run(ctx context.Context, input string, options ...chains.ChainCallOption) (string, error) {
 	// create llm handle
 	llm, err := openai.NewChat(
 		openai.WithModel("gpt-4"),
@@ -103,7 +103,7 @@ func (chain AsaiChain) Run(ctx context.Context, input string) (string, error) {
 	)
 
 	// run the agent
-	response, err := chains.Run(ctx, executor, input)
+	response, err := chains.Run(ctx, executor, input, options...)
 	if err != nil {
 		return "", err
 	}
