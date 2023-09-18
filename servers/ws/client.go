@@ -1,12 +1,15 @@
 package ws
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"time"
 
+	"github.com/AstroSynapseAI/engine-service/chains"
 	"github.com/gorilla/websocket"
+	options "github.com/tmc/langchaingo/chains"
 )
 
 var (
@@ -23,17 +26,19 @@ type Client struct {
 	egress     chan []byte
 	connection *websocket.Conn
 	manager    *Manager
+	asaiChain  *chains.AsaiChain
 }
 
-func NewClient(conn *websocket.Conn, manager *Manager) *Client {
+func NewClient(conn *websocket.Conn, manager *Manager, chain *chains.AsaiChain) *Client {
 	return &Client{
 		egress:     make(chan []byte),
 		connection: conn,
 		manager:    manager,
+		asaiChain:  chain,
 	}
 }
 
-func (client *Client) ReadMsgs() {
+func (client *Client) ReadMsgs(ctx context.Context) {
 	defer func() {
 		client.manager.removeClient(client)
 	}()
@@ -72,18 +77,33 @@ func (client *Client) ReadMsgs() {
 
 		client.sessionID = request.SessionId
 
-		var response string = dummyResponseString()
+		// var response string = dummyResponseString()
 
-		for c := range client.manager.clients {
-			if c.sessionID == client.sessionID {
-				c.egress <- []byte(response)
-			}
-		}
+		client.asaiChain.SetSessionID(request.SessionId)
+
+		client.asaiChain.Run(
+			ctx,
+			request.UserPrompt,
+			options.WithStreamingFunc(func(ctx context.Context, chunk []byte) error {
+				client.egress <- chunk
+				return nil
+			}),
+		)
+		client.egress <- []byte("/end/")
+
+		// for c := range client.manager.clients {
+		// 	if c.sessionID == client.sessionID {
+		// 		for _, symbol := range getSymbols(response) {
+		// 			c.egress <- []byte(symbol)
+		// 		}
+		// 		c.egress <- []byte("/end/")
+		// 	}
+		// }
 
 	}
 }
 
-func (client *Client) SendMsgs() {
+func (client *Client) SendMsgs(ctx context.Context) {
 	ticker := time.NewTicker(pingInterval)
 	defer func() {
 		client.manager.removeClient(client)
@@ -122,6 +142,14 @@ func (client *Client) pongHandler(pongMsg string) error {
 	return client.connection.SetReadDeadline(time.Now().Add(pongWait))
 }
 
-func dummyResponseString() string {
-	return "dummy response"
-}
+// func dummyResponseString() string {
+// 	return `Yes, I see the bug. The issue arises from the prefixPrinted variable inside the goroutine that's used to determine whether to print the "ASAI >" prefix. Once it's set to true for the first response, it never gets reset, so the prefix is not printed for subsequent responses.`
+// }
+
+// func getSymbols(s string) []string {
+// 	var symbols []string
+// 	for _, char := range s {
+// 		symbols = append(symbols, string(char))
+// 	}
+// 	return symbols
+// }

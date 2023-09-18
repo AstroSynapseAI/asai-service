@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/AstroSynapseAI/engine-service/chains"
 	"github.com/gorilla/websocket"
 )
 
@@ -16,6 +17,7 @@ var websocketUpgrader = websocket.Upgrader{
 }
 
 type Manager struct {
+	ctx context.Context
 	sync.RWMutex
 	clients map[*Client]bool
 }
@@ -23,6 +25,7 @@ type Manager struct {
 func NewManager(ctx context.Context) *Manager {
 	mng := &Manager{
 		clients: make(map[*Client]bool),
+		ctx:     ctx,
 	}
 
 	return mng
@@ -35,12 +38,14 @@ func (m *Manager) Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client := NewClient(conn, m)
+	asaiChain, _ := chains.NewAsaiChain()
+
+	client := NewClient(conn, m, asaiChain)
 
 	m.addClient(client)
 
-	go client.ReadMsgs()
-	go client.SendMsgs()
+	go client.ReadMsgs(m.ctx)
+	go client.SendMsgs(m.ctx)
 
 }
 
