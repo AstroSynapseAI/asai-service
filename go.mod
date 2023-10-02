@@ -6,6 +6,7 @@ require (
 	github.com/GoLangWebSDK/rest v0.0.0-20230522143808-2e1e35b013d6
 	github.com/bwmarrin/discordgo v0.27.1
 	github.com/gocolly/colly v1.2.0
+	github.com/gorilla/websocket v1.5.0
 	github.com/tmc/langchaingo v0.0.0-20230827001633-72b07a1c060f
 	gopkg.in/yaml.v2 v2.3.0
 	gorm.io/driver/postgres v1.5.2
@@ -32,7 +33,6 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
-	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/huandu/xstrings v1.3.3 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect

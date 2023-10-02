@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/AstroSynapseAI/engine-service/templates"
-	"github.com/AstroSynapseAI/engine-service/tools/google"
+	"github.com/AstroSynapseAI/engine-service/cortex/templates"
+	"github.com/AstroSynapseAI/engine-service/cortex/tools/google"
 
-	asaiTools "github.com/AstroSynapseAI/engine-service/tools"
+	asaiTools "github.com/AstroSynapseAI/engine-service/cortex/tools"
 
 	"github.com/tmc/langchaingo/agents"
 	"github.com/tmc/langchaingo/chains"
@@ -95,7 +95,7 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 
 	// create agents executor chain
 	searchAgent.Executor = agents.NewExecutor(agent, searchTools)
-	
+
 	return searchAgent, nil
 }
 
