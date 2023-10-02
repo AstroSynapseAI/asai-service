@@ -1,0 +1,22 @@
+@font-face {
+  font-family: "Basier Square Bold";
+  src: url('../fonts/BasierSquare-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Basier Square Regular";
+  src: url('../fonts/BasierSquare-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+body {
+  color: white;
+  background-color: black;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Basier Square Bold";
+}

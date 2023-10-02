@@ -6,7 +6,7 @@ import (
 )
 
 func Load(name string) (string, error) {
-	path := "./templates/" + name
+	path := "./cortex/templates/" + name
 
 	tmplContent, err := os.ReadFile(path)
 	if err != nil {

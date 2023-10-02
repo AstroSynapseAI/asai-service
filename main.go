@@ -69,6 +69,9 @@ func main() {
 
 	static := http.FileServer(http.Dir("./servers/static"))
 	router.Mux.Handle("/", static)
+	//router.Mux.Handle("/static", static)
+
+	router.Mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", static))
 
 	port := os.Getenv("PORT")
 	if port == "" {
