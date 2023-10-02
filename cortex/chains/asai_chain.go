@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/AstroSynapseAI/engine-service/agents/browser"
-	"github.com/AstroSynapseAI/engine-service/agents/search"
 	"github.com/AstroSynapseAI/engine-service/config"
-	"github.com/AstroSynapseAI/engine-service/memory"
-	"github.com/AstroSynapseAI/engine-service/templates"
-	"github.com/AstroSynapseAI/engine-service/tools/documents"
+	"github.com/AstroSynapseAI/engine-service/cortex/agents/browser"
+	"github.com/AstroSynapseAI/engine-service/cortex/agents/search"
+	"github.com/AstroSynapseAI/engine-service/cortex/memory"
+	"github.com/AstroSynapseAI/engine-service/cortex/templates"
+	"github.com/AstroSynapseAI/engine-service/cortex/tools/documents"
 
-	asaiTools "github.com/AstroSynapseAI/engine-service/tools"
+	asaiTools "github.com/AstroSynapseAI/engine-service/cortex/tools"
 
 	"github.com/tmc/langchaingo/agents"
 	"github.com/tmc/langchaingo/chains"
@@ -94,6 +94,10 @@ func (chain AsaiChain) Run(ctx context.Context, input string, options ...chains.
 	}
 
 	// create asai agent
+
+	// need to try this might be I initally loaded the proompt option wrong in the Executor
+	// asaiAgent := agents.NewConversationalAgent(llm, chain.Agents, agents.WithPrompt(promptTmplt))
+
 	asaiAgent := agents.NewConversationalAgent(llm, chain.Agents)
 	asaiAgent.Chain = chains.NewLLMChain(llm, promptTmplt)
 

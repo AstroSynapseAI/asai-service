@@ -10,8 +10,8 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/AstroSynapseAI/engine-service/chains"
 	"github.com/AstroSynapseAI/engine-service/config"
+	"github.com/AstroSynapseAI/engine-service/cortex/chains"
 	"github.com/AstroSynapseAI/engine-service/servers/ws"
 	"github.com/GoLangWebSDK/rest"
 	"github.com/bwmarrin/discordgo"
@@ -66,6 +66,9 @@ func main() {
 	ctrl.Post("/api/chat/msg", PostHandler)
 
 	router.Mux.HandleFunc("/api/chat/socket", wsManager.Handler)
+
+	static := http.FileServer(http.Dir("./servers/static"))
+	router.Mux.Handle("/", static)
 
 	port := os.Getenv("PORT")
 	if port == "" {

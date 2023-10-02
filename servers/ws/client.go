@@ -7,7 +7,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/AstroSynapseAI/engine-service/chains"
+	"github.com/AstroSynapseAI/engine-service/cortex/chains"
 	"github.com/gorilla/websocket"
 	options "github.com/tmc/langchaingo/chains"
 )
@@ -85,6 +85,7 @@ func (client *Client) ReadMsgs(ctx context.Context) {
 			ctx,
 			request.UserPrompt,
 			options.WithStreamingFunc(func(ctx context.Context, chunk []byte) error {
+				fmt.Print(string(chunk))
 				client.egress <- chunk
 				return nil
 			}),
