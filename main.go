@@ -59,23 +59,30 @@ func main() {
 	}
 
 	router := rest.NewRouter()
-	ctrl := rest.NewController(router)
-
 	router.Mux.StrictSlash(true)
 
-	ctrl.Post("/api/chat/msg", PostHandler)
-
-	router.Mux.HandleFunc("/api/chat/socket", wsManager.Handler)
-
+	// Web client server
 	static := http.FileServer(http.Dir("./servers/static"))
-	router.Mux.Handle("/", static)
-	//router.Mux.Handle("/static", static)
 
 	router.Mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", static))
+	router.Mux.Handle("/", static)
+
+	// API server
+	ctrl := rest.NewController(router)
+	ctrl.Get("/api/chat/history/{id}", GetHistory)
+	ctrl.Post("/api/chat/msg", PostHandler)
+	ctrl.Get("/api/users/session", GetSession)
+
+	// Websocket server
+	router.Mux.HandleFunc("/api/chat/socket", wsManager.Handler)
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		router.Listen(":8082")
+		err := router.Listen(":8082")
+		if err != nil {
+			fmt.Println("Failed to listen:", err)
+			return
+		}
 		return
 	}
 
@@ -101,6 +108,14 @@ func main() {
 
 	// Cleanly close down the Discord session.
 	discordClient.Close()
+
+}
+
+func GetHistory(ctx *rest.Context) {
+
+}
+
+func GetSession(ctx *rest.Context) {
 
 }
 
