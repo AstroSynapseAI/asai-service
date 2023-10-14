@@ -7,6 +7,7 @@ require (
 	github.com/bwmarrin/discordgo v0.27.1
 	github.com/gocolly/colly v1.2.0
 	github.com/gorilla/websocket v1.5.0
+	github.com/thanhpk/randstr v1.0.6
 	github.com/tmc/langchaingo v0.0.0-20230827001633-72b07a1c060f
 	gopkg.in/yaml.v2 v2.3.0
 	gorm.io/driver/postgres v1.5.2

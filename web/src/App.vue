@@ -15,15 +15,15 @@ usersStore.getSession();
 
 <template>
   <div class="container p-4 border-start border-end border-white border-5 min-vh-100 d-flex flex-column">
-    <div class="conversation-container flex-grow-1">
+    <div class="conversation-container flex-grow-1 overflow-auto">
       
       <template v-if="messages.length > 0">
       
         <div class="conversation-item row" v-for="(message, index) in messages" :key="index">
         
           <div class="col-1">
-            <img src="./assets/asai-icon.png" class="logo" alt="Asai Icon" width="35" height="50" v-if="message.sender === 'Asai'"/>
-            <img src="./assets/user-icon.png" class="logo" alt="User Icon" width="35" height="50" v-if="message.sender === 'User'"/>
+            <img src="./assets/asai-icon.png" class="logo" alt="Asai Icon" width="35" height="50" v-if="message.sender === 'ai'"/>
+            <img src="./assets/user-icon.png" class="logo" alt="User Icon" width="35" height="50" v-if="message.sender === 'human'"/>
           </div>
         
           <div class="col-11">  
@@ -46,6 +46,9 @@ usersStore.getSession();
 </template>
 
 <style scoped>
+.conversation-container {
+  max-height: 90vh;
+}
 .separator {
   width: 95%;
   margin: 10px auto;

@@ -15,6 +15,7 @@ import (
 	"github.com/AstroSynapseAI/engine-service/servers/ws"
 	"github.com/GoLangWebSDK/rest"
 	"github.com/bwmarrin/discordgo"
+	"github.com/thanhpk/randstr"
 )
 
 var (
@@ -63,13 +64,14 @@ func main() {
 
 	// Web client server
 	static := http.FileServer(http.Dir("./servers/static"))
+	assets := http.FileServer(http.Dir("./servers/static/assets"))
 
-	router.Mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", static))
+	router.Mux.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", assets))
 	router.Mux.Handle("/", static)
 
 	// API server
 	ctrl := rest.NewController(router)
-	ctrl.Get("/api/chat/history/{id}", GetHistory)
+	ctrl.Get("/api/chat/history/{session_id}", GetHistory)
 	ctrl.Post("/api/chat/msg", PostHandler)
 	ctrl.Get("/api/users/session", GetSession)
 
@@ -112,10 +114,36 @@ func main() {
 }
 
 func GetHistory(ctx *rest.Context) {
+	sessionID := ctx.GetParam("session_id")
+
+	asaiChain.SetSessionID(sessionID)
+	msgs := asaiChain.LoadHistory()
+
+	type Message struct {
+		Sender  string `json:"sender"`
+		Content string `json:"content"`
+	}
+
+	responseJson := make([]Message, len(msgs))
+
+	for i, msg := range msgs {
+		responseJson[i].Sender = string(msg.GetType())
+		responseJson[i].Content = msg.GetContent()
+	}
+
+	ctx.JsonResponse(200, responseJson)
 
 }
 
 func GetSession(ctx *rest.Context) {
+	sessionID := randstr.String(16)
+
+	var reponseJson struct {
+		SessionId string `json:"session_id"`
+	}
+
+	reponseJson.SessionId = sessionID
+	ctx.JsonResponse(200, reponseJson)
 
 }
 

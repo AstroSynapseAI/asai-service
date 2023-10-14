@@ -11,5 +11,8 @@ RUN GO111MODULE=on go install github.com/cosmtrek/air@latest
 # Set working directory
 WORKDIR /app
 
+# Copy the source code
+COPY . .
+
 # Set the command that will be ran when container is started
 CMD ["air"]

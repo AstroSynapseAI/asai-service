@@ -1,6 +1,9 @@
 package memory
 
 import (
+	"context"
+	"fmt"
+
 	"github.com/tmc/langchaingo/llms/openai"
 	"github.com/tmc/langchaingo/memory"
 	"github.com/tmc/langchaingo/schema"
@@ -61,4 +64,14 @@ func (m *AsaiMemory) SetSessionID(id string) {
 // It returns a schema.Memory object.
 func (m *AsaiMemory) Buffer() schema.Memory {
 	return m.buffer
+}
+
+func (m *AsaiMemory) Messages() []schema.ChatMessage {
+	msgs, err := m.chatHistory.Messages(context.Background())
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	return msgs
 }

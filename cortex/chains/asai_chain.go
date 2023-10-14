@@ -18,6 +18,7 @@ import (
 	"github.com/tmc/langchaingo/chains"
 	"github.com/tmc/langchaingo/llms/openai"
 	"github.com/tmc/langchaingo/prompts"
+	"github.com/tmc/langchaingo/schema"
 	"github.com/tmc/langchaingo/tools"
 )
 
@@ -62,6 +63,10 @@ func NewAsaiChain() (*AsaiChain, error) {
 
 func (chain AsaiChain) SetSessionID(id string) {
 	chain.Memory.SetSessionID(id)
+}
+
+func (chain AsaiChain) LoadHistory() []schema.ChatMessage {
+	return chain.Memory.Messages()
 }
 
 func (chain AsaiChain) Run(ctx context.Context, input string, options ...chains.ChainCallOption) (string, error) {

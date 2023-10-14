@@ -1,5 +1,5 @@
 {
-  "name": "static",
+  "name": "web",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "pinia": "^2.1.6",
+    "vee-validate": "^4.11.8",
     "vue": "^3.3.4"
   },
   "devDependencies": {
