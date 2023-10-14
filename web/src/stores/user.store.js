@@ -13,14 +13,13 @@ export const useUsersStore = defineStore({
   }),
   actions: {
     async getSession() {
-      console.log(usersURL)
       console.log("Creating session...")
       const chatStore = useChatStore(); 
       this.user = JSON.parse(localStorage.getItem('user'));
       
       if (!this.user) {
         try {
-          user = await fetchWrapper.get(`${usersURL}/session`);
+          const user = await fetchWrapper.get(`${usersURL}/session`);
           localStorage.setItem('user', JSON.stringify(user));
         } catch (error) {
           console.error(error);
