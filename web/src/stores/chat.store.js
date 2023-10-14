@@ -38,7 +38,7 @@ export const useChatStore = defineStore({
         content: content
       }
 
-      this.messages.push(msg); 
+      this.messages = [...this.messages, msg];
       
       const data = {
         session_id: this.user.session_id,
@@ -50,7 +50,7 @@ export const useChatStore = defineStore({
           sender: "ai",
           content: response.content
         }
-        this.messages.push(msg);
+        this.messages = [...this.messages, msg];
       } catch (error) {
         console.error(error);
       }

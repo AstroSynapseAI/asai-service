@@ -7,9 +7,19 @@ import { useChatStore } from '../stores/chat.store.js';
 const chatStore = useChatStore();
 const prompt = ref("");
 
-function submitPrompt() {
-  chatStore.sendPrompt(prompt.value);
-  prompt.value = "";
+function submitPrompt(event) {
+  if (event.shiftKey && event.key == 'Enter') {
+    event.preventDefault();
+    let cursorPos = event.target.selectionStart;
+    let textBeforeCursor = prompt.value.substring(0, cursorPos);
+    let textAfterCursor = prompt.value.substring(cursorPos);
+    prompt.value = textBeforeCursor + '\n' + textAfterCursor;
+  }
+  else if (event.key == 'Enter') {
+    event.preventDefault();
+    chatStore.sendPrompt(prompt.value);
+    prompt.value = "";
+  }
 }
 
 </script>
@@ -17,7 +27,7 @@ function submitPrompt() {
 <template>
   <Form>
     <Field 
-      @keyup.enter="submitPrompt" 
+      @keydown.enter="submitPrompt"
       name="prompt" 
       v-model="prompt" 
       type="text" 

@@ -1,7 +1,10 @@
 <script setup>
-import PromptInput from './components/PromptInput.vue';
 
+import PromptInput from './components/PromptInput.vue';
+import { ref, onMounted, watch, nextTick } from 'vue';
 import { storeToRefs } from 'pinia';
+import  MarkdownIt  from 'markdown-it';
+
 import { useChatStore } from './stores/chat.store.js';
 import { useUsersStore } from './stores/user.store.js';
 
@@ -9,13 +12,44 @@ const chatStore = useChatStore();
 const { messages } = storeToRefs(chatStore);
 
 const usersStore = useUsersStore();
+const conversationContainer = ref(null);
+
+const md = new MarkdownIt({
+    breaks: true
+  }
+);
 
 usersStore.getSession();
+
+async function scrollToBottom() {
+  console.log('Scrolling to bottom');
+  // await nextTick()
+  // if (conversationContainer.value) {
+  //   conversationContainer.value.scrollTop = conversationContainer.value.scrollHeight;
+  // }
+  requestAnimationFrame(() => {
+    if (conversationContainer.value) {
+      conversationContainer.value.scrollTop = conversationContainer.value.scrollHeight;
+    }
+  });
+}
+
+// onMounted(() => {
+//   console.log('App mounted');
+//   scrollToBottom();
+// });
+
+watch(messages, () => {
+  console.log('Messages changed');
+  scrollToBottom();
+});
+
+
 </script>
 
 <template>
   <div class="container p-4 border-start border-end border-white border-5 min-vh-100 d-flex flex-column">
-    <div class="conversation-container flex-grow-1 overflow-auto">
+    <div ref="conversationContainer" class="conversation-container flex-grow-1 overflow-auto">
       
       <template v-if="messages.length > 0">
       
@@ -27,7 +61,7 @@ usersStore.getSession();
           </div>
         
           <div class="col-11">  
-            <p class="message-content">{{ message.content }}</p>
+            <div class="message-content" v-html="md.render(message.content.trim())"></div>
           </div>
           
           <hr class="separator opacity-100" v-if="messages.length > 1 && index !== messages.length - 1">
