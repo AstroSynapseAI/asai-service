@@ -5,6 +5,7 @@ import { useUsersStore } from './user.store.js';
 
 const chatURL = `${import.meta.env.VITE_API_URL}/chat`;
 
+
 export const useChatStore = defineStore({
   id: 'chat',
   state: () => ({
@@ -19,7 +20,8 @@ export const useChatStore = defineStore({
   actions: {
     async loadHistory() {
       console.log("Loading history...")
-      const session_id = this.user.session_id;
+      const userStore = useUsersStore();
+      const session_id = userStore.user.session_id;
       try {
         const response = await fetchWrapper.get(`${chatURL}/history/${session_id}`);
         if (response.length > 0) {
@@ -33,6 +35,8 @@ export const useChatStore = defineStore({
 
     async sendPrompt(content) {      
       console.log("Sending prompt...")
+      const userStore = useUsersStore();
+
       var msg = {
         sender: "human",
         content: content
@@ -41,7 +45,7 @@ export const useChatStore = defineStore({
       this.messages = [...this.messages, msg];
       
       const data = {
-        session_id: this.user.session_id,
+        session_id: userStore.user.session_id,
         user_prompt: content
       }
       try {

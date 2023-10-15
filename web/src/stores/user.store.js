@@ -21,14 +21,19 @@ export const useUsersStore = defineStore({
         try {
           const user = await fetchWrapper.get(`${usersURL}/session`);
           localStorage.setItem('user', JSON.stringify(user));
+          this.user = user;
         } catch (error) {
           console.error(error);
         }    
       }
 
-      console.log("User:", this.user);
-
-      chatStore.loadHistory();
-    }  
+      // This condition ensures that we don't call loadHistory
+      // if there was an error and this.user is still not set.
+      if (this.user) {
+        console.log("User:", this.user);
+        chatStore.loadHistory();
+      }
+    }
   }
+
 })

@@ -23,10 +23,6 @@ usersStore.getSession();
 
 async function scrollToBottom() {
   console.log('Scrolling to bottom');
-  // await nextTick()
-  // if (conversationContainer.value) {
-  //   conversationContainer.value.scrollTop = conversationContainer.value.scrollHeight;
-  // }
   requestAnimationFrame(() => {
     if (conversationContainer.value) {
       conversationContainer.value.scrollTop = conversationContainer.value.scrollHeight;
@@ -34,13 +30,7 @@ async function scrollToBottom() {
   });
 }
 
-// onMounted(() => {
-//   console.log('App mounted');
-//   scrollToBottom();
-// });
-
 watch(messages, () => {
-  console.log('Messages changed');
   scrollToBottom();
 });
 
