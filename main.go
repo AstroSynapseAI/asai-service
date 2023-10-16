@@ -115,6 +115,7 @@ func main() {
 
 func GetHistory(ctx *rest.Context) {
 	sessionID := ctx.GetParam("session_id")
+	fmt.Println("Fetching history for session:", sessionID)
 
 	asaiChain.SetSessionID(sessionID)
 	msgs := asaiChain.LoadHistory()
@@ -131,7 +132,7 @@ func GetHistory(ctx *rest.Context) {
 		responseJson[i].Content = msg.GetContent()
 	}
 
-	ctx.JsonResponse(200, responseJson)
+	_ = ctx.JsonResponse(200, responseJson)
 
 }
 
@@ -143,7 +144,7 @@ func GetSession(ctx *rest.Context) {
 	}
 
 	reponseJson.SessionId = sessionID
-	ctx.JsonResponse(200, reponseJson)
+	_ = ctx.JsonResponse(200, reponseJson)
 
 }
 
@@ -157,7 +158,7 @@ func PostHandler(ctx *rest.Context) {
 	err := ctx.JsonDecode(&request)
 	if err != nil {
 		fmt.Println("Bad Request: %w", err)
-		ctx.JsonResponse(400, err)
+		_ = ctx.JsonResponse(400, err)
 		return
 	}
 
@@ -166,7 +167,7 @@ func PostHandler(ctx *rest.Context) {
 	response, err := asaiChain.Run(context.Background(), request.UserPrompt)
 	if err != nil {
 		fmt.Println(err)
-		ctx.JsonResponse(500, err)
+		_ = ctx.JsonResponse(500, err)
 		return
 	}
 
@@ -176,7 +177,7 @@ func PostHandler(ctx *rest.Context) {
 
 	responseJson.Content = response
 
-	ctx.JsonResponse(200, responseJson)
+	_ = ctx.JsonResponse(200, responseJson)
 }
 
 func DiscordMsgHandler(session *discordgo.Session, msg *discordgo.MessageCreate) {
@@ -195,6 +196,6 @@ func DiscordMsgHandler(session *discordgo.Session, msg *discordgo.MessageCreate)
 			return
 		}
 
-		session.ChannelMessageSend(msg.ChannelID, response)
+		_, _ = session.ChannelMessageSend(msg.ChannelID, response)
 	}
 }

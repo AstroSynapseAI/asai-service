@@ -9,7 +9,6 @@ import (
 
 	"github.com/AstroSynapseAI/engine-service/cortex/chains"
 	"github.com/gorilla/websocket"
-	options "github.com/tmc/langchaingo/chains"
 )
 
 var (
@@ -76,22 +75,31 @@ func (client *Client) ReadMsgs(ctx context.Context) {
 		}
 
 		client.sessionID = request.SessionId
-
-		// var response string = dummyResponseString()
-
 		client.asaiChain.SetSessionID(request.SessionId)
 
-		client.asaiChain.Run(
-			ctx,
-			request.UserPrompt,
-			options.WithStreamingFunc(func(ctx context.Context, chunk []byte) error {
-				fmt.Print(string(chunk))
-				client.egress <- chunk
-				return nil
-			}),
-		)
-		client.egress <- []byte("/end/")
+		response, err := client.asaiChain.Run(context.Background(), request.UserPrompt)
+		if err != nil {
+			fmt.Println("error running chain: ", err)
+			break
+		}
 
+		client.egress <- []byte(response)
+
+		// Figuring out and testing LLM stream response.
+		// The Langchain-go doesn't support streamed agent response atm
+		// Need to make a contribution to Langchain-go
+		// _, _ = client.asaiChain.Run(
+		// 	ctx,
+		// 	request.UserPrompt,
+		// 	options.WithStreamingFunc(func(ctx context.Context, chunk []byte) error {
+		// 		fmt.Print(string(chunk))
+		// 		client.egress <- chunk
+		// 		return nil
+		// 	}),
+		// )
+		// client.egress <- []byte("/end/")
+
+		// var response string = dummyResponseString()
 		// for c := range client.manager.clients {
 		// 	if c.sessionID == client.sessionID {
 		// 		for _, symbol := range getSymbols(response) {
