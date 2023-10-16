@@ -27,8 +27,6 @@ export const useUsersStore = defineStore({
         }    
       }
 
-      // This condition ensures that we don't call loadHistory
-      // if there was an error and this.user is still not set.
       if (this.user) {
         console.log("User:", this.user);
         chatStore.loadHistory();

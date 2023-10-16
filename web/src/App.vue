@@ -30,10 +30,13 @@ async function scrollToBottom() {
   });
 }
 
+onMounted(() => {
+  chatStore.connectWebSocket();
+})
+
 watch(messages, () => {
   scrollToBottom();
 });
-
 
 </script>
 
@@ -46,8 +49,8 @@ watch(messages, () => {
         <div class="conversation-item row" v-for="(message, index) in messages" :key="index">
         
           <div class="col-1">
-            <img src="./assets/asai-icon.png" class="logo" alt="Asai Icon" width="35" height="50" v-if="message.sender === 'ai'"/>
-            <img src="./assets/user-icon.png" class="logo" alt="User Icon" width="35" height="50" v-if="message.sender === 'human'"/>
+            <img src="./assets/asai-icon.png" class="logo" alt="Asai Icon" v-if="message.sender === 'ai'"/>
+            <img src="./assets/user-icon.png" class="logo" alt="User Icon" v-if="message.sender === 'human'"/>
           </div>
         
           <div class="col-11">  
@@ -77,4 +80,11 @@ watch(messages, () => {
   width: 95%;
   margin: 10px auto;
 }
+
+.conversation-item img {
+  max-width: 35px;
+  max-height: 50px;
+}
+
+
 </style>
