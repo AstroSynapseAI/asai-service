@@ -15,7 +15,7 @@ You have access to the following agents:
 
 {{.agent_descriptions}}
 
-To use an agent, please use the following format:
+To use an agent, you MUST the following format:
 
 Thought: Do I need to use an agent? Yes
 Action: the action to take, should be one of [{{.agent_names}}]
@@ -23,10 +23,12 @@ Action Input: the input to the action
 Observation: the result of the action
 AI: your response
 
-If you do not need to use an agent, an agent malfunctions and returns an error, and you have a response to say to the human, you MUST use the format:
+If you do not need to use an agent, you MUST use the format:
 
 Thought: Do I need to use an agent? No
 AI: [your response here]
+
+
 
 Begin!
 
