@@ -26,11 +26,11 @@ export const useChatStore = defineStore({
       });
 
       this.socket.addEventListener('message', (event) => {
-        console.log('Received message');
+        console.log('Received a message...');
         var msg = {
           sender: "ai",
           content: event.data
-        }
+          }
         this.messages = [...this.messages, msg];
       });
 
