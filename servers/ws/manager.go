@@ -44,6 +44,7 @@ func (m *Manager) Handler(w http.ResponseWriter, r *http.Request) {
 
 	m.addClient(client)
 
+	go client.MaintainConnection(m.ctx)
 	go client.ReadMsgs(m.ctx)
 	go client.SendMsgs(m.ctx)
 

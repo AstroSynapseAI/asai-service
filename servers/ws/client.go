@@ -13,10 +13,11 @@ import (
 
 var (
 	// pongWait is how long we will await a pong response from client
-	pongWait = 10 * time.Second
+	pongWait = 30 * time.Second
 	// pingInterval has to be less than pongWait, We cant multiply by 0.9 to get 90% of time
 	// Because that can make decimals, so instead *9 / 10 to get 90%
-	// The reason why it has to be less than PingRequency is becuase otherwise it will send a new Ping before getting response
+	// The reason why it has to be less than PingRequency is becuase otherwise it will
+	// send a new Ping before getting response
 	pingInterval = (pongWait * 9) / 10
 )
 
@@ -37,13 +38,8 @@ func NewClient(conn *websocket.Conn, manager *Manager, chain *chains.AsaiChain) 
 	}
 }
 
-func (client *Client) ReadMsgs(ctx context.Context) {
-	defer func() {
-		client.manager.removeClient(client)
-	}()
-
-	// Set Max Size of Messages in Bytes
-	// client.connection.SetReadLimit(512)
+func (client *Client) MaintainConnection(ctx context.Context) {
+	ticker := time.NewTicker(pingInterval)
 
 	// Configure Wait time for Pong response, use Current time + pongWait
 	// This has to be done here to set the first initial timer.
@@ -52,8 +48,27 @@ func (client *Client) ReadMsgs(ctx context.Context) {
 		return
 	}
 
-	// Configure how to handle Pong responses
 	client.connection.SetPongHandler(client.pongHandler)
+
+	for {
+		fmt.Println("Ping...")
+		err := client.connection.WriteMessage(websocket.PingMessage, []byte{})
+		if err != nil {
+			fmt.Println("Connection closed:", err)
+			return
+		}
+		// Wait for next tick
+		<-ticker.C
+	}
+}
+
+func (client *Client) ReadMsgs(ctx context.Context) {
+	defer func() {
+		client.manager.removeClient(client)
+	}()
+
+	// Set Max Size of Messages in Bytes
+	// client.connection.SetReadLimit(512)
 
 	for {
 		_, payload, err := client.connection.ReadMessage()
@@ -113,36 +128,19 @@ func (client *Client) ReadMsgs(ctx context.Context) {
 }
 
 func (client *Client) SendMsgs(ctx context.Context) {
-	ticker := time.NewTicker(pingInterval)
 	defer func() {
 		client.manager.removeClient(client)
 	}()
 
-	for {
-		select {
-		case msg, ok := <-client.egress:
-			if !ok {
-				if err := client.connection.WriteMessage(websocket.CloseMessage, nil); err != nil {
-					fmt.Println("Connection closed:", err)
-				}
-				return
-			}
-
-			// Write a Regular text message to the connection
-			if err := client.connection.WriteMessage(websocket.TextMessage, msg); err != nil {
-				fmt.Println("Connection closed:", err)
-			}
-			fmt.Println("Msg sent:", msg)
-		case <-ticker.C:
-			fmt.Println("Ping...")
-
-			if err := client.connection.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
-				fmt.Println("Connection closed:", err)
-				return
-			}
+	for msg := range client.egress {
+		// Write a Regular text message to the connection
+		if err := client.connection.WriteMessage(websocket.TextMessage, msg); err != nil {
+			fmt.Println("Connection closed with error:", err)
+			return
 		}
-	}
 
+		fmt.Println("Msg sent...")
+	}
 }
 
 func (client *Client) pongHandler(pongMsg string) error {
