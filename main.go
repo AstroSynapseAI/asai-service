@@ -115,12 +115,10 @@ func main() {
 
 func GetHistory(ctx *rest.Context) {
 	sessionID := ctx.GetParam("session_id")
-	fmt.Println("Fetching history for session:", sessionID)
+	// fmt.Println("Fetching history for session:", sessionID)
 
 	asaiChain.SetSessionID(sessionID)
 	msgs := asaiChain.LoadHistory()
-
-	println(msgs)
 
 	type Message struct {
 		Sender  string `json:"sender"`
@@ -135,7 +133,6 @@ func GetHistory(ctx *rest.Context) {
 	}
 
 	_ = ctx.JsonResponse(200, responseJson)
-
 }
 
 func GetSession(ctx *rest.Context) {
