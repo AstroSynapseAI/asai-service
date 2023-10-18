@@ -132,6 +132,8 @@ func GetHistory(ctx *rest.Context) {
 		responseJson[i].Content = msg.GetContent()
 	}
 
+	println(responseJson)
+
 	_ = ctx.JsonResponse(200, responseJson)
 
 }
