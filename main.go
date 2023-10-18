@@ -120,6 +120,8 @@ func GetHistory(ctx *rest.Context) {
 	asaiChain.SetSessionID(sessionID)
 	msgs := asaiChain.LoadHistory()
 
+	println(msgs)
+
 	type Message struct {
 		Sender  string `json:"sender"`
 		Content string `json:"content"`
@@ -131,8 +133,6 @@ func GetHistory(ctx *rest.Context) {
 		responseJson[i].Sender = string(msg.GetType())
 		responseJson[i].Content = msg.GetContent()
 	}
-
-	println(responseJson)
 
 	_ = ctx.JsonResponse(200, responseJson)
 
