@@ -19,6 +19,10 @@ export const useUsersStore = defineStore({
       
       if (!this.user) {
         try {
+          chatStore.messages = [{
+              sender: "ai",
+              content: "Hello there... I'm Asai, How can I help you?"
+          }];
           const user = await fetchWrapper.get(`${usersURL}/session`);
           localStorage.setItem('user', JSON.stringify(user));
           this.user = user;
