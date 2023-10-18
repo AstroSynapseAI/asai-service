@@ -41,19 +41,19 @@ watch(messages, () => {
 </script>
 
 <template>
-  <div class="container p-4 border-start border-end border-white border-5 min-vh-100 d-flex flex-column">
-    <div ref="conversationContainer" class="conversation-container container flex-grow-1 overflow-auto">
+  <div class="container border-start border-end border-white border-5 min-vh-100 d-flex flex-column">
+    <div ref="conversationContainer" class="conversation-container container-fluid flex-grow-1 overflow-auto">
       
       <template v-if="messages.length > 0">
       
         <div class="conversation-item row" v-for="(message, index) in messages" :key="index">
         
-          <div class="col-1">
+          <div class="col-1 col-xs-4">
             <img src="./assets/asai-icon.png" class="logo" alt="Asai Icon" v-if="message.sender === 'ai'"/>
             <img src="./assets/user-icon.png" class="logo" alt="User Icon" v-if="message.sender === 'human'"/>
           </div>
         
-          <div class="col-11">  
+          <div class="col-11 col-xs-8">
             <div class="message-content" v-html="md.render(message.content.trim())"></div>
           </div>
           
@@ -75,7 +75,15 @@ watch(messages, () => {
 <style scoped>
 .conversation-container {
   max-height: 90vh;
+  padding: 1.25rem;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
 }
+.conversation-container ::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+  padding: 1.5rem;
+}
+
 .separator {
   width: 95%;
   margin: 10px auto;
@@ -86,5 +94,15 @@ watch(messages, () => {
   max-height: 50px;
 }
 
+@media only screen and (max-width: 600px) {
 
+  .conversation-container {
+    padding: 0.25rem;
+  }
+  .conversation-item img {
+    max-width: 25px;
+    max-height: 35px;
+    padding-top: 4px;
+  }
+}
 </style>
