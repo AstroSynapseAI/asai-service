@@ -42,8 +42,19 @@ export const useChatStore = defineStore({
       try {
         console.log("Loading history...", session_id);
         const response = await fetchWrapper.get(`${chatURL}/history/${session_id}`);
-        if (response.length > 0) {
-          this.messages = response
+
+        console.log("Response:", response);
+        var responseMsgs = []
+
+        if (response) {
+          for (var i = 0; i < response.length; i++) {
+            var msg = {
+              sender: response[i].type,
+              content: response[i].text
+            }
+            responseMsgs.push(msg)
+          }
+          this.messages = responseMsgs;
           console.log("Fetched History:", response);
         }
         console.log("Messages:", this.messages);
@@ -69,16 +80,6 @@ export const useChatStore = defineStore({
       }
 
       this.socket.send(JSON.stringify(data));
-      // try {
-      //   const response = await fetchWrapper.post(`${chatURL}/msg`, data);
-      //   msg = {
-      //     sender: "ai",
-      //     content: response.content
-      //   }
-      //   this.messages = [...this.messages, msg];
-      // } catch (error) {
-      //   console.error(error);
-      // }
     }
   }
 })

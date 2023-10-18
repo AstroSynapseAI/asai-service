@@ -12,10 +12,10 @@ import (
 
 	"github.com/AstroSynapseAI/engine-service/config"
 	"github.com/AstroSynapseAI/engine-service/cortex/chains"
+	api "github.com/AstroSynapseAI/engine-service/servers/rest"
 	"github.com/AstroSynapseAI/engine-service/servers/ws"
 	"github.com/GoLangWebSDK/rest"
 	"github.com/bwmarrin/discordgo"
-	"github.com/thanhpk/randstr"
 )
 
 var (
@@ -71,9 +71,9 @@ func main() {
 
 	// API server
 	ctrl := rest.NewController(router)
-	ctrl.Get("/api/chat/history/{session_id}", GetHistory)
+	ctrl.Get("/api/chat/history/{session_id}", api.GetHistory)
 	ctrl.Post("/api/chat/msg", PostHandler)
-	ctrl.Get("/api/users/session", GetSession)
+	ctrl.Get("/api/users/session", api.GetSession)
 
 	// Websocket server
 	router.Mux.HandleFunc("/api/chat/socket", wsManager.Handler)
@@ -110,40 +110,6 @@ func main() {
 
 	// Cleanly close down the Discord session.
 	discordClient.Close()
-
-}
-
-func GetHistory(ctx *rest.Context) {
-	sessionID := ctx.GetParam("session_id")
-	// fmt.Println("Fetching history for session:", sessionID)
-
-	asaiChain.SetSessionID(sessionID)
-	msgs := asaiChain.LoadHistory()
-
-	type Message struct {
-		Sender  string `json:"sender"`
-		Content string `json:"content"`
-	}
-
-	responseJson := make([]Message, len(msgs))
-
-	for i, msg := range msgs {
-		responseJson[i].Sender = string(msg.GetType())
-		responseJson[i].Content = msg.GetContent()
-	}
-
-	_ = ctx.JsonResponse(200, responseJson)
-}
-
-func GetSession(ctx *rest.Context) {
-	sessionID := randstr.String(16)
-
-	var reponseJson struct {
-		SessionId string `json:"session_id"`
-	}
-
-	reponseJson.SessionId = sessionID
-	_ = ctx.JsonResponse(200, reponseJson)
 
 }
 

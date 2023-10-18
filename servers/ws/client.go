@@ -48,10 +48,10 @@ func (client *Client) MaintainConnection(ctx context.Context) {
 		return
 	}
 
-	client.connection.SetPongHandler(client.pongHandler)
+	client.connection.SetPongHandler(client.PongHandler)
 
 	for {
-		fmt.Println("Ping...")
+		// fmt.Println("Ping...")
 		err := client.connection.WriteMessage(websocket.PingMessage, []byte{})
 		if err != nil {
 			fmt.Println("Ping failed:", err)
@@ -60,6 +60,19 @@ func (client *Client) MaintainConnection(ctx context.Context) {
 		// Wait for next tick
 		<-ticker.C
 	}
+}
+
+func (client *Client) PongHandler(pongMsg string) error {
+	// Current time + Pong Wait time
+	//fmt.Println("Pong...")
+
+	err := client.connection.SetReadDeadline(time.Now().Add(pongWait))
+	if err != nil {
+		fmt.Println("Failed to set read deadline in pong handler:", err)
+		return err
+	}
+
+	return nil
 }
 
 func (client *Client) ReadMsgs(ctx context.Context) {
@@ -145,19 +158,6 @@ func (client *Client) SendMsgs(ctx context.Context) {
 
 		fmt.Println("Msg sent...")
 	}
-}
-
-func (client *Client) pongHandler(pongMsg string) error {
-	// Current time + Pong Wait time
-	fmt.Println("Pong...")
-
-	err := client.connection.SetReadDeadline(time.Now().Add(pongWait))
-	if err != nil {
-		fmt.Println("Failed to set read deadline in pong handler:", err)
-		return err
-	}
-
-	return nil
 }
 
 // func dummyResponseString() string {
