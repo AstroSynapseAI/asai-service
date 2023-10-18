@@ -42,7 +42,7 @@ watch(messages, () => {
 
 <template>
   <div class="container p-4 border-start border-end border-white border-5 min-vh-100 d-flex flex-column">
-    <div ref="conversationContainer" class="conversation-container flex-grow-1 overflow-auto">
+    <div ref="conversationContainer" class="conversation-container container flex-grow-1 overflow-auto">
       
       <template v-if="messages.length > 0">
       
@@ -65,7 +65,7 @@ watch(messages, () => {
 
     </div>
     
-    <div class="prompt-container">
+    <div class="prompt-container container">
       <hr class="border border-3 opacity-100">
       <PromptInput />
     </div>
