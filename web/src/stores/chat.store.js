@@ -9,12 +9,10 @@ const wsURL = `${import.meta.env.VITE_WS_URL}/chat/socket`;
 export const useChatStore = defineStore({
   id: 'chat',
   state: () => ({
-    messages: [
-      {
-        sender: "ai",
-        content: "Hello there... I'm Asai, How can I help you?"
-      }
-    ],
+    messages: [{
+      sender: "ai",
+      content: "Hello there... I'm Asai, How can I help you?"
+    }],
     socket: null
   }),
   actions: {
@@ -39,15 +37,16 @@ export const useChatStore = defineStore({
       });
     },
     async loadHistory() {
-      console.log("Loading history...")
       const userStore = useUsersStore();
       const session_id = userStore.user.session_id;
       try {
+        console.log("Loading history...", session_id);
         const response = await fetchWrapper.get(`${chatURL}/history/${session_id}`);
         if (response.length > 0) {
           this.messages = response
+          console.log("Fetched History:", response);
         }
-        console.log("History:", this.messages);
+        console.log("Messages:", this.messages);
       } catch (error) {
         console.error(error);
       } 

@@ -122,13 +122,11 @@ func (history *PersistentChatHistory) AddMessage(ctx context.Context, message sc
 }
 
 func (history *PersistentChatHistory) AddAIMessage(ctx context.Context, message string) error {
-	history.AddMessage(ctx, schema.AIChatMessage{Content: message})
-	return nil
+	return history.AddMessage(ctx, schema.AIChatMessage{Content: message})
 }
 
 func (history *PersistentChatHistory) AddUserMessage(ctx context.Context, message string) error {
-	history.AddMessage(ctx, schema.HumanChatMessage{Content: message})
-	return nil
+	return history.AddMessage(ctx, schema.HumanChatMessage{Content: message})
 }
 
 func (history *PersistentChatHistory) SetMessages(ctx context.Context, messages []schema.ChatMessage) error {
