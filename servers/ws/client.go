@@ -102,8 +102,6 @@ func (client *Client) ReadMsgs(ctx context.Context) {
 			break
 		}
 
-		//var response = "My reponse"
-
 		client.sessionID = request.SessionId
 
 		client.asaiChain.SetSessionID(request.SessionId)

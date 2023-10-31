@@ -1,5 +1,7 @@
 module github.com/AstroSynapseAI/engine-service
 
+// replace github.com/tmc/langchaingo => /Users/simun/Engineering/Projects/GoLangChain/SourceCode
+
 go 1.20
 
 require (
