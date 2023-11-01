@@ -80,9 +80,6 @@ func (client *Client) ReadMsgs(ctx context.Context) {
 		client.manager.removeClient(client)
 	}()
 
-	// Set Max Size of Messages in Bytes
-	// client.connection.SetReadLimit(512)
-
 	for {
 		_, payload, err := client.connection.ReadMessage()
 		if err != nil {
@@ -106,41 +103,62 @@ func (client *Client) ReadMsgs(ctx context.Context) {
 
 		client.asaiChain.SetSessionID(request.SessionId)
 
-		go func() {
-			response, err := client.asaiChain.Run(context.Background(), request.UserPrompt)
-			if err != nil {
-				fmt.Println("error running chain: ", err)
-				return
-			}
-			client.egress <- []byte(response)
-		}()
+		client.asaiChain.Stream = func(ctx context.Context, chunk []byte) {
+			client.egress <- chunk
+		}
 
-		// Figuring out and testing LLM stream response.
-		// The Langchain-go doesn't support streamed agent response atm
-		// Need to make a contribution to Langchain-go
-		// _, _ = client.asaiChain.Run(
-		// 	ctx,
-		// 	request.UserPrompt,
-		// 	options.WithStreamingFunc(func(ctx context.Context, chunk []byte) error {
-		// 		fmt.Print(string(chunk))
-		// 		client.egress <- chunk
-		// 		return nil
-		// 	}),
-		// )
-		// client.egress <- []byte("/end/")
-
-		// var response string = dummyResponseString()
-		// for c := range client.manager.clients {
-		// 	if c.sessionID == client.sessionID {
-		// 		for _, symbol := range getSymbols(response) {
-		// 			c.egress <- []byte(symbol)
-		// 		}
-		// 		c.egress <- []byte("/end/")
-		// 	}
-		// }
+		// smth is wrong with context need to look into it
+		if err = client.asaiChain.Run(context.Background(), request.UserPrompt); err != nil {
+			fmt.Println("error Asai running chain: ", err)
+			return
+		}
 
 	}
 }
+
+// func (client *Client) ReadMsgs(ctx context.Context) {
+// 	defer func() {
+// 		client.manager.removeClient(client)
+// 	}()
+
+// Set Max Size of Messages in Bytes
+// client.connection.SetReadLimit(512)
+// for {
+// go func() {
+// 	response, err := client.asaiChain.Run(context.Background(), request.UserPrompt)
+// 	if err != nil {
+// 		fmt.Println("error running chain: ", err)
+// 		return
+// 	}
+// 	client.egress <- []byte(response)
+// }()
+
+// Figuring out and testing LLM stream response.
+// The Langchain-go doesn't support streamed agent response atm
+// Need to make a contribution to Langchain-go
+// _, _ = client.asaiChain.Run(
+// 	ctx,
+// 	request.UserPrompt,
+// 	options.WithStreamingFunc(func(ctx context.Context, chunk []byte) error {
+// 		fmt.Print(string(chunk))
+// 		client.egress <- chunk
+// 		return nil
+// 	}),
+// )
+// client.egress <- []byte("/end/")
+
+// var response string = dummyResponseString()
+// for c := range client.manager.clients {
+// 	if c.sessionID == client.sessionID {
+// 		for _, symbol := range getSymbols(response) {
+// 			c.egress <- []byte(symbol)
+// 		}
+// 		c.egress <- []byte("/end/")
+// 	}
+// }
+
+// }
+// }
 
 func (client *Client) SendMsgs(ctx context.Context) {
 	defer func() {
@@ -157,15 +175,3 @@ func (client *Client) SendMsgs(ctx context.Context) {
 		fmt.Println("Msg sent...")
 	}
 }
-
-// func dummyResponseString() string {
-// 	return `Yes, I see the bug. The issue arises from the prefixPrinted variable inside the goroutine that's used to determine whether to print the "ASAI >" prefix. Once it's set to true for the first response, it never gets reset, so the prefix is not printed for subsequent responses.`
-// }
-
-// func getSymbols(s string) []string {
-// 	var symbols []string
-// 	for _, char := range s {
-// 		symbols = append(symbols, string(char))
-// 	}
-// 	return symbols
-// }

@@ -129,7 +129,7 @@ func PostHandler(ctx *rest.Context) {
 
 	asaiChain.SetSessionID(request.SessionId)
 
-	response, err := asaiChain.Run(context.Background(), request.UserPrompt)
+	response, err := asaiChain.Prompt(context.Background(), request.UserPrompt)
 	if err != nil {
 		fmt.Println(err)
 		_ = ctx.JsonResponse(500, err)
@@ -155,7 +155,7 @@ func DiscordMsgHandler(session *discordgo.Session, msg *discordgo.MessageCreate)
 
 	if strings.Contains(msg.Content, "@"+session.State.User.ID) {
 		asaiChain.SetSessionID(sessionID)
-		response, err := asaiChain.Run(context.Background(), userPrompt)
+		response, err := asaiChain.Prompt(context.Background(), userPrompt)
 		if err != nil {
 			fmt.Println(err)
 			return
