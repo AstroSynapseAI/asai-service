@@ -1,0 +1,16 @@
+###
+GET  http://localhost:8082/api/chat/history/UDID-0001
+Content-Type: application/json
+
+###
+GET  http://localhost:8082/api/users/session
+Content-Type: application/json
+
+###
+POST  http://localhost:8082/api/chat/msg
+Content-Type: application/json
+
+{
+  "session_id": "UDID-0001",
+  "user_prompt": "Who are you?"
+}
