@@ -10,10 +10,12 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/AstroSynapseAI/engine-service/config"
-	"github.com/AstroSynapseAI/engine-service/cortex/chains"
-	api "github.com/AstroSynapseAI/engine-service/servers/rest"
-	"github.com/AstroSynapseAI/engine-service/servers/ws"
+	api "github.com/AstroSynapseAI/controllers"
+
+	config "github.com/AstroSynapseAI/app"
+	"github.com/AstroSynapseAI/controllers/ws"
+	"github.com/AstroSynapseAI/engine/chains"
+
 	"github.com/GoLangWebSDK/rest"
 	"github.com/bwmarrin/discordgo"
 )

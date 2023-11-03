@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/AstroSynapseAI/engine-service/cortex/tools/scraper"
+	"github.com/AstroSynapseAI/engine/tools/scraper"
 	"github.com/tmc/langchaingo/chains"
 	"github.com/tmc/langchaingo/documentloaders"
 	"github.com/tmc/langchaingo/llms/openai"

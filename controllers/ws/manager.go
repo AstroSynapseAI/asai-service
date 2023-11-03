@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/AstroSynapseAI/engine-service/cortex/chains"
+	"github.com/AstroSynapseAI/engine/chains"
 	"github.com/gorilla/websocket"
 )
 

@@ -1,32 +1,17 @@
 version: '3'
 
 services:
-  # asai-app:
-  #   container_name: asai-app
-  #   build:
-  #     context: ./asai-app-service
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "8082:8082"
-  #   volumes:
-  #     - ./asai-app-service:/app
-  #   depends_on:
-  #     - asai-db
-  #   #   - asai-engine
-  #   networks:
-  #     - asai-network
-  
-  asai-engine:
-    container_name: asai-engine
+  asai-app:
+    container_name: asai-app
     environment:
       - ENVIRONMENT=LOCAL DEV
     build:
-      context: ./asai-engine-service
+      context: .
       dockerfile: Dockerfile
     ports:
       - "8082:8082"
     volumes:
-      - ./asai-engine-service:/app
+      - .:/app
     depends_on:
       - asai-db
     networks:

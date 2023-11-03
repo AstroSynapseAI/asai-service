@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/AstroSynapseAI/engine-service/config"
-	"github.com/AstroSynapseAI/engine-service/cortex/agents/browser"
-	"github.com/AstroSynapseAI/engine-service/cortex/agents/search"
-	"github.com/AstroSynapseAI/engine-service/cortex/memory"
-	"github.com/AstroSynapseAI/engine-service/cortex/templates"
-	"github.com/AstroSynapseAI/engine-service/cortex/tools/documents"
+	config "github.com/AstroSynapseAI/app"
+	"github.com/AstroSynapseAI/engine/agents/browser"
+	"github.com/AstroSynapseAI/engine/agents/search"
+	"github.com/AstroSynapseAI/engine/memory"
+	"github.com/AstroSynapseAI/engine/templates"
+	"github.com/AstroSynapseAI/engine/tools/documents"
 
-	asaiTools "github.com/AstroSynapseAI/engine-service/cortex/tools"
+	asaiTools "github.com/AstroSynapseAI/engine/tools"
 
 	"github.com/tmc/langchaingo/agents"
 	"github.com/tmc/langchaingo/callbacks"

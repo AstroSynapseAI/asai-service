@@ -1,4 +1,4 @@
-package api
+package controllers
 
 import (
 	"database/sql/driver"
@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/AstroSynapseAI/engine-service/config"
+	config "github.com/AstroSynapseAI/app"
 	"github.com/GoLangWebSDK/rest"
 	"github.com/thanhpk/randstr"
 	"gorm.io/driver/postgres"

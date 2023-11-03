@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/AstroSynapseAI/engine-service/cortex/templates"
-	"github.com/AstroSynapseAI/engine-service/cortex/tools/google"
+	"github.com/AstroSynapseAI/engine/templates"
+	"github.com/AstroSynapseAI/engine/tools/google"
 
-	asaiTools "github.com/AstroSynapseAI/engine-service/cortex/tools"
+	asaiTools "github.com/AstroSynapseAI/engine/tools"
 
 	"github.com/tmc/langchaingo/agents"
 	"github.com/tmc/langchaingo/chains"
