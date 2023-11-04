@@ -1,12 +1,14 @@
 package controllers
 
 import (
+	"context"
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
 	"fmt"
 
-	config "github.com/AstroSynapseAI/app"
+	"github.com/AstroSynapseAI/app-service/app"
+	"github.com/AstroSynapseAI/app-service/engine/chains"
 	"github.com/GoLangWebSDK/rest"
 	"github.com/thanhpk/randstr"
 	"gorm.io/driver/postgres"
@@ -42,7 +44,8 @@ func (m *Messages) Scan(src interface{}) error {
 
 func GetHistory(ctx *rest.Context) {
 	fmt.Println("Fetching history...")
-	dsn := config.SetupPostgreDSN()
+	// dsn := config.SetupPostgreDSN()
+	dsn := app.CONFIG.DSN
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		fmt.Println(err)
@@ -73,34 +76,35 @@ func GetSession(ctx *rest.Context) {
 
 }
 
-// func PromptHandler(ctx *rest.Context) {
-// 	// Parse the incoming http request
-// 	var request struct {
-// 		SessionId  string `json:"session_id"`
-// 		UserPrompt string `json:"user_prompt"`
-// 	}
+func PostHandler(ctx *rest.Context) {
+	asaiChain, _ := chains.NewAsaiChain()
+	// Parse the incoming http request
+	var request struct {
+		SessionId  string `json:"session_id"`
+		UserPrompt string `json:"user_prompt"`
+	}
 
-// 	err := ctx.JsonDecode(&request)
-// 	if err != nil {
-// 		fmt.Println("Bad Request: %w", err)
-// 		_ = ctx.JsonResponse(400, err)
-// 		return
-// 	}
+	err := ctx.JsonDecode(&request)
+	if err != nil {
+		fmt.Println("Bad Request: %w", err)
+		_ = ctx.JsonResponse(400, err)
+		return
+	}
 
-// 	asaiChain.SetSessionID(request.SessionId)
+	asaiChain.SetSessionID(request.SessionId)
 
-// 	response, err := asaiChain.Run(context.Background(), request.UserPrompt)
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		_ = ctx.JsonResponse(500, err)
-// 		return
-// 	}
+	response, err := asaiChain.Prompt(context.Background(), request.UserPrompt)
+	if err != nil {
+		fmt.Println(err)
+		_ = ctx.JsonResponse(500, err)
+		return
+	}
 
-// 	var responseJson struct {
-// 		Content string `json:"content"`
-// 	}
+	var responseJson struct {
+		Content string `json:"content"`
+	}
 
-// 	responseJson.Content = response
+	responseJson.Content = response
 
-// 	_ = ctx.JsonResponse(200, responseJson)
-// }
+	_ = ctx.JsonResponse(200, responseJson)
+}

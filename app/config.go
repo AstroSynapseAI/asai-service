@@ -7,30 +7,46 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func LoadEnvironment() {
-	env := os.Getenv("ENVIRONMENT")
+var CONFIG *Config
 
-	fmt.Println("Current Environment:", env)
+type ServerAdapter interface {
+	Run() error
+}
 
-	if env == "HEROKU DEV" {
-		setupHerokuDev()
+type Config struct {
+	ENV string
+	DSN string
+}
+
+func NewConfig() *Config {
+	return &Config{
+		ENV: os.Getenv("ENVIRONMENT"),
+	}
+}
+
+func (cnf *Config) RunServer(server ServerAdapter) error {
+	cnf.loadEnvironment()
+	CONFIG = cnf
+	return server.Run()
+}
+
+func (cnf *Config) InitDB() {
+	if cnf.ENV == "HEROKU DEV" {
+		cnf.DSN = os.Getenv("DATABASE_URL")
 		return
 	}
+	cnf.DSN = "postgresql://asai-admin:asai-password@asai-db:5432/asai-db"
+}
 
-	if env == "LOCAL DEV" {
+func (cnf *Config) loadEnvironment() {
+	fmt.Println("Current Environment:", cnf.ENV)
+	if cnf.ENV == "LOCAL DEV" {
 		setupLocalDev()
 		return
 	}
-}
-
-func setupHerokuDev() {
 
 }
 
-// setupLocalDev initializes the local development environment by setting the necessary environment variables.
-//
-// No parameters.
-// No return values.
 func setupLocalDev() {
 	var Config struct {
 		OpenAPIKey    string `yaml:"open_api_key"`
@@ -38,7 +54,7 @@ func setupLocalDev() {
 		DiscordApiKey string `yaml:"discord_api_key"`
 	}
 
-	keys, err := os.ReadFile("./config/keys.yaml")
+	keys, err := os.ReadFile("keys.yaml")
 	if err != nil {
 		panic(err)
 	}
@@ -68,13 +84,4 @@ func setupLocalDev() {
 		fmt.Println("Error setting environment variable:", err)
 		return
 	}
-}
-
-func SetupPostgreDSN() string {
-	if os.Getenv("ENVIRONMENT") == "HEROKU DEV" {
-		return os.Getenv("DATABASE_URL")
-	}
-
-	dsn := "postgresql://asai-admin:asai-password@asai-db:5432/asai-db"
-	return dsn
 }

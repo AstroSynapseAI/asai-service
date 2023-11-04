@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"time"
 
-	config "github.com/AstroSynapseAI/app"
-	"github.com/AstroSynapseAI/engine/agents/browser"
-	"github.com/AstroSynapseAI/engine/agents/search"
-	"github.com/AstroSynapseAI/engine/memory"
-	"github.com/AstroSynapseAI/engine/templates"
-	"github.com/AstroSynapseAI/engine/tools/documents"
+	"github.com/AstroSynapseAI/app-service/app"
+	"github.com/AstroSynapseAI/app-service/engine/agents/browser"
+	"github.com/AstroSynapseAI/app-service/engine/agents/search"
+	"github.com/AstroSynapseAI/app-service/engine/memory"
+	"github.com/AstroSynapseAI/app-service/engine/templates"
+	"github.com/AstroSynapseAI/app-service/engine/tools/documents"
 
-	asaiTools "github.com/AstroSynapseAI/engine/tools"
+	asaiTools "github.com/AstroSynapseAI/app-service/engine/tools"
 
 	"github.com/tmc/langchaingo/agents"
 	"github.com/tmc/langchaingo/callbacks"
@@ -31,7 +31,8 @@ type AsaiChain struct {
 }
 
 func NewAsaiChain() (*AsaiChain, error) {
-	dsn := config.SetupPostgreDSN()
+	// dsn := config.SetupPostgreDSN()
+	dsn := app.CONFIG.DSN
 	asaiMemory := memory.NewMemory(dsn)
 
 	// create llm

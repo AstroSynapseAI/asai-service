@@ -11,13 +11,13 @@ import (
 )
 
 const (
-	DefualtRootPath = "./data/documents/"
+	DefualtRootPath = "./engine/documents/"
 
 	ErrInvalidInput = "Invalid input"
-	ErrFileLoad 	= "Error while loading requested file"	
-) 
+	ErrFileLoad     = "Error while loading requested file"
+)
 
-var _ tools.Tool = &DocumentsTool{} 
+var _ tools.Tool = &DocumentsTool{}
 
 type DocumentsTool struct {
 	RootPath string
@@ -31,12 +31,12 @@ func NewLoader(options ...DocuemntsToolOption) (*DocumentsTool, error) {
 	for _, option := range options {
 		option(documents)
 	}
-	
+
 	return documents, nil
 }
 
 func (agent *DocumentsTool) Name() string {
-	return "Library Agent"	
+	return "Library Agent"
 }
 
 func (agent *DocumentsTool) Description() string {
@@ -93,7 +93,7 @@ func (tool *DocumentsTool) Call(ctx context.Context, input string) (string, erro
 	if err != nil {
 		return fmt.Sprintf("%v: %s", ErrInvalidInput, err), nil
 	}
-	
+
 	path := tool.RootPath + toolInput.FileName
 
 	fileContents, err := os.ReadFile(path)
@@ -102,4 +102,4 @@ func (tool *DocumentsTool) Call(ctx context.Context, input string) (string, erro
 	}
 
 	return string(fileContents), nil
-} 
+}

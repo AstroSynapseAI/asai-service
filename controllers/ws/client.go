@@ -7,7 +7,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/AstroSynapseAI/engine/chains"
+	"github.com/AstroSynapseAI/app-service/engine/chains"
 	"github.com/gorilla/websocket"
 )
 

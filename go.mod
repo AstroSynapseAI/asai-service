@@ -1,4 +1,4 @@
-module github.com/AstroSynapseAI
+module github.com/AstroSynapseAI/app-service
 
 go 1.20
 

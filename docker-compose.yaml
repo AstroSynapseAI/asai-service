@@ -7,9 +7,9 @@ services:
       - ENVIRONMENT=LOCAL DEV
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./env/docker/Dockerfile
     ports:
-      - "8082:8082"
+      - 8082:8082
     volumes:
       - .:/app
     depends_on:
@@ -28,7 +28,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - 5432:5432
     restart: unless-stopped
     networks:
       - asai-network

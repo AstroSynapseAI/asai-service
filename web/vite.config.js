@@ -4,7 +4,7 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 
 // Define your custom build output directory
-const customBuildPath = '../servers/static'
+const customBuildPath = './static'
 
 export default defineConfig({
   plugins: [vue()],
