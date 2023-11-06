@@ -24,16 +24,18 @@ import (
 )
 
 type AsaiChain struct {
-	LLM    *openai.Chat
-	Memory *memory.AsaiMemory
-	Agents []tools.Tool
-	Stream func(context.Context, []byte)
+	LLM          *openai.Chat
+	Memory       *memory.AsaiMemory
+	Agents       []tools.Tool
+	Stream       func(context.Context, []byte)
+	asaiCallback callbacks.FinalStreamHandler
 }
 
 func NewAsaiChain() (*AsaiChain, error) {
 	// dsn := config.SetupPostgreDSN()
 	dsn := app.CONFIG.DSN
 	asaiMemory := memory.NewMemory(dsn)
+	cb := callbacks.NewFinalStreamHandler()
 
 	// create llm
 	llm, err := openai.NewChat(
@@ -117,7 +119,15 @@ func (chain AsaiChain) Run(ctx context.Context, input string, options ...chains.
 	// asaiAgent := agents.NewConversationalAgent(llm, chain.Agents, agents.WithPrompt(promptTmplt))
 
 	agentCallback := callbacks.NewFinalStreamHandler()
-	agentCallback.ReadFromEgress(chain.Stream)
+	// agentCallback.ReadFromEgress(chain.Stream)
+
+	agentEgress := agentCallback.GetEgress()
+	go func() {
+		defer close(agentEgress)
+		for data := range agentEgress {
+			chain.Stream(ctx, data)
+		}
+	}()
 
 	asaiAgent := agents.NewConversationalAgent(
 		chain.LLM,

@@ -19,14 +19,15 @@ type Config struct {
 }
 
 func NewConfig() *Config {
-	return &Config{
+	config := &Config{
 		ENV: os.Getenv("ENVIRONMENT"),
 	}
+
+	CONFIG = config
+	return config
 }
 
 func (cnf *Config) RunServer(server ServerAdapter) error {
-	cnf.loadEnvironment()
-	CONFIG = cnf
 	return server.Run()
 }
 
@@ -38,7 +39,7 @@ func (cnf *Config) InitDB() {
 	cnf.DSN = "postgresql://asai-admin:asai-password@asai-db:5432/asai-db"
 }
 
-func (cnf *Config) loadEnvironment() {
+func (cnf *Config) LoadEnvironment() {
 	fmt.Println("Current Environment:", cnf.ENV)
 	if cnf.ENV == "LOCAL DEV" {
 		setupLocalDev()
@@ -54,14 +55,16 @@ func setupLocalDev() {
 		DiscordApiKey string `yaml:"discord_api_key"`
 	}
 
-	keys, err := os.ReadFile("keys.yaml")
+	keys, err := os.ReadFile("./app/keys.yaml")
 	if err != nil {
-		panic(err)
+		fmt.Println("Error reading keys.yaml:", err)
+		return
 	}
 
 	err = yaml.Unmarshal(keys, &Config)
 	if err != nil {
-		panic(err)
+		fmt.Println("Error unmarshalling keys.yaml:", err)
+		return
 	}
 
 	// Set the Openai API key as env variable

@@ -12,6 +12,8 @@ func main() {
 
 	app.InitDB()
 
+	app.LoadEnvironment()
+
 	asaiServer := server.NewAsaiServer()
 
 	err := app.RunServer(asaiServer)

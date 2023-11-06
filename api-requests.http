@@ -11,6 +11,6 @@ POST  http://localhost:8082/api/chat/msg
 Content-Type: application/json
 
 {
-  "session_id": "UDID-0001",
+  "session_id": "67347mRRMHaouxoO",
   "user_prompt": "Who are you?"
 }

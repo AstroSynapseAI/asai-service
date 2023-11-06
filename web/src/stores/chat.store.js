@@ -13,6 +13,7 @@ export const useChatStore = defineStore({
       sender: "ai",
       content: "Hello there... I'm Asai, How can I help you?"
     }],
+    currentMsg: null,
     socket: null
   }),
   actions: {
@@ -24,12 +25,10 @@ export const useChatStore = defineStore({
       });
 
       this.socket.addEventListener('message', (event) => {
-        // console.log('Received a message...');
-        var msg = {
-          sender: "ai",
-          content: event.data
-          }
-        this.messages = [...this.messages, msg];
+        if (this.currentMsg) {
+          this.currentMsg.content += event.data;
+        }
+          
       });
 
       this.socket.addEventListener('close', (event) => {
@@ -79,7 +78,18 @@ export const useChatStore = defineStore({
         user_prompt: content
       }
 
-      this.socket.send(JSON.stringify(data));
+      try {
+        this.socket.send(JSON.stringify(data));
+        console.log("Sent prompt...");
+        this.currentMsg = {
+          sender: "ai",
+          content: ""
+        };
+        this.messages = [...this.messages, this.currentMsg];
+      } catch (error) {
+        console.error("Failed to send prompt:", error);
+      }
+
     }
   }
 })

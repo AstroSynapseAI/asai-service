@@ -12,6 +12,7 @@ services:
       - 8082:8082
     volumes:
       - .:/app
+      - /Users/simun/Engineering/Projects/GoLangChain/SourceCode:/GoLangChain
     depends_on:
       - asai-db
     networks:

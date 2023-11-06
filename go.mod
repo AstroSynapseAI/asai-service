@@ -2,7 +2,8 @@ module github.com/AstroSynapseAI/app-service
 
 go 1.20
 
-replace github.com/tmc/langchaingo => /Users/simun/Engineering/Projects/GoLangChain/SourceCode
+// replace github.com/tmc/langchaingo => /Users/simun/Engineering/Projects/GoLangChain/SourceCode
+replace github.com/tmc/langchaingo => ../GoLangChain
 
 require (
 	github.com/GoLangWebSDK/rest v0.0.0-20230522143808-2e1e35b013d6
