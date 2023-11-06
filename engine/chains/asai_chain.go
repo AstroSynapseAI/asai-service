@@ -8,6 +8,7 @@ import (
 	"github.com/AstroSynapseAI/app-service/app"
 	"github.com/AstroSynapseAI/app-service/engine/agents/browser"
 	"github.com/AstroSynapseAI/app-service/engine/agents/search"
+	"github.com/AstroSynapseAI/app-service/engine/callbacks"
 	"github.com/AstroSynapseAI/app-service/engine/memory"
 	"github.com/AstroSynapseAI/app-service/engine/templates"
 	"github.com/AstroSynapseAI/app-service/engine/tools/documents"
@@ -15,7 +16,7 @@ import (
 	asaiTools "github.com/AstroSynapseAI/app-service/engine/tools"
 
 	"github.com/tmc/langchaingo/agents"
-	"github.com/tmc/langchaingo/callbacks"
+
 	"github.com/tmc/langchaingo/chains"
 	"github.com/tmc/langchaingo/llms/openai"
 	"github.com/tmc/langchaingo/prompts"
@@ -24,18 +25,16 @@ import (
 )
 
 type AsaiChain struct {
-	LLM          *openai.Chat
-	Memory       *memory.AsaiMemory
-	Agents       []tools.Tool
-	Stream       func(context.Context, []byte)
-	asaiCallback callbacks.FinalStreamHandler
+	LLM    *openai.Chat
+	Memory *memory.AsaiMemory
+	Agents []tools.Tool
+	Stream func(context.Context, []byte)
 }
 
 func NewAsaiChain() (*AsaiChain, error) {
 	// dsn := config.SetupPostgreDSN()
 	dsn := app.CONFIG.DSN
 	asaiMemory := memory.NewMemory(dsn)
-	cb := callbacks.NewFinalStreamHandler()
 
 	// create llm
 	llm, err := openai.NewChat(
@@ -85,8 +84,6 @@ func (chain AsaiChain) LoadHistory() []schema.ChatMessage {
 }
 
 func (chain AsaiChain) Prompt(ctx context.Context, input string) (string, error) {
-	fmt.Println("Asai Prompt Running...")
-
 	chain.loadTemplate()
 
 	asaiAgent := agents.NewConversationalAgent(
@@ -115,19 +112,11 @@ func (chain AsaiChain) Prompt(ctx context.Context, input string) (string, error)
 func (chain AsaiChain) Run(ctx context.Context, input string, options ...chains.ChainCallOption) error {
 	fmt.Println("Asai Chain Running...")
 
-	// need to try this might be I initally loaded the proompt option wrong in the Executor
+	// need to try this might be I initally loaded the prompt option wrong in the Executor
 	// asaiAgent := agents.NewConversationalAgent(llm, chain.Agents, agents.WithPrompt(promptTmplt))
 
-	agentCallback := callbacks.NewFinalStreamHandler()
-	// agentCallback.ReadFromEgress(chain.Stream)
-
-	agentEgress := agentCallback.GetEgress()
-	go func() {
-		defer close(agentEgress)
-		for data := range agentEgress {
-			chain.Stream(ctx, data)
-		}
-	}()
+	agentCallback := callbacks.NewStreamHandler()
+	agentCallback.ReadFromEgress(ctx, chain.Stream)
 
 	asaiAgent := agents.NewConversationalAgent(
 		chain.LLM,
