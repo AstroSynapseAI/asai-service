@@ -25,7 +25,9 @@ async function scrollToBottom() {
   console.log('Scrolling to bottom');
   requestAnimationFrame(() => {
     if (conversationContainer.value) {
-      conversationContainer.value.scrollTop = conversationContainer.value.scrollHeight;
+      var promptContainerHeight = document.querySelector('.prompt-container').offsetHeight;
+      var scrollTo = conversationContainer.value.scrollHeight + 200;
+      conversationContainer.value.scrollTop = scrollTo
     }
   });
 }
@@ -79,7 +81,7 @@ watch(messages, () => {
 
 <style scoped>
 .conversation-container {
-  max-height: 90vh;
+  max-height: calc(90vh - 30px);
   padding: 1.25rem;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
@@ -87,6 +89,11 @@ watch(messages, () => {
 .conversation-container ::-webkit-scrollbar {
   display: none; /* Chrome, Safari */
   padding: 1.5rem;
+}
+
+.prompt-container {
+  bottom: 30px;
+  position: sticky;
 }
 
 .separator {
@@ -97,18 +104,6 @@ watch(messages, () => {
 .conversation-item img {
   max-width: 35px;
   max-height: 50px;
-}
-
-@media only screen and (max-width: 600px) {
-
-  .conversation-container {
-    padding: 0.25rem;
-  }
-  .conversation-item img {
-    max-width: 25px;
-    max-height: 35px;
-    padding-top: 4px;
-  }
 }
 
 @keyframes rotate {
@@ -126,5 +121,15 @@ watch(messages, () => {
   animation: rotate 0.5s linear infinite;
 }
 
+@media only screen and (max-width: 600px) {
 
+  .conversation-container {
+    padding: 0.25rem;
+  }
+  .conversation-item img {
+    max-width: 25px;
+    max-height: 35px;
+    padding-top: 4px;
+  }
+}
 </style>

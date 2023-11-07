@@ -23,7 +23,7 @@ serpapi_api_key: ""
 discord_api_key: ""
 ```
 
-- For openpi API key visit: https://platform.openai.com/
+- For openai API key visit:  https://platform.openai.com/
 - For serpapi API key visit: https://serpapi.com/
 - For discord API key visit: https://discordgsm.com/guide/how-to-get-a-discord-bot-token
 
@@ -36,11 +36,11 @@ docker compose build
 docker compose up
 ```
 
-> Main development branch is `dev` branch, all changes merged into `main` branch will automatically be deployed to https://asai.astrosynapse.ai
+Main development branch is `dev` branch, all changes merged into `main` branch will automatically be deployed to https://asai.astrosynapse.ai
 
-## Web Client
+### Web Client
 
-Vue based web client is located in `./web` folder. To install dependacies run:
+Vue based web client is located in `./web` folder. To install dependencies run:
 
 ```bash
 cd web
