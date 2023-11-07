@@ -1,12 +1,13 @@
 <script setup>
 // Tu ide send logika 
 import { ref, onMounted } from 'vue';
-import { Form, Field } from 'vee-validate';
+import { Form, Field, useForm } from 'vee-validate';
 import { useChatStore } from '../stores/chat.store.js';
 
 const chatStore = useChatStore();
 const prompt = ref("");
-const maxRows = 8;
+
+let { resetForm } = useForm();
 
 function resizeTextArea(event) {
   const lineHeight = parseInt(window.getComputedStyle(event.target).getPropertyValue("line-height"));
@@ -24,7 +25,7 @@ function resizeTextArea(event) {
   window.scrollTo(0, scrollTo);
 }
 
-function submitPrompt(event) {
+function submitPrompt(event, resetForm) {
   if (event.shiftKey && event.key == 'Enter') {
     event.preventDefault();
     let cursorPos = event.target.selectionStart;
@@ -34,8 +35,10 @@ function submitPrompt(event) {
   }
   else if (event.key == 'Enter') {
     event.preventDefault();
-    chatStore.sendPrompt(prompt.value);
-    prompt.value = "";
+    if (prompt.value != '') {
+      chatStore.sendPrompt(prompt.value);
+      resetForm();
+    }
   }
 }
 
@@ -46,11 +49,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <Form>
+  <Form v-slot="{ resetForm }">
     <div class="textarea-container">
       <Field
         v-on:input="resizeTextArea"
-        @keydown.enter="submitPrompt"
+        @keydown.enter="submitPrompt($event, resetForm)"
         name="prompt"
         v-model="prompt"
         type="text"
@@ -58,8 +61,9 @@ onMounted(() => {
         class="form-control"
         rows="2"
         placeholder="Send a message..."
+        :disabled="chatStore.isLoading"
       ></Field>
-      <button class="send-button btn btn-light" @click="submitPrompt">
+      <button class="send-button btn btn-light" @click="submitPrompt($event, resetForm)">
         <i class="align-middle" data-feather="send"></i>
       </button>
     </div>
@@ -88,10 +92,17 @@ onMounted(() => {
 textarea {
   width: 100%;
   background-color: transparent;
+  color: white !important;
 }
 
 textarea:focus {
   background-color: transparent;
   color: white;
 }
+
+textarea:disabled {
+  background-color: grey;
+  color: white;
+}
+
 </style>

@@ -26,7 +26,7 @@ async function scrollToBottom() {
   requestAnimationFrame(() => {
     if (conversationContainer.value) {
       var promptContainerHeight = document.querySelector('.prompt-container').offsetHeight;
-      var scrollTo = conversationContainer.value.scrollHeight + 200;
+      var scrollTo = conversationContainer.value.scrollHeight + 30;
       conversationContainer.value.scrollTop = scrollTo
     }
   });
@@ -38,6 +38,9 @@ onMounted(() => {
 
 watch(messages, () => {
   scrollToBottom();
+  nextTick(() => {
+    feather.replace();
+  });
 });
 
 </script>
@@ -49,23 +52,31 @@ watch(messages, () => {
       <template v-if="messages.length > 0">
       
         <div class="conversation-item row" v-for="(message, index) in messages" :key="index">
-        
-          <div class="col-1 col-xs-4">
-            <img src="./assets/asai-icon.png" class="logo" alt="Asai Icon" v-if="message.sender === 'ai'"/>
-            <img src="./assets/user-icon.png" class="logo" alt="User Icon" v-if="message.sender === 'human'"/>
-          </div>
-        
-          <div class="col-11 col-xs-8">
-            <div v-if="message.content !== 'loader'" class="message-content" v-html="md.render(message.content.trim())"></div>
-            <div v-else>
-              <span class="spinner mb-2 me-2"></span> I'm thinking... 
-            </div>
-            
-            <!-- <div class="message-content" v-html="md.render(message.content.trim())"></div> -->
-          </div>
-          
-          <hr class="separator opacity-100" v-if="messages.length > 1 && index !== messages.length - 1">
+          <div class="col-12">
 
+            <!-- <div class="row">
+              <div class="col-12">
+                <button class="msg-btn btn btn-dark btn-sm float-end me-3 mb-1" v-if="message.sender === 'human'"><i class="msg-btn-icon d-block" data-feather="refresh-cw"></i></button>
+                <button class="msg-btn btn btn-dark btn-sm float-end me-3 mb-1" v-if="message.sender === 'ai'"><i class="msg-btn-icon d-block" data-feather="clipboard"></i></button>
+              </div>
+            </div> -->
+
+            <div class="row">
+              <div class="col-1 col-xs-4">
+                <img src="./assets/asai-icon.png" class="logo" alt="Asai Icon" v-if="message.sender === 'ai'"/>
+                <img src="./assets/user-icon.png" class="logo" alt="User Icon" v-if="message.sender === 'human'"/>
+              </div>
+            
+              <div class="col-11 col-xs-8">
+                <div v-if="message.content !== 'loader'" class="message-content pe-3" v-html="md.render(message.content.trim())"></div>
+                <div v-else>
+                  <span class="me-3">I'm thinking...  </span><span class="spinner mb-2 me-2"><img src="./assets/loader.png" alt=""></span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <hr class="separator opacity-100" v-if="messages.length > 1 && index !== messages.length - 1">
         </div>
 
       </template>
@@ -91,6 +102,18 @@ watch(messages, () => {
   padding: 1.5rem;
 }
 
+.msg-btn {
+  padding-right: 23px;
+  padding-bottom: 23px !important;
+  width: 25px;
+  height: 25px;
+}
+
+.msg-btn-icon {
+  width: 16px;
+  height: 16px;
+}
+
 .prompt-container {
   bottom: 30px;
   position: sticky;
@@ -113,12 +136,14 @@ watch(messages, () => {
   75%   { transform: rotate(270deg); }
   100%  { transform: rotate(360deg); }
 }
-.spinner::after {
-  content: '|';
+
+.spinner img {
   display: inline-block;
   vertical-align: middle;
   transform-origin: 50% 50%;
   animation: rotate 0.5s linear infinite;
+  height: 18px;
+  margin-bottom: 5px;
 }
 
 @media only screen and (max-width: 600px) {

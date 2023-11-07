@@ -14,7 +14,8 @@ export const useChatStore = defineStore({
       content: "Hello there... I'm Asai, How can I help you?"
     }],
     aiMsg: null,
-    socket: null
+    socket: null,
+    isLoading: false
   }),
   actions: {
     async connectWebSocket() {
@@ -33,6 +34,7 @@ export const useChatStore = defineStore({
           this.messages = [...this.messages, this.aiMsg];
         } else if (event.data === "[chain end]") {
           this.aiMsg = null;
+          this.isLoading = false;
         } else if (this.aiMsg) {
           if (this.aiMsg.content == "loader") {
             this.aiMsg.content = ""
@@ -90,6 +92,7 @@ export const useChatStore = defineStore({
 
       try {
         this.socket.send(JSON.stringify(data));
+        this.isLoading = true;
       } catch (error) {
         console.error("Failed to send prompt:", error);
       }
