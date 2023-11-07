@@ -2,16 +2,13 @@ module github.com/AstroSynapseAI/app-service
 
 go 1.20
 
-replace github.com/tmc/langchaingo => /Users/simun/Engineering/Projects/GoLangChain/SourceCode
-// replace github.com/tmc/langchaingo => ../GoLangChain
-
 require (
 	github.com/GoLangWebSDK/rest v0.0.0-20230522143808-2e1e35b013d6
 	github.com/bwmarrin/discordgo v0.27.1
 	github.com/gocolly/colly v1.2.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/thanhpk/randstr v1.0.6
-	github.com/tmc/langchaingo v0.0.0-20230827001633-72b07a1c060f
+	github.com/tmc/langchaingo v0.0.0-20231107054554-0cff34d32fa3
 	gopkg.in/yaml.v2 v2.3.0
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.2
@@ -59,11 +56,6 @@ require (
 	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/temoto/robotstxt v1.1.2 // indirect
-	gitlab.com/golang-commonmark/html v0.0.0-20191124015941-a22733972181 // indirect
-	gitlab.com/golang-commonmark/linkify v0.0.0-20191026162114-a0c2df6c8f82 // indirect
-	gitlab.com/golang-commonmark/markdown v0.0.0-20211110145824-bf3e522c626a // indirect
-	gitlab.com/golang-commonmark/mdurl v0.0.0-20191124015652-932350d1cb84 // indirect
-	gitlab.com/golang-commonmark/puny v0.0.0-20191124015043-9f83538fa04f // indirect
 	go.starlark.net v0.0.0-20230302034142-4b1e35fe2254 // indirect
 	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/exp v0.0.0-20230510235704-dd950f8aeaea // indirect

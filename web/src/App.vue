@@ -54,7 +54,12 @@ watch(messages, () => {
           </div>
         
           <div class="col-11 col-xs-8">
-            <div class="message-content" v-html="md.render(message.content.trim())"></div>
+            <div v-if="message.content !== 'loader'" class="message-content" v-html="md.render(message.content.trim())"></div>
+            <div v-else>
+              <span class="spinner mb-2 me-2"></span> I'm thinking... 
+            </div>
+            
+            <!-- <div class="message-content" v-html="md.render(message.content.trim())"></div> -->
           </div>
           
           <hr class="separator opacity-100" v-if="messages.length > 1 && index !== messages.length - 1">
@@ -105,4 +110,21 @@ watch(messages, () => {
     padding-top: 4px;
   }
 }
+
+@keyframes rotate {
+  0%    { transform: rotate(0deg); }
+  25%   { transform: rotate(90deg); }
+  50%   { transform: rotate(180deg); }
+  75%   { transform: rotate(270deg); }
+  100%  { transform: rotate(360deg); }
+}
+.spinner::after {
+  content: '|';
+  display: inline-block;
+  vertical-align: middle;
+  transform-origin: 50% 50%;
+  animation: rotate 0.5s linear infinite;
+}
+
+
 </style>

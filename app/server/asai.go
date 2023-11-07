@@ -37,9 +37,6 @@ func NewAsaiServer() *AsaiServer {
 		fmt.Println("Failed to create Discord session:", err)
 	}
 
-	// ctx, cancel := context.WithCancel(context.Background())
-	// defer cancel()
-
 	server.wsManager = ws.NewManager(context.Background())
 
 	return server

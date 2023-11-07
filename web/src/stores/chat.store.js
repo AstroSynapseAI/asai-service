@@ -28,13 +28,13 @@ export const useChatStore = defineStore({
         if (event.data === "[chain start]") {
           this.aiMsg = {
             sender: "ai",
-            content: "I'm thinking..."
+            content: "loader"
           };
           this.messages = [...this.messages, this.aiMsg];
         } else if (event.data === "[chain end]") {
           this.aiMsg = null;
         } else if (this.aiMsg) {
-          if (this.aiMsg.content == "I'm thinking...") {
+          if (this.aiMsg.content == "loader") {
             this.aiMsg.content = ""
           }
           this.aiMsg.content += event.data;
