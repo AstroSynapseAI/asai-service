@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 
 	"github.com/AstroSynapseAI/app-service/controllers"
@@ -57,8 +58,9 @@ func (server *AsaiServer) Run() error {
 	router.Mux.StrictSlash(true)
 
 	// Web client server
-	static := http.FileServer(http.Dir("./web/static"))
-	assets := http.FileServer(http.Dir("./web/static/assets"))
+	staticDir := "./web/static"
+	static := http.FileServer(http.Dir(staticDir))
+	assets := http.FileServer(http.Dir(staticDir + "/assets"))
 
 	router.Mux.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", assets))
 	router.Mux.Handle("/", static)
@@ -71,6 +73,21 @@ func (server *AsaiServer) Run() error {
 
 	// Websocket server
 	router.Mux.HandleFunc("/api/chat/socket", server.wsManager.Handler)
+
+	// Fallback to index.html for Vue Router
+	router.Mux.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		path := filepath.Join(staticDir + r.URL.Path)
+		_, err := os.Stat(path)
+
+		if os.IsNotExist(err) {
+			http.ServeFile(w, r, staticDir+"/index.html")
+			return
+		}
+
+		// If request is not for a directory, serve with the static file server as normal
+		static.ServeHTTP(w, r)
+		return
+	})
 
 	port := os.Getenv("PORT")
 	if port == "" {
