@@ -1,7 +1,7 @@
 <script setup>
 
 import PromptInput from './components/PromptInput.vue';
-import { ref, onMounted, watch, nextTick } from 'vue';
+import { ref, onMounted, watch, nextTick, watchEffect } from 'vue';
 import { storeToRefs } from 'pinia';
 import  MarkdownIt  from 'markdown-it';
 
@@ -36,7 +36,7 @@ onMounted(() => {
   chatStore.connectWebSocket();
 })
 
-watch(messages, () => {
+watchEffect(messages, () => {
   scrollToBottom();
   nextTick(() => {
     feather.replace();
