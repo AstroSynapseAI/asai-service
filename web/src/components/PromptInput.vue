@@ -18,11 +18,6 @@ function resizeTextArea(event) {
     event.target.style.height = 'auto';
     event.target.style.height = event.target.scrollHeight + 'px';
   }
-
-  // Scroll to bottom
-  var promptContainerHeight = document.querySelector('.prompt-container').offsetHeight;
-  var scrollTo = document.body.scrollHeight + promptContainerHeight;
-  window.scrollTo(0, scrollTo);
 }
 
 function submitPrompt(event, resetForm) {
@@ -91,12 +86,13 @@ onMounted(() => {
 
 textarea {
   width: 100%;
-  background-color: transparent;
+  background-color: black;
   color: white !important;
+  z-index: 999;
 }
 
 textarea:focus {
-  background-color: transparent;
+  background-color: black;
   color: white;
 }
 

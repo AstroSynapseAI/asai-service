@@ -19,7 +19,7 @@ const md = new MarkdownIt({
   }
 );
 
-usersStore.getSession();
+// usersStore.getSession();
 
 async function scrollToBottom() {
   console.log('Scrolling to bottom');
@@ -33,7 +33,8 @@ async function scrollToBottom() {
 }
 
 onMounted(() => {
-  chatStore.connectWebSocket();
+  scrollToBottom();
+  // chatStore.connectWebSocket();
 })
 
 watch(messages, () => {
@@ -115,6 +116,7 @@ watch(messages, () => {
 }
 
 .prompt-container {
+  background-color: black;
   bottom: 30px;
   position: sticky;
 }
