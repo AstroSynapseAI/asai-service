@@ -36,7 +36,7 @@ onMounted(() => {
   chatStore.connectWebSocket();
 })
 
-watchEffect(messages, () => {
+watch(messages, () => {
   scrollToBottom();
   nextTick(() => {
     feather.replace();
