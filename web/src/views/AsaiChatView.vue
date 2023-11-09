@@ -34,7 +34,7 @@ async function scrollToBottom() {
 
 onMounted(() => {
   scrollToBottom();
-  // chatStore.connectWebSocket();
+  chatStore.connectWebSocket();
 })
 
 watch(messages, () => {
