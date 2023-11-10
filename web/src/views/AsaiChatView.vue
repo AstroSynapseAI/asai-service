@@ -1,7 +1,7 @@
 <script setup>
 
 import PromptInput from '../components/PromptInput.vue';
-import { ref, onMounted, watch, nextTick, watchEffect } from 'vue';
+import { ref, onMounted, watch, nextTick, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import  MarkdownIt  from 'markdown-it';
 
@@ -10,44 +10,44 @@ import { useUsersStore } from '../stores/user.store.js';
 
 const chatStore = useChatStore();
 const { messages } = storeToRefs(chatStore);
-
 const usersStore = useUsersStore();
 const conversationContainer = ref(null);
+const promptContainer = ref(null);
+const md = new MarkdownIt({breaks: true});
+const lastMessageIndex = computed(() => messages.value.length - 1)
+const lastMessageText = computed(() => messages.value[lastMessageIndex.value]?.content || "")
 
-const md = new MarkdownIt({
-    breaks: true
-  }
-);
-
-// usersStore.getSession();
+usersStore.getSession();
 
 async function scrollToBottom() {
   console.log('Scrolling to bottom');
   requestAnimationFrame(() => {
     if (conversationContainer.value) {
-      var promptContainerHeight = document.querySelector('.prompt-container').offsetHeight;
-      var scrollTo = conversationContainer.value.scrollHeight + 30;
+      var offset = promptContainer.value.offsetHeight + 30;
+      var scrollTo = conversationContainer.value.scrollHeight + offset
       conversationContainer.value.scrollTop = scrollTo
     }
   });
 }
 
-onMounted(() => {
-  scrollToBottom();
-  chatStore.connectWebSocket();
-})
-
 watch(messages, () => {
   scrollToBottom();
-  nextTick(() => {
-    feather.replace();
-  });
 });
+
+watch(lastMessageText, () => {
+  scrollToBottom();
+});
+
+onMounted(() => {
+  scrollToBottom();
+  feather.replace();
+  chatStore.connectWebSocket();
+})
 
 </script>
 
 <template>
-  <div class="container border-start border-end border-white border-5 min-vh-100 d-flex flex-column">
+  <div class="container border-start border-end border-white border-5 min-vh-100 d-flex flex-column ">
     <div ref="conversationContainer" class="conversation-container container-fluid flex-grow-1 overflow-auto">
       
       <template v-if="messages.length > 0">
@@ -57,8 +57,12 @@ watch(messages, () => {
 
             <!-- <div class="row">
               <div class="col-12">
-                <button class="msg-btn btn btn-dark btn-sm float-end me-3 mb-1" v-if="message.sender === 'human'"><i class="msg-btn-icon d-block" data-feather="refresh-cw"></i></button>
-                <button class="msg-btn btn btn-dark btn-sm float-end me-3 mb-1" v-if="message.sender === 'ai'"><i class="msg-btn-icon d-block" data-feather="clipboard"></i></button>
+                <button class="msg-btn btn btn-dark btn-sm float-end me-3 mb-1" v-if="message.sender === 'human'">
+                  <i class="msg-btn-icon d-block" data-feather="refresh-cw"></i>
+                </button>
+                <button class="msg-btn btn btn-dark btn-sm float-end me-3 mb-1" v-if="message.sender === 'ai'">
+                  <i class="msg-btn-icon d-block" data-feather="clipboard"></i>
+                </button>
               </div>
             </div> -->
 
@@ -84,7 +88,7 @@ watch(messages, () => {
 
     </div>
     
-    <div class="prompt-container container">
+    <div ref="promptContainer" class="prompt-container container">
       <hr class="border border-3 opacity-100">
       <PromptInput />
     </div>
