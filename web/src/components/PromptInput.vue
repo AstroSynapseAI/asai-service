@@ -10,28 +10,29 @@ const prompt = ref("");
 let { resetForm } = useForm();
 
 function resizeTextArea(event) {
+  event.target.style.height = 'auto';
+
   const lineHeight = parseInt(window.getComputedStyle(event.target).getPropertyValue("line-height"));
-  const currentRows = event.target.scrollHeight / lineHeight;
+  let currentRows = Math.floor(event.target.scrollHeight / lineHeight);
   const maxRows = 10;
 
-  if (currentRows <= maxRows) {
-    event.target.style.height = 'auto';
-    event.target.style.height = event.target.scrollHeight + 'px';
-  }
+  currentRows = currentRows > maxRows ? maxRows : currentRows;
+  event.target.style.height = `${currentRows * lineHeight}px`;
 }
 
 function submitPrompt(event, resetForm) {
+  event.preventDefault();
   if (event.shiftKey && event.key == 'Enter') {
-    event.preventDefault();
     let cursorPos = event.target.selectionStart;
     let textBeforeCursor = prompt.value.substring(0, cursorPos);
     let textAfterCursor = prompt.value.substring(cursorPos);
     prompt.value = textBeforeCursor + '\n' + textAfterCursor;
+    resizeTextArea(event);
   }
   else if (event.key == 'Enter') {
-    event.preventDefault();
-    if (prompt.value != '') {
+    if (prompt.value.trim() !== '') {
       chatStore.sendPrompt(prompt.value);
+      event.target.style.height = 'auto';
       resetForm();
     }
   }
@@ -45,7 +46,7 @@ onMounted(() => {
 
 <template>
   <Form v-slot="{ resetForm }">
-    <div class="textarea-container">
+    <div :class="{ 'textarea-container': true, 'loading': chatStore.isLoading, 'form-control': true}" class="form-control">
       <Field
         v-on:input="resizeTextArea"
         @keydown.enter="submitPrompt($event, resetForm)"
@@ -53,12 +54,12 @@ onMounted(() => {
         v-model="prompt"
         type="text"
         as="textarea"
-        class="form-control"
+        class=""
         rows="2"
         placeholder="Send a message..."
         :disabled="chatStore.isLoading"
       ></Field>
-      <button class="send-button btn btn-light" @click="submitPrompt($event, resetForm)">
+      <button class="send-button btn btn-light" :disabled="chatStore.isLoading" @click="submitPrompt($event, resetForm)">
         <i class="align-middle" data-feather="send"></i>
       </button>
     </div>
@@ -69,10 +70,11 @@ onMounted(() => {
 <style scoped>
 .textarea-container {
   position: relative;
+  background-color: black;
 }
 
-.message-input {
-  padding: 1rem 3rem 1rem 1rem;  /* make space for the button */
+.loading {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .send-button {
@@ -84,20 +86,27 @@ onMounted(() => {
   border: 1px solid white;
 }
 
+.send-button:disabled {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: black;
+}
+
 textarea {
-  width: 100%;
-  background-color: black;
+  width: calc(100% - 50px);
+  background-color: transparent;
   color: white !important;
   z-index: 999;
+  border: none;
 }
 
 textarea:focus {
-  background-color: black;
+  background-color: transparent;
   color: white;
+  border: none !important;
+  outline: none !important;
 }
 
 textarea:disabled {
-  background-color: grey;
   color: white;
 }
 
