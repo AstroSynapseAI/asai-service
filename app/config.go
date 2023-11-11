@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/tmc/langchaingo/llms"
+	"github.com/tmc/langchaingo/llms/ollama"
+	"github.com/tmc/langchaingo/llms/openai"
 	"gopkg.in/yaml.v2"
 )
 
@@ -14,6 +17,7 @@ type ServerAdapter interface {
 }
 
 type Config struct {
+	LLM llms.LanguageModel
 	ENV string
 	DSN string
 }
@@ -42,13 +46,26 @@ func (cnf *Config) InitDB() {
 func (cnf *Config) LoadEnvironment() {
 	fmt.Println("Current Environment:", cnf.ENV)
 	if cnf.ENV == "LOCAL DEV" {
-		setupLocalDev()
+		cnf.setupLocalDev()
 		return
 	}
 
+	if cnf.ENV == "HEROKU DEV" {
+		cnf.setupHeroku()
+		return
+	}
 }
 
-func setupLocalDev() {
+func (cnf *Config) setupHeroku() {
+	var err error
+	cnf.LLM, err = openai.NewChat(openai.WithModel("gpt-4"))
+	if err != nil {
+		fmt.Println("Error creating default LLM:", err)
+		return
+	}
+}
+
+func (cnf *Config) setupLocalDev() {
 	var Config struct {
 		OpenAPIKey    string `yaml:"open_api_key"`
 		SerpAPIKey    string `yaml:"serpapi_api_key"`
@@ -85,6 +102,12 @@ func setupLocalDev() {
 	err = os.Setenv("DISCORD_API_KEY", Config.DiscordApiKey)
 	if err != nil {
 		fmt.Println("Error setting environment variable:", err)
+		return
+	}
+
+	cnf.LLM, err = ollama.New(ollama.WithModel("mistral"))
+	if err != nil {
+		fmt.Println("Error creating default LLM:", err)
 		return
 	}
 }

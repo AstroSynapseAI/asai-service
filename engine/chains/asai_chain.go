@@ -16,33 +16,23 @@ import (
 	asaiTools "github.com/AstroSynapseAI/app-service/engine/tools"
 
 	"github.com/tmc/langchaingo/agents"
+	"github.com/tmc/langchaingo/llms"
 
 	"github.com/tmc/langchaingo/chains"
-	"github.com/tmc/langchaingo/llms/openai"
 	"github.com/tmc/langchaingo/prompts"
 	"github.com/tmc/langchaingo/schema"
 	"github.com/tmc/langchaingo/tools"
 )
 
 type AsaiChain struct {
-	LLM    *openai.Chat
+	LLM    llms.LanguageModel
 	Memory *memory.AsaiMemory
 	Agents []tools.Tool
 	Stream func(context.Context, []byte)
 }
 
 func NewAsaiChain() (*AsaiChain, error) {
-	// dsn := config.SetupPostgreDSN()
-	dsn := app.CONFIG.DSN
-	asaiMemory := memory.NewMemory(dsn)
-
-	// create llm
-	llm, err := openai.NewChat(
-		openai.WithModel("gpt-4"),
-	)
-	if err != nil {
-		return nil, err
-	}
+	asaiMemory := memory.NewMemory(app.CONFIG.DSN)
 
 	// create search agent
 	searchAgent, err := search.NewSearchAgent()
@@ -65,7 +55,7 @@ func NewAsaiChain() (*AsaiChain, error) {
 	}
 
 	return &AsaiChain{
-		LLM:    llm,
+		LLM:    app.CONFIG.LLM,
 		Memory: asaiMemory,
 		Agents: []tools.Tool{
 			searchAgent,
