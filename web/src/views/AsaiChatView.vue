@@ -20,7 +20,6 @@ const lastMessageText = computed(() => messages.value[lastMessageIndex.value]?.c
 usersStore.getSession();
 
 async function scrollToBottom() {
-  console.log('Scrolling to bottom');
   requestAnimationFrame(() => {
     if (conversationContainer.value) {
       var offset = promptContainer.value.offsetHeight + 30;

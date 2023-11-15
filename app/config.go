@@ -105,7 +105,10 @@ func (cnf *Config) setupLocalDev() {
 		return
 	}
 
-	cnf.LLM, err = ollama.New(ollama.WithModel("mistral"))
+	cnf.LLM, err = ollama.New(
+		ollama.WithModel("mistral"),
+		ollama.WithServerURL("http://localhost:11434/"),
+	)
 	if err != nil {
 		fmt.Println("Error creating default LLM:", err)
 		return

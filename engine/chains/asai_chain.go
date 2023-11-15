@@ -17,6 +17,7 @@ import (
 
 	"github.com/tmc/langchaingo/agents"
 	"github.com/tmc/langchaingo/llms"
+	"github.com/tmc/langchaingo/llms/ollama"
 
 	"github.com/tmc/langchaingo/chains"
 	"github.com/tmc/langchaingo/prompts"
@@ -33,6 +34,15 @@ type AsaiChain struct {
 
 func NewAsaiChain() (*AsaiChain, error) {
 	asaiMemory := memory.NewMemory(app.CONFIG.DSN)
+
+	llm, err := ollama.New(
+		ollama.WithModel("mistral"),
+		ollama.WithServerURL("http://host.docker.internal:11434/"),
+	)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
 
 	// create search agent
 	searchAgent, err := search.NewSearchAgent()
@@ -55,7 +65,7 @@ func NewAsaiChain() (*AsaiChain, error) {
 	}
 
 	return &AsaiChain{
-		LLM:    app.CONFIG.LLM,
+		LLM:    llm,
 		Memory: asaiMemory,
 		Agents: []tools.Tool{
 			searchAgent,

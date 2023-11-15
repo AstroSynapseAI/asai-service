@@ -12,11 +12,12 @@ services:
       - 8082:8082
     volumes:
       - .:/app
-      - /Users/simun/Engineering/Projects/GoLangChain/SourceCode:/GoLangChain
     depends_on:
       - asai-db
     networks:
       - asai-network
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   asai-db:
     image: postgres:9.6.12
@@ -34,8 +35,22 @@ services:
     networks:
       - asai-network
 
+  # asai-ollama:
+    # image: ollama/ollama
+    # container_name: asai-ollama
+    # ports:
+    #   - 11434:11434
+    # volumes:
+    #   - ollama_data:/app
+    # networks:
+    #   - asai-network
+
 volumes:
+  # ollama_data:
+  #   driver: local
   db-data:
+    driver: local
 
 networks:
   asai-network:
+    driver: bridge
