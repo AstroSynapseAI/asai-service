@@ -58,7 +58,7 @@ func (cnf *Config) LoadEnvironment() {
 
 func (cnf *Config) setupHeroku() {
 	var err error
-	cnf.LLM, err = openai.NewChat(openai.WithModel("gpt-4"))
+	cnf.LLM, err = openai.NewChat(openai.WithModel("gpt-4-1106-preview"))
 	if err != nil {
 		fmt.Println("Error creating default LLM:", err)
 		return
@@ -107,7 +107,7 @@ func (cnf *Config) setupLocalDev() {
 
 	cnf.LLM, err = ollama.New(
 		ollama.WithModel("mistral"),
-		ollama.WithServerURL("http://localhost:11434/"),
+		ollama.WithServerURL("http://host.docker.internal:11434/"),
 	)
 	if err != nil {
 		fmt.Println("Error creating default LLM:", err)

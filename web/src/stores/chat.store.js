@@ -26,7 +26,6 @@ export const useChatStore = defineStore({
       });
 
       this.socket.addEventListener('message', (event) => {
-        console.log('WebSocket message', event.data);
         if (event.data === "[chain start]") {
           this.aiMsg = {
             sender: "ai",
