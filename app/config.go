@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/tmc/langchaingo/llms"
-	"github.com/tmc/langchaingo/llms/ollama"
 	"github.com/tmc/langchaingo/llms/openai"
 	"gopkg.in/yaml.v2"
 )
@@ -69,7 +68,7 @@ func (cnf *Config) setupHeroku() {
 }
 
 func (cnf *Config) setupLocalDev() {
-	cnf.MemorySize = 4024
+
 	var Config struct {
 		OpenAPIKey    string `yaml:"open_api_key"`
 		SerpAPIKey    string `yaml:"serpapi_api_key"`
@@ -109,10 +108,14 @@ func (cnf *Config) setupLocalDev() {
 		return
 	}
 
-	cnf.LLM, err = ollama.New(
-		ollama.WithModel("mistral"),
-		ollama.WithServerURL("http://host.docker.internal:11434/"),
-	)
+	cnf.LLM, err = openai.NewChat(openai.WithModel("gpt-4"))
+	cnf.MemorySize = 20048
+
+	// cnf.MemorySize = 4024
+	// cnf.LLM, err = ollama.New(
+	// 	ollama.WithModel("mistral"),
+	// 	ollama.WithServerURL("http://host.docker.internal:11434/"),
+	// )
 	if err != nil {
 		fmt.Println("Error creating default LLM:", err)
 		return

@@ -104,6 +104,9 @@ func (agent *BrowserAgent) Description() string {
 }
 
 func (agent *BrowserAgent) Call(ctx context.Context, input string) (string, error) {
+	fmt.Println("Browser Agent Running with input...")
+	fmt.Println(input)
+
 	jsonString, err := extractJSON(input)
 	if err != nil {
 		return ErrParsingInput, nil
