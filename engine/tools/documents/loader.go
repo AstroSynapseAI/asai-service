@@ -78,9 +78,6 @@ func (agent *DocumentsTool) Description() string {
 }
 
 func (tool *DocumentsTool) Call(ctx context.Context, input string) (string, error) {
-	fmt.Println("Retrieving documents with input...")
-	fmt.Println(input)
-
 	var toolInput struct {
 		FileName string
 		Query    string

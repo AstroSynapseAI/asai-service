@@ -2,9 +2,11 @@ package callbacks
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/tmc/langchaingo/callbacks"
+	"github.com/tmc/langchaingo/schema"
 )
 
 // DefaultKeywords is map of the agents final out prefix keywords.
@@ -59,6 +61,21 @@ func (handler *StreamHandler) HandleChainEnd(_ context.Context, outputs map[stri
 	handler.egress <- []byte("END")
 }
 
+func (handler *StreamHandler) HandleToolStart(_ context.Context, input string) {
+	startToolString := "[tool start]"
+	handler.egress <- []byte(startToolString)
+
+}
+
+func (handler *StreamHandler) HandleToolEnd(_ context.Context, output string) {
+	endToolString := "[tool end]"
+	handler.egress <- []byte(endToolString)
+}
+
+func (handler *StreamHandler) HandleAgentAction(_ context.Context, action schema.AgentAction) {
+	fmt.Println("Agent selected action:", formatAgentAction(action))
+}
+
 func (handler *StreamHandler) HandleStreamingFunc(ctx context.Context, chunk []byte) {
 	chunkStr := string(chunk)
 	handler.LastTokens += chunkStr
@@ -91,4 +108,12 @@ func (handler *StreamHandler) HandleStreamingFunc(ctx context.Context, chunk []b
 	if handler.PrintOutput {
 		handler.egress <- chunk
 	}
+}
+
+func formatAgentAction(action schema.AgentAction) string {
+	return fmt.Sprintf("\"%s\" with input \"%s\"", removeNewLines(action.Tool), removeNewLines(action.ToolInput))
+}
+
+func removeNewLines(s any) string {
+	return strings.ReplaceAll(fmt.Sprint(s), "\n", " ")
 }

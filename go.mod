@@ -8,7 +8,7 @@ require (
 	github.com/gocolly/colly v1.2.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/thanhpk/randstr v1.0.6
-	github.com/tmc/langchaingo v0.0.0-20231107054554-0cff34d32fa3
+	github.com/tmc/langchaingo v0.0.0-20231110174329-09a09b3b6093
 	gopkg.in/yaml.v2 v2.3.0
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.2
