@@ -32,7 +32,7 @@ type AsaiChain struct {
 }
 
 func NewAsaiChain() (*AsaiChain, error) {
-	asaiMemory := memory.NewMemory(app.CONFIG.DSN)
+	asaiMemory := memory.NewMemory(app.CONFIG.DSN, app.CONFIG.MemorySize)
 
 	// create search agent
 	searchAgent, err := search.NewSearchAgent()

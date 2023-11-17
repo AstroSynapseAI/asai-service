@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/tmc/langchaingo/llms/openai"
+	"github.com/AstroSynapseAI/app-service/app"
+
 	"github.com/tmc/langchaingo/memory"
 	"github.com/tmc/langchaingo/schema"
 )
@@ -14,19 +15,21 @@ type AsaiMemory struct {
 	chatHistory *PersistentChatHistory
 }
 
-const DefaultMemoryBufferTokenSize = 4024
+var DefaultMemoryBufferTokenSize = 20048
 
 // NewMemory creates a new instance of AsaiMemory.
 //
 // It takes a dsn postgred string as a parameter and returns a pointer to AsaiMemory.
-func NewMemory(dsn string) *AsaiMemory {
-	llm, _ := openai.New(
-		openai.WithModel("gpt-4"),
-	)
+func NewMemory(dsn string, memorySize ...int) *AsaiMemory {
+
+	if memorySize != nil {
+		DefaultMemoryBufferTokenSize = memorySize[0]
+	}
+
 	chatHistory := NewPersistentChatHistory(dsn)
 
 	buffer := memory.NewConversationTokenBuffer(
-		llm,
+		app.CONFIG.LLM,
 		DefaultMemoryBufferTokenSize,
 		memory.WithChatHistory(chatHistory),
 	)

@@ -17,9 +17,10 @@ type ServerAdapter interface {
 }
 
 type Config struct {
-	LLM llms.LanguageModel
-	ENV string
-	DSN string
+	LLM        llms.LanguageModel
+	ENV        string
+	DSN        string
+	MemorySize int
 }
 
 func NewConfig() *Config {
@@ -59,6 +60,8 @@ func (cnf *Config) LoadEnvironment() {
 func (cnf *Config) setupHeroku() {
 	var err error
 	cnf.LLM, err = openai.NewChat(openai.WithModel("gpt-4-1106-preview"))
+	cnf.MemorySize = 20048
+
 	if err != nil {
 		fmt.Println("Error creating default LLM:", err)
 		return
@@ -66,6 +69,7 @@ func (cnf *Config) setupHeroku() {
 }
 
 func (cnf *Config) setupLocalDev() {
+	cnf.MemorySize = 4024
 	var Config struct {
 		OpenAPIKey    string `yaml:"open_api_key"`
 		SerpAPIKey    string `yaml:"serpapi_api_key"`
