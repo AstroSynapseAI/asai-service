@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import AsaiChatView from '../views/AsaiChatView.vue'
+import AsaiChatView from '@/views/AsaiChatView.vue'
+import HomeView from '@/views/HomeView.vue'
+import AboutView from '@/views/Home/AboutView.vue'
+import CTAView from '@/views/Home/CTAView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,8 +15,23 @@ const router = createRouter({
     {
       path: '/home',
       name: 'home',
-      component: HomeView
+      component: HomeView,
+      children: [
+        {
+          path: 'cta',
+          name: 'cta',
+          component: CTAView
+        },
+    
+        {
+          path: 'about/:slug?',
+          name: 'about',
+          component: AboutView
+        },
+      ]
     },
+  
+
     // {
     //   path: '/about',
     //   name: 'about',

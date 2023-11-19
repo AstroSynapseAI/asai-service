@@ -108,7 +108,7 @@ func (cnf *Config) setupLocalDev() {
 		return
 	}
 
-	cnf.LLM, err = openai.NewChat(openai.WithModel("gpt-4"))
+	cnf.LLM, err = openai.NewChat(openai.WithModel("gpt-4-1106-preview"))
 	cnf.MemorySize = 20048
 
 	// cnf.MemorySize = 4024

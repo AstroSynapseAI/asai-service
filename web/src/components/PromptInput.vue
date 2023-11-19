@@ -1,5 +1,4 @@
 <script setup>
-// Tu ide send logika 
 import { ref, onMounted } from 'vue';
 import { Form, Field, useForm } from 'vee-validate';
 import { useChatStore } from '../stores/chat.store.js';
