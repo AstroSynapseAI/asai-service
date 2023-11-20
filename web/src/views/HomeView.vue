@@ -198,7 +198,7 @@ a:hover {
 
   .logo {
     margin-bottom: 25px;
-    width: auto;
+    width: 100%;
   }
 
   .cta {
