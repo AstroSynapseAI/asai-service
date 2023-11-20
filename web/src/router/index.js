@@ -16,6 +16,7 @@ const router = createRouter({
       path: '/home',
       name: 'home',
       component: HomeView,
+      redirect: { name: 'cta' },
       children: [
         {
           path: 'cta',
@@ -31,7 +32,6 @@ const router = createRouter({
       ]
     },
   
-
     // {
     //   path: '/about',
     //   name: 'about',

@@ -23,28 +23,66 @@ onMounted(() => {
     </div>
     
     <div class="row">
-      <div class="col-sm-6 col-md-9 col-xl-6">
+      <div class="col-sm-6 col-md-8 col-xl-6">
         <img class="logo" src="@/assets/Logo.v1.white.png" alt="">
       </div>
-      <div class="col-sm-6 col-md-3 col-xl-6">
-        <router-link :to="{name: 'about', params: {slug: 'open-source'}}">
-          <h5 class="mb-3">Open source <i data-feather="arrow-right"></i></h5>
-        </router-link>
+      <div class="col-sm-6 col-md-4 col-xl-6">
+        <table cl>
+          <tr>
+            <td>
+              <router-link :to="{name: 'about', params: {slug: 'open-source'}}">
+                <h5 class="mb-3 me-3">Open source</h5>
+              </router-link>
+            </td>
+            <td>
+              <i class="mb-3" data-feather="arrow-right"></i>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <router-link :to="{name: 'about', params: {slug: 'transparency'}}">
+                <h5 class="mb-3">Transparent</h5>
+              </router-link>
+            </td>
+            <td>
+              <i class="mb-3" data-feather="arrow-right"></i>
+            </td>
+          </tr>
 
-        <router-link :to="{name: 'about', params: {slug: 'transparency'}}">
-          <h5 class="mb-3">Transparent<i data-feather="arrow-right"></i></h5>
-        </router-link>
+          <tr>
+            <td>
+              <router-link :to="{name: 'about', params: {slug: 'customization'}}">
+                <h5 class="mb-3">Customizable</h5>
+              </router-link>
+            </td>
+            <td>
+              <i class="mb-3" data-feather="arrow-right"></i>
+            </td>
+          </tr>
 
-        <router-link :to="{name: 'about', params: {slug: 'customization'}}">
-          <h5 class="mb-3">Customizable<i data-feather="arrow-right"></i></h5>
-        </router-link>
-        
-        <router-link :to="{name: 'about', params: {slug: 'personalization'}}">
-          <h5 class="mb-3">Personalized<i data-feather="arrow-right"></i></h5>
-        </router-link>
-        <router-link :to="{name: 'about', params: {slug: 'privacy'}}">
-          <h5 class="mb-3">Private<i data-feather="arrow-right"></i></h5>
-        </router-link>
+          <tr>
+            <td>
+              <router-link :to="{name: 'about', params: {slug: 'personalization'}}">
+                <h5 class="mb-3">Personalized</h5>
+              </router-link>
+            </td>
+            <td>
+              <i class="mb-3" data-feather="arrow-right"></i>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <router-link :to="{name: 'about', params: {slug: 'privacy'}}">
+                <h5 class="mb-3">Private</h5>
+              </router-link>
+            </td>
+            <td>
+              <i class="mb-3" data-feather="arrow-right"></i>
+            </td>
+          </tr>
+        </table>
+
       </div>
     </div>
     
@@ -142,6 +180,12 @@ a:hover {
   background-color: white;
 }
 
+@media screen and (max-width: 1024px) {
+  .logo {
+    width: 100%;
+  }
+}
+
 @media only screen and (max-width: 576px) {
   hr {
     margin-top: 10px;
@@ -154,6 +198,7 @@ a:hover {
 
   .logo {
     margin-bottom: 25px;
+    width: auto;
   }
 
   .cta {

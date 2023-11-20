@@ -37,7 +37,7 @@ onMounted(() => {
 
   <div class="row">
     <div class="col-12">
-      <div>{{ content }}</div>
+      <div v-html="content"></div>
     </div>
   </div>
 </template>

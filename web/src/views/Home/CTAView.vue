@@ -1,4 +1,5 @@
 <template>
+  <h4 class="text-center"> Asai comes in 3 differnte flavors, make your choice: </h4>
   <div class="cta row">
     <div class="col-md-4">
       <button class="btn btn-primary w-100 btn-lg">CLOUD</button>
