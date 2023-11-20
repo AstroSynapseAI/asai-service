@@ -21,11 +21,19 @@ export const useChatStore = defineStore({
     async connectWebSocket() {
       this.socket = new WebSocket(wsURL);
 
-      this.socket.addEventListener('open', (event) => {
-        console.log('WebSocket connected', event);
-      });
-
       this.socket.addEventListener('message', (event) => {
+        switch (event.data) {
+          case "[chain start]":
+            this.onChainStart(event);
+          case "[chain end]":
+            this.onChainEnd(event);
+          case "[agent running]":
+            this.onAgentRunning(event);
+          default:
+            this.onMessage(event);
+        }
+
+
         if (event.data === "[chain start]") {
           this.aiMsg = {
             sender: "ai",
@@ -41,6 +49,10 @@ export const useChatStore = defineStore({
           }
           this.aiMsg.content += event.data;
         }
+      });
+
+      this.socket.addEventListener('open', (event) => {
+        console.log('WebSocket connected', event);
       });
 
       this.socket.addEventListener('close', (event) => {
@@ -95,6 +107,31 @@ export const useChatStore = defineStore({
         console.error("Failed to send prompt:", error);
       }
 
+    },
+
+    onChainStart() {
+      this.aiMsg = {
+        sender: "ai",
+        content: "loader"
+      };
+      this.messages = [...this.messages, this.aiMsg];
+    },
+
+    onChainEnd() {
+      this.aiMsg = null;
+      this.isLoading = false;
+    },
+
+    onAgentRunning() {
+
+    },
+
+    onMessage() {
+      if (this.aiMsg.content == "loader") {
+        this.aiMsg.content = ""
+      }
+      this.aiMsg.content += event.data;
     }
+
   }
 })
