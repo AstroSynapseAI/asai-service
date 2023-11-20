@@ -109,7 +109,7 @@ onMounted(() => {
       <div class="col-12">
         <div class="contacts row">
           
-            <div class="col-4 offset-4">
+            <div class="col-md-4 offset-md-4 col-sm-6 offset-sm-2">
 
               <div class="row">
                 <div class="col-4 d-flex justify-content-center align-items-center">
