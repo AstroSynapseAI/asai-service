@@ -23,7 +23,7 @@ export const useHomeStore = defineStore({
       "open-source": {
         title: "Open Source",
         description: `<div class="container">
-        <p class="mt-3">Asai is an open-source project, centered around transparency and community collaboration. Our platform is based on open source tools like Langchain-Go and Ollama, among other popular libraries widely utilized in software development. We value trust and transparency, which is why we have chosen to build Asai in the open-source domain.</p>
+        <p class="mt-3">Asai is an open-source project, centered around transparency and community collaboration. Our platform is based on open source tools like <a href="https://github.com/tmc/langchaingo" target="_blank">Langchain-Go</a> and <a href="https://ollama.ai/">Ollama</a>, among other popular libraries widely utilized in software development. We value trust and transparency, which is why we have chosen to build Asai in the open-source domain.</p>
 
         <p>In the early stages of development, the source code will be momentarily closed for public contributions. However, this is only so that we can perfect the initial stages of the Asai cloud platform. Immediately after this phase, the source code will be published on GitHub, becoming openly available to the user community.</p>
         </div>`,
