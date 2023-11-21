@@ -2,7 +2,7 @@ package callbacks
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
 	"strings"
 
 	"github.com/tmc/langchaingo/callbacks"
@@ -51,29 +51,44 @@ func (handler *StreamHandler) ReadFromEgress(ctx context.Context, callback func(
 }
 
 func (handler *StreamHandler) HandleChainStart(_ context.Context, inputs map[string]any) {
-	startString := "[chain start]"
-	handler.egress <- []byte(startString)
+	jsonPayload := map[string]any{
+		"step": "chain start",
+	}
+	jsonData, _ := json.Marshal(jsonPayload)
+	handler.egress <- jsonData
 }
 
 func (handler *StreamHandler) HandleChainEnd(_ context.Context, outputs map[string]any) {
-	endString := "[chain end]"
-	handler.egress <- []byte(endString)
-	handler.egress <- []byte("END")
+	jsonPayload := map[string]any{
+		"step": "chain end",
+	}
+	jsonData, _ := json.Marshal(jsonPayload)
+	handler.egress <- jsonData
 }
 
 func (handler *StreamHandler) HandleToolStart(_ context.Context, input string) {
-	startToolString := "[tool start]"
-	handler.egress <- []byte(startToolString)
-
+	jsonPayload := map[string]any{
+		"step": "tool start",
+	}
+	jsonData, _ := json.Marshal(jsonPayload)
+	handler.egress <- jsonData
 }
 
 func (handler *StreamHandler) HandleToolEnd(_ context.Context, output string) {
-	endToolString := "[tool end]"
-	handler.egress <- []byte(endToolString)
+	jsonPayload := map[string]any{
+		"step": "tool end",
+	}
+	jsonData, _ := json.Marshal(jsonPayload)
+	handler.egress <- jsonData
 }
 
 func (handler *StreamHandler) HandleAgentAction(_ context.Context, action schema.AgentAction) {
-	fmt.Println("Agent selected action:", formatAgentAction(action))
+	jsonPayload := map[string]any{
+		"step":  "agent action",
+		"agent": action.Tool,
+	}
+	jsonData, _ := json.Marshal(jsonPayload)
+	handler.egress <- jsonData
 }
 
 func (handler *StreamHandler) HandleStreamingFunc(ctx context.Context, chunk []byte) {
@@ -106,14 +121,11 @@ func (handler *StreamHandler) HandleStreamingFunc(ctx context.Context, chunk []b
 
 	// Print the final output after the detection of keyword.
 	if handler.PrintOutput {
-		handler.egress <- chunk
+		jsonPayload := map[string]any{
+			"step": "final output",
+			"msg":  string(chunk),
+		}
+		jsonData, _ := json.Marshal(jsonPayload)
+		handler.egress <- jsonData
 	}
-}
-
-func formatAgentAction(action schema.AgentAction) string {
-	return fmt.Sprintf("\"%s\" with input \"%s\"", removeNewLines(action.Tool), removeNewLines(action.ToolInput))
-}
-
-func removeNewLines(s any) string {
-	return strings.ReplaceAll(fmt.Sprint(s), "\n", " ")
 }

@@ -9,7 +9,7 @@ import { useChatStore } from '../stores/chat.store.js';
 import { useUsersStore } from '../stores/user.store.js';
 
 const chatStore = useChatStore();
-const { messages } = storeToRefs(chatStore);
+const { messages, connectionErr } = storeToRefs(chatStore);
 const usersStore = useUsersStore();
 const conversationContainer = ref(null);
 const promptContainer = ref(null);
@@ -47,6 +47,18 @@ onMounted(() => {
 
 <template>
   <div class="container border-start border-end border-white border-5 min-vh-100 d-flex flex-column ">
+
+    <div class="error-container text-white border border-1 border-white px-3" v-if="connectionErr.active">
+      <div class="row h-100 align-items-center justify-content-center text-center">
+        <div class="col">
+          <p class="mb-0">An has occurred! Please refresh the page and try again.</p>
+        </div>
+        <div class="col-auto">
+          <button class="btn-close btn-close-white" v-on:click="chatStore.closeError"></button>
+        </div>
+      </div>
+    </div>
+
     <div ref="conversationContainer" class="conversation-container container-fluid flex-grow-1 overflow-auto">
       
       <template v-if="messages.length > 0">
@@ -72,10 +84,14 @@ onMounted(() => {
               </div>
             
               <div class="col-11 col-xs-8">
-                <div v-if="message.content !== 'loader'" class="message-content pe-3" v-html="md.render(message.content.trim())"></div>
-                <div v-else>
-                  <span class="me-3">I'm thinking...  </span><span class="spinner mb-2 me-2"><img src="../assets/loader.png" alt=""></span>
+
+                <div v-if="message.isLoading">
+                  <p><span class="me-3">I'm thinking...  </span><span class="spinner mb-2 me-2"><img v-if="!message.isAgentRunnig" src="../assets/loader.png" alt=""></span></p>
+                  <p v-if="message.isAgentRunnig"><span class="me-3 fst-italic">Activating agent: {{ message.agentName }}...  </span><span class="spinner mb-2 me-2"><img src="../assets/loader.png" alt=""></span></p>
                 </div>
+
+                <div v-else class="message-content pe-3" v-html="md.render(message.content.trim())"></div>
+
               </div>
             </div>
 
@@ -95,6 +111,16 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.error-container {
+  position: fixed;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 60px;
+  background-color: black;
+}
+
 .conversation-container {
   max-height: calc(90vh - 30px);
   padding: 1.25rem;
