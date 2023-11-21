@@ -113,7 +113,7 @@ onMounted(() => {
 <style scoped>
 .error-container {
   position: fixed;
-  top: 40px;
+  bottom: 180px;
   left: 50%;
   transform: translateX(-50%);
   width: 600px;

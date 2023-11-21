@@ -28,7 +28,7 @@ export const useChatStore = defineStore({
       agentName: null
     },
     connectionErr: {
-      active: true,
+      active: false,
       msg: null
     }
   }),
@@ -70,6 +70,8 @@ export const useChatStore = defineStore({
           case "final output":
             this.onMessage(payload);
             break;
+          case "error":
+            this.connectionErr.active = true;
         }
       });
     },

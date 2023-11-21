@@ -64,7 +64,6 @@ func (client *Client) MaintainConnection(ctx context.Context) {
 
 func (client *Client) PongHandler(pongMsg string) error {
 	// Current time + Pong Wait time
-	//fmt.Println("Pong...")
 
 	err := client.connection.SetReadDeadline(time.Now().Add(pongWait))
 	if err != nil {
@@ -110,6 +109,12 @@ func (client *Client) ReadMsgs(ctx context.Context) {
 		go func() {
 			if err = client.asaiChain.Run(ctx, request.UserPrompt); err != nil {
 				fmt.Println("error Asai running chain: ", err)
+				// Send an error message
+				errMessage, _ := json.Marshal(map[string]string{
+					"step": "error",
+				})
+
+				client.egress <- errMessage
 				return
 			}
 		}()
