@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import { Form, Field, useForm } from 'vee-validate';
 import { useChatStore } from '../stores/chat.store.js';
 
@@ -19,22 +19,42 @@ function resizeTextArea(event) {
   event.target.style.height = `${currentRows * lineHeight}px`;
 }
 
+function addNewLines(event) {
+  event.preventDefault();
+  let cursorPos = event.target.selectionStart;
+  let textBeforeCursor = prompt.value.substring(0, cursorPos);
+  let textAfterCursor = prompt.value.substring(cursorPos);
+  prompt.value = textBeforeCursor + '\n' + textAfterCursor;
+  nextTick(() => {
+    resizeTextArea(event);
+  });
+}
+
 function submitPrompt(event, resetForm) {
   event.preventDefault();
-  if (event.shiftKey && event.key == 'Enter') {
-    let cursorPos = event.target.selectionStart;
-    let textBeforeCursor = prompt.value.substring(0, cursorPos);
-    let textAfterCursor = prompt.value.substring(cursorPos);
-    prompt.value = textBeforeCursor + '\n' + textAfterCursor;
-    resizeTextArea(event);
+  if (prompt.value.trim() !== '') {
+    chatStore.sendPrompt(prompt.value);
+    event.target.style.height = 'auto';
+    resetForm();
   }
-  else if (event.key == 'Enter') {
-    if (prompt.value.trim() !== '') {
-      chatStore.sendPrompt(prompt.value);
-      event.target.style.height = 'auto';
-      resetForm();
+}
+
+function handleEnterPress(event, resetForm) {
+  const isDesktop = !(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+
+  if (isDesktop) {
+    if (event.shiftKey && event.key == 'Enter') {
+      addNewLines(event);
+    }
+    else if (event.key == 'Enter') {
+      submitPrompt(event, resetForm);
+    }
+  } else {
+    if (event.key == 'Enter') {
+      addNewLines(event);
     }
   }
+
 }
 
 onMounted(() => {
@@ -48,7 +68,7 @@ onMounted(() => {
     <div :class="{ 'textarea-container': true, 'loading': chatStore.isLoading, 'form-control': true}" class="form-control">
       <Field
         v-on:input="resizeTextArea"
-        @keydown.enter="submitPrompt($event, resetForm)"
+        @keydown.enter="handleEnterPress($event, resetForm)"
         name="prompt"
         v-model="prompt"
         type="text"
