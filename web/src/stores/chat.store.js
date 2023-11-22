@@ -41,6 +41,7 @@ export const useChatStore = defineStore({
       })
 
       this.socket.addEventListener('error', (event) => {
+        console.log("Connection error:", event);
         this.connectionErr.status = true;
       });
 

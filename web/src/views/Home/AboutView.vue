@@ -25,13 +25,14 @@ onMounted(() => {
 
 
 </script>
+
 <template>  
   <div class="row">
     <div class="col-8">
       <h1>{{ title }}</h1>
     </div>
     <div class="col-4">
-      <router-link :to="{name: 'cta'}"><i class="large-icon" data-feather="x"></i></router-link>
+      <router-link :to="{name: 'home'}"><i class="large-icon" data-feather="x"></i></router-link>
     </div>
   </div>
 
