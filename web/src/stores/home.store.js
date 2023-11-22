@@ -18,7 +18,8 @@ export const useHomeStore = defineStore({
           </div>
           <p class="mt-3 mt-md-5">Out of the box, your AI Avatar comes with a toolkit of autonomous agents that can perform various operations. Your avatar can search the web for you, read webpages, and the documents you provide it or give access to on GDrive. It connects to your Gmail or private Mailbox for easier email curation, and can even manage your social media identity if connected to your social media accounts.</p>
           <p>Access it via a standard web-based UI, or use plugins to integrate a chatbot to Slack, Discord, or equivalent. Through its dashboard, you can create a completely custom persona that manages your workflows and controls your agents. Choose which agents you want to use and modify their actions, select specific foundation models for your agents to use. If all of that is too overwhelming, use our simplified creation wizard.</p>
-        </div>`,
+        </div>
+        <hr class="opacity-100 my-5 d-lg-none">`,
       },
       "open-source": {
         title: "Open Source",
@@ -26,7 +27,8 @@ export const useHomeStore = defineStore({
         <p class="mt-3">Asai is an open-source project, centered around transparency and community collaboration. Our platform is based on open source tools like <a href="https://github.com/tmc/langchaingo" target="_blank">Langchain-Go</a> and <a href="https://ollama.ai/">Ollama</a>, among other popular libraries widely utilized in software development. We value trust and transparency, which is why we have chosen to build Asai in the open-source domain.</p>
 
         <p>In the early stages of development, the source code will be momentarily closed for public contributions. However, this is only so that we can perfect the initial stages of the Asai cloud platform. Immediately after this phase, the source code will be published on GitHub, becoming openly available to the user community.</p>
-        </div>`,
+        </div>
+        <hr class="opacity-100 my-5 d-lg-none">`,
       }, 
       "transparency": {
         title: "Transparent",
@@ -36,7 +38,8 @@ export const useHomeStore = defineStore({
         Through our forthcoming GitHub public contributions, we will not only be sharing our platform with the world but also learning from global insights. This allows users to be confident in the integrity of their data, its management, and their overall interaction with the Asai platform. Our ultimate goal is to provide transparency, ensuring users can see how their contributions are influencing the continual enhancement and growth of Asai.</p>
 
         <p>In addition, Asai provides you with exceptional control over your Avatar. You can decide on the type of models you want to use and actively manage the costs associated with using these models. One of the major advantages is your ability to manage where your data and documentation is stored. This control extends to how your AI avatar manages these elements. The design of Asai is rooted in a user-first approach, and we provide every tool possible for users to have direct control over their experience. We aim for you to feel confident in using Asai, knowing that you have control over your avatar's learning, cost, and data handling process.</p>
-        <div class="container">`,
+        <div class="container">
+        <hr class="opacity-100 my-5 d-lg-none">`,
       },
       "customization": {
         title: "Customizable",
@@ -56,7 +59,8 @@ export const useHomeStore = defineStore({
         <p>This advanced implementation couples with our memory-centric <a href="https://github.com/cpacker/MemGPT" target="_blank">MemGPT-based</a> architecture. Your AI Avatar doesn't just 'know' - it 'remembers'. From short-term interactions to long-term trends, your Avatar develops a coherent and consistent persona. It doesn't just respond; it evolves with you.</p>
         
         <p>With Asai, you're not just opting for automation. You're choosing a personalized experience - a unique, intuitive, and evolving assistant that's custom-made for you.</p>
-        </div>`,
+        </div>
+        <hr class="opacity-100 my-5 d-lg-none">`,
       },
       "privacy": {
         title: "Private",
@@ -64,7 +68,8 @@ export const useHomeStore = defineStore({
         <p class="mt-3">With Asai, we prioritize privacy and transparency. In an AI-driven world with justified concerns about personal data, we provide a clear view of our processes through an open-source approach. At the same time, we allow for self-hosting or operating your Avatar locally, offering an additional level of data security and control based on your needs.</p>
 
         <p>More than just technology, Asai represents an initiative to seamlessly integrate AI into the fabric of your life, your workflows, and your world. It's about empowering individuals with customized AI technologies without compromising privacy. With us, you get the privilege of a personalized AI experience, keeping you in control while staying true to our commitment to data protection.</p>
-        </div>`,
+        </div>
+        <hr class="opacity-100 my-5 d-lg-none">`,
       },
       "integrations": {
         title: "Integrations",
@@ -74,7 +79,8 @@ export const useHomeStore = defineStore({
         <p>Moreover, this bespoke setup allows us to establish a custom ecosystem catered to your requirements. This ecosystem can be further extended with specific agents, each one custom-tailored, thereby truly personalizing your AI technology experience.</p>
         
         <p>For more information or to discuss custom integrations, please reach out to us at <a href="mailto:contact@astrosynapse.ai">contact@astrosynapse.ai</a>. We're committed to helping you create an AI solution that's just right for you.</p>
-        </div>`,
+        </div>
+        <hr class="opacity-100 my-5 d-lg-none">`,
       } 
     },
   }),

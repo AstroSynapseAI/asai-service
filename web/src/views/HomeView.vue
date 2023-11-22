@@ -1,112 +1,172 @@
 <script setup>
-import { onMounted} from 'vue';
+import { onMounted } from 'vue';
+
 
 onMounted(() => {
   feather.replace();
-})
-
+});
 </script>
 
 <template>
   <div class="container d-flex flex-column vh-100">
-    <nav class="navbar navbar-dark bg-transparent">
-      <router-link :to="{name: 'asai'}" class="navbar-brand" href="#">
-        <img src="@/assets/asai-icon.png" height="24" class="d-inline-block" alt="">
-        <span class="ms-3">TALK TO ASAI</span>
-      </router-link>
-    </nav>
     
-    <div class="header row">
-      <div class="col-12">
-        <h3>AI Avatars Platform</h3>
+    <!-- Navigation  -->
+
+    <nav class="navbar navbar-expand-md bg-dark bg-transparent">
+      <div class="container-fluid">
+        <div class="row w-100">
+          <div class="col-xl-6 col-md-4">
+            <span class="navbar-brand text-white">AI Avatars Platform</span>
+          </div>
+          <div class="navbar-menu col-xl-6 col-md-8 d-flex justify-content-md-end justify-content-sm-start">
+
+            <div class="row">
+              <div class="col-auto">
+                <router-link :to="{name: 'asai'}" class="btn text-white px-md-4 px-lg-5 px-sm-2">
+                  <img src="@/assets/asai-icon.png" height="24" alt="">
+                  <span class="ms-3">Talk to Asai</span>
+                </router-link>
+              </div>
+              <div class="col-auto">
+                <router-link :to="{name: 'about', hash: '#content'}" class="btn text-white px-md-5 px-sm-0">
+                  <span>About</span>
+                </router-link>
+              </div>
+
+              <div class="col-auto">
+                <router-link :to="{name: 'login'}" class="btn text-white">
+                  <i class="align-middle" data-feather="log-in"></i>
+                </router-link>
+              </div>
+            </div>
+
+          </div>
+        </div>
       </div>
-    </div>
+    </nav>
+
+    <!-- Navigation End -->
+
+    <hr class="top-hr opacity-100">
+
+    <!-- Content -->
     
-    <div class="row">
-      <div class="col-sm-6 col-md-8 col-xl-6">
+    <div class="sub-menu row">
+      <div class="col-lg-6">
         <img class="logo" src="@/assets/Logo.v1.white.png" alt="">
       </div>
-      <div class="col-sm-6 col-md-4 col-xl-6">
-        <table cl>
-          <tr>
-            <td>
-              <router-link :to="{name: 'about', params: {slug: 'open-source'}}">
-                <h5 class="mb-3 me-3">Open source</h5>
-              </router-link>
-            </td>
-            <td>
-              <i class="mb-3" data-feather="arrow-right"></i>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <router-link :to="{name: 'about', params: {slug: 'transparency'}}">
-                <h5 class="mb-3">Transparent</h5>
-              </router-link>
-            </td>
-            <td>
-              <i class="mb-3" data-feather="arrow-right"></i>
-            </td>
-          </tr>
 
-          <tr>
-            <td>
-              <router-link :to="{name: 'about', params: {slug: 'customization'}}">
-                <h5 class="mb-3">Customizable</h5>
-              </router-link>
-            </td>
-            <td>
-              <i class="mb-3" data-feather="arrow-right"></i>
-            </td>
-          </tr>
+      <div class="col-lg-6">
+        <div class="row">
 
-          <tr>
-            <td>
-              <router-link :to="{name: 'about', params: {slug: 'personalization'}}">
-                <h5 class="mb-3">Personalized</h5>
-              </router-link>
-            </td>
-            <td>
-              <i class="mb-3" data-feather="arrow-right"></i>
-            </td>
-          </tr>
+          <div class="col-md-6">
+            <table>
+              <tr>
+                <td>
+                  <router-link :to="{name: 'about', hash: '#content', params: {slug: 'open-source'}}">
+                    <h5 class="mb-3">Open source</h5>
+                  </router-link>
+                </td>
+                <td class="d-flex justify-content-end">
+                  <i class="mb-3 ms-3" data-feather="arrow-right"></i>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <router-link :to="{name: 'about', hash: '#content', params: {slug: 'transparency'}}">
+                    <h5 class="mb-3">Transparent</h5>
+                  </router-link>
+                </td>
+                <td class="d-flex justify-content-end">
+                  <i class="mb-3" data-feather="arrow-right"></i>
+                </td>
+              </tr>
 
-          <tr>
-            <td>
-              <router-link :to="{name: 'about', params: {slug: 'privacy'}}">
-                <h5 class="mb-3">Private</h5>
-              </router-link>
-            </td>
-            <td>
-              <i class="mb-3" data-feather="arrow-right"></i>
-            </td>
-          </tr>
-        </table>
+              <tr>
+                <td>
+                  <router-link :to="{name: 'about', hash: '#content', params: {slug: 'personalization'}}">
+                    <h5 class="mb-3">Personalized</h5>
+                  </router-link>
+                </td>
+                <td class="d-flex justify-content-end">
+                  <i class="mb-3" data-feather="arrow-right"></i>
+                </td>
+              </tr>
 
+              <tr>
+                <td>
+                  <router-link :to="{name: 'about', hash: '#content', params: {slug: 'privacy'}}">
+                    <h5>Private</h5>
+                  </router-link>
+                </td>
+                <td class="d-flex justify-content-end">
+                  <i class="mb-3" data-feather="arrow-right"></i>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="col-md-6">
+            <table>
+              <tr>
+                <td>
+                  <router-link :to="{name: 'about', hash: '#content', params: {slug: 'open-source'}}">
+                    <h5 class="mb-3">Cloud</h5>
+                  </router-link>
+                </td>
+                <td class="d-flex justify-content-end">
+                  <i class="mb-3 ms-3" data-feather="arrow-right"></i>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <router-link :to="{name: 'about', hash: '#content', params: {slug: 'transparency'}}">
+                    <h5 class="mb-3">Self-Hosted</h5>
+                  </router-link>
+                </td>
+                <td class="d-flex justify-content-end">
+                  <i class="mb-3" data-feather="arrow-right"></i>
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  <router-link :to="{name: 'about', hash: '#content', params: {slug: 'integrations'}}">
+                    <h5 class="mb-3">Integrations</h5>
+                  </router-link>
+                </td>
+                <td class="d-flex justify-content-end">
+                  <i class="mb-3" data-feather="arrow-right"></i>
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  <router-link :to="{name: 'about', hash: '#content', params: {slug: 'integrations'}}">
+                    <h5 class="mb-3">Local</h5>
+                  </router-link>
+                </td>
+                <td class="d-flex justify-content-end">
+                  <i class="mb-3" data-feather="arrow-right"></i>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+        </div>
       </div>
+
     </div>
     
-    <hr class="opacity-100">
+    <hr class="bottom-hr opacity-100">
     
+    <div id="content"></div>
     <router-view> </router-view>
-    
-    <hr class="opacity-100">
-    
-    <div class="row">
-      <div class="col-12">
-        <h5 class="mb-3 mt-3 text-center">WOULD YOU LIKE TO KNOW MORE?</h5>
-        <router-link :to="{name: 'about'}">
-          <h5 class="mb-3 mt-3 text-center">MORE INFO </h5>
-        </router-link>
-        <router-link :to="{name: 'about', params: {slug: 'integrations'}}">
-          <h5 class="mb-3 mt-3 text-center">CUSTOM INTEGRATIONS </h5>
-        </router-link>
-      </div>
 
-    </div>
+    <!-- Content End -->
 
     <div class="row mt-auto">
-      <div class="col-12">
+      <div class="col-12 mt-lg-5">
         <div class="contacts row">
           
             <div class="col-md-4 offset-md-4 col-sm-6 offset-sm-2">
@@ -149,23 +209,48 @@ a:hover {
   text-decoration: underline;
 }
 
+nav {
+  margin-top: 50px;
+  margin-bottom: 6em;
+}
+
+nav .btn {
+  background-color: black;
+  border-color: white;
+  border-radius: 0;
+  text-decoration: none;
+}
+
+nav .btn:hover {
+  color: black !important;
+  background-color: white;
+}
+
+.sub-menu h5 {
+  font-size: 20px;
+  font-weight: 400;
+}
+
+table i {
+  margin-left: 5em;
+}
+
 .header {
   margin-top: 150px;
   margin-bottom: 30px;
 }
 
-.cta {
-  margin-top: 100px;  
-  margin-bottom: 100px;
+.top-hr {
+  margin-bottom: 6em;
 }
-.cta .btn {
-  background-color: black;
-  border-color: white;
+
+.bottom-hr {
+  margin-top: 6em;
+  margin-bottom: 6em;
 }
 
 .contacts {
   margin-bottom: 15px;
-  margin-top: 30px; 
 }
 
 .contacts .btn {
@@ -173,9 +258,10 @@ a:hover {
   color: white;
   border: 1px solid white;
   width: 60px;
+  border-radius: 0;
 }
 
-.btn:hover {
+.contacts .btn:hover {
   color: black;
   background-color: white;
 }
@@ -183,32 +269,43 @@ a:hover {
 @media screen and (max-width: 1024px) {
   .logo {
     width: 100%;
+    margin-bottom: 3em;
   }
 }
 
 @media only screen and (max-width: 576px) {
-  hr {
-    margin-top: 10px;
-    margin-bottom: 10px;
-  }
 
+  nav {
+    margin-top: 10px;
+    margin-bottom: 2em;
+  }
   .header {
     margin-top: 20px;
   }
 
-  .logo {
-    margin-bottom: 25px;
+  .navbar-menu {
+    margin-top: 2em;
+  }
+
+  .navbar-menu .row > * {
+    padding-right: calc(var(--bs-gutter-x) * .40) !important;
+    padding-left: calc(var(--bs-gutter-x) * .40) !important;
+  }
+
+  .sub-menu table {
     width: 100%;
   }
 
-  .cta {
-    margin-top: 25px;
-    margin-bottom: 25px;
+  .top-hr {
+    margin-bottom: 3em;
   }
-  .cta .btn {
-    margin-bottom: 15px;
+
+  .bottom-hr {
+    margin-top: 3em;
+    margin-bottom: 3em;
   }
-  
+
+
 }
 
 </style>
