@@ -13,10 +13,11 @@ onMounted(() => {
     <nav class="navbar navbar-expand-md bg-dark bg-transparent">
       <div class="container-fluid">
         <div class="row w-100">
-          <div class="col-xl-6 col-md-4">
+          <div class="col-6">
             <span class="navbar-brand text-white">AI Avatars Platform</span>
           </div>
-          <div class="navbar-menu col-xl-6 col-md-8 d-flex justify-content-md-end justify-content-sm-start">
+
+          <div class="navbar-menu col-6 d-flex justify-content-end">
 
             <div class="row">
               <div class="col-auto">
@@ -50,7 +51,7 @@ onMounted(() => {
       <div class="col-md-6">
         <h5 class="px-3 mb-4 mt-3 mt-md-0"> Asai cloud is currently in <b>closed beta</b>, and access is limited to <b>invite only</b>. Plese send us your email, if you are interested, and we will add you in the next onbaording batch of testers.</h5>
         <Form class="form-control d-flex" action="https://formspree.io/f/xyyqjdgr" method="POST">
-          <Field id="waitlist-email" name="WaitList Email" type="email" class="email-input flex-fill mb-0" placeholder="Email"></Field>
+          <Field id="waitlist-email" name="WaitList Email" type="email" class="email-input flex-fill mb-0 corner-0" placeholder="Email"></Field>
           <button class="send-button btn btn-light" @click="''">Submit</button>
         </Form>
       </div>
@@ -105,5 +106,12 @@ nav {
 .btn:hover {
   color: black !important;
   background-color: white;
+}
+
+@media only screen and (max-width: 576px) {
+  nav {
+    margin-top: 10px;
+    margin-bottom: 2em;
+  }
 }
 </style>
