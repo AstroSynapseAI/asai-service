@@ -47,7 +47,6 @@ onMounted(() => {
 
 <template>
   <div class="container border-start border-end border-white border-5 min-vh-100 d-flex flex-column ">
-
     <div class="error-container text-white border border-1 border-white px-3" v-if="connectionErr.active">
       <div class="row h-100 align-items-center justify-content-center text-center">
         <div class="col">

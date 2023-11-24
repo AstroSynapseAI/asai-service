@@ -22,7 +22,7 @@ onMounted(() => {
 
             <div class="row">
               <div class="col-auto">
-                <router-link :to="{name: 'asai'}" class="btn text-white px-md-4 px-lg-5 px-sm-2">
+                <router-link :to="{name: 'asai'}" target="_blank" class="btn text-white px-md-4 px-lg-5 px-sm-2">
                   <img src="@/assets/asai-icon.png" height="24" alt="">
                   <span class="ms-3">Talk to Asai</span>
                 </router-link>
@@ -53,7 +53,7 @@ onMounted(() => {
     
     <div class="sub-menu row">
       <div class="col-lg-6">
-        <img class="logo" src="@/assets/Logo.v1.white.png" alt="">
+        <img class="logo" src="@/assets/ASAILogotype.svg" alt="">
       </div>
 
       <div class="col-lg-6">
@@ -229,6 +229,10 @@ nav .btn {
 nav .btn:hover {
   color: black !important;
   background-color: white;
+}
+
+.logo {
+  width: 90%;
 }
 
 .sub-menu h5 {

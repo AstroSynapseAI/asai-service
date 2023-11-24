@@ -1,14 +1,39 @@
 <script setup>
+import { onMounted } from 'vue';
 import { Form, Field, useForm } from 'vee-validate';
+
+
+onMounted(() => {
+  feather.replace();
+});
+
 </script>
-
-
 <template>
-  <div class="container">
+  <div class="container d-flex flex-column vh-100">
+    <nav class="navbar navbar-expand-md bg-dark bg-transparent">
+      <div class="container-fluid">
+        <div class="row w-100">
+          <div class="col-xl-6 col-md-4">
+            <span class="navbar-brand text-white">AI Avatars Platform</span>
+          </div>
+          <div class="navbar-menu col-xl-6 col-md-8 d-flex justify-content-md-end justify-content-sm-start">
+
+            <div class="row">
+              <div class="col-auto">
+                <router-link :to="{name: 'home'}" class="btn text-white">
+                  <i class="align-middle" data-feather="home"></i>
+                </router-link>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </nav>
     <div class="row">
 
       <div class="col-md-6">
-        <img class="logo" src="@/assets/Logo.v1.white.png" alt="">
+        <img class="logo" src="@/assets/ASAILogotype.svg" alt="">
         <div class="card">
           <div class="card-body">
             
@@ -35,6 +60,10 @@ import { Form, Field, useForm } from 'vee-validate';
 </template>
 
 <style scoped>
+nav {
+  margin-top: 50px;
+  margin-bottom: 15em;
+}
 .logo {
   width: 100%;
   margin-bottom: 3em;

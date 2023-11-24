@@ -86,7 +86,7 @@ export const useHomeStore = defineStore({
         title: "Cloud",
         description: `<div class="container">
         <p>The simplest way to use Asai is our cloud version. Quickly set up your avatar with our creation wizard and start with a free configuration. Add additional features and expand your subscription as you go. Ideal for freelancers and SMEs.</p
-        <p>To start, visit <router-link :to="{name: 'login'}">Login page</router-link></p>
+        <p>To start, visit <a href="/login">Login page</a></p>
         </div>
         <hr class="opacity-100 my-5 d-lg-none">`,
       },
