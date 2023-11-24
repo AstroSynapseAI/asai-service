@@ -84,6 +84,7 @@ nav {
   border: none;
   width: 100%;
   color: white;
+  border-radius: 0;
 }
 
 .email-input, .pass-input {
@@ -93,6 +94,7 @@ nav {
   background-color: transparent;
   border: 1px solid white;
   color: white;
+  border-radius: 0;
 }
 
 .btn {
