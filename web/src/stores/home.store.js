@@ -7,7 +7,7 @@ export const useHomeStore = defineStore({
   state: () => ({
     contents: {
       "about": {
-        title: "Info",
+        title: "About",
         description:`
         <div class="container">
           <p class="mb-4 mt-3">Asai is an AI Avatar platform, an interconnected system driven by several types of AI models (LLM, A/V) that entirely replace all your interactions with software and the internet using simple text and voice commands.</p>
@@ -72,7 +72,7 @@ export const useHomeStore = defineStore({
         <hr class="opacity-100 my-5 d-lg-none">`,
       },
       "integrations": {
-        title: "Integrations",
+        title: "Custom Integrations",
         description: `<div class="container">
         <p class="mt-3">Our AI Avatar platform is designed with adaptability at its core. Understanding that every business has unique needs, we offer specifically tailored Avatars that can be seamlessly integrated into your business and internal infrastructure. This level of customization empowers you to shape your Avatar to fit perfectly within your specific context, further enhancing your workflows and productivity.
 
@@ -81,7 +81,32 @@ export const useHomeStore = defineStore({
         <p>For more information or to discuss custom integrations, please reach out to us at <a href="mailto:contact@astrosynapse.ai">contact@astrosynapse.ai</a>. We're committed to helping you create an AI solution that's just right for you.</p>
         </div>
         <hr class="opacity-100 my-5 d-lg-none">`,
-      } 
+      },
+      "cloud": {
+        title: "Cloud",
+        description: `<div class="container">
+        <p>The simplest way to use Asai is our cloud version. Quickly set up your avatar with our creation wizard and start with a free configuration. Add additional features and expand your subscription as you go. Ideal for freelancers and SMEs.</p
+        <p>To start, visit <router-link :to="{name: 'login'}">Login page</router-link></p>
+        </div>
+        <hr class="opacity-100 my-5 d-lg-none">`,
+      },
+      "self-hosted": {
+        title: "Self Hosted",
+        description: `<div class="container">
+        <p>We are collaborating with several data centers to provide a plug-and-play platform solution for Asai, specifically for hosting and running various open-source models. More information will be available soon.</p>
+        <p>In the meantime, Asai will be available as a dockerized container that can be deployed on your chosen hosting provider, supporting inferences on CPU or GPU.</p>
+        </div>
+        <hr class="opacity-100 my-5 d-lg-none">`,
+      },
+      "local": {
+        title: "Local",
+        description: `<div class="container">
+        <p>No internet means no privacy issues. If you want full control, you can always set up Asai on your local machine. We are working on providing a simple plug-and-play solution that will deploy a dockerized version of Asai on your local machine.</p>
+
+        <p>You will need a separate installation of <a href="https://ollama.ai" target="_blank">Ollama</a> running on your computer, but you will still be able to use all popular paid APIs and closed-source models.</p>
+        </div>
+        <hr class="opacity-100 my-5 d-lg-none">`,
+      }
     },
   }),
   actions: {
