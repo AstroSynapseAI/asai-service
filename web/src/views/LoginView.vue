@@ -53,6 +53,7 @@ import { Form, Field, useForm } from 'vee-validate';
   background-color: black;
   border: none;
   width: 100%;
+  color: white;
 }
 
 .email-input, .pass-input {
@@ -61,6 +62,7 @@ import { Form, Field, useForm } from 'vee-validate';
   height: 3em;
   background-color: transparent;
   border: 1px solid white;
+  color: white;
 }
 
 .btn {
