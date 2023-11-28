@@ -23,7 +23,22 @@ onMounted(() => {
             <div class="row">
               <div class="col-auto">
                 <router-link :to="{name: 'asai'}" target="_blank" class="btn text-white px-md-4 px-lg-5 px-sm-2">
-                  <img src="@/assets/asai-icon.png" height="24" alt="">
+                  <!-- <img src="@/assets/ASAILogomark.svg" height="24" alt=""> -->
+
+                  <svg class="asai-icon" height="24" viewBox="0 0 165 247" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_1100_3274)">
+                    <line x1="161.602" y1="1.28433e-07" x2="161.602" y2="246.81" stroke="white" stroke-width="5.87643"/>
+                    <line x1="2.93821" y1="1.28433e-07" x2="2.9382" y2="246.81" stroke="white" stroke-width="5.87643"/>
+                    <line x1="164.54" y1="245.341" x2="0.000106555" y2="245.341" stroke="white" stroke-width="5.87643"/>
+                    <line x1="126.343" y1="155.725" x2="38.1969" y2="155.725" stroke="white" stroke-width="5.87643"/>
+                    </g>
+                    <defs>
+                    <clipPath id="clip0_1100_3274">
+                    <rect width="164.54" height="246.81" fill="white" transform="translate(164.54 246.81) rotate(-180)"/>
+                    </clipPath>
+                    </defs>
+                  </svg>
+
                   <span class="ms-3">Talk to Asai</span>
                 </router-link>
               </div>
@@ -173,18 +188,18 @@ onMounted(() => {
 
               <div class="row">
                 <div class="col-4 d-flex justify-content-center align-items-center">
-                  <button class="btn d-flex justify-content-center align-items-center"><i class="d-block" data-feather="github"></i></button>
+                  <a href="https://github.com/AstroSynapseAI" target="_blank" class="btn d-flex justify-content-center align-items-center"><i class="d-block" data-feather="github"></i></a>
                 </div>
                 <div class="col-4 d-flex justify-content-center align-items-center">
-                  <button class="btn">
+                  <a href="https://discord.gg/yDb4AbEprY" target="_blank" class="btn">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36">
                       <path class="disc-icon" fill="#fff" d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/>
                     </svg>
                     <!-- <img src="../assets/discord-mark-white.svg" alt="discord" height="24"> -->
-                  </button>
+                  </a>
                 </div>
                 <div class="col-4 d-flex justify-content-center align-items-center">
-                  <button class="btn d-flex justify-content-center align-items-center"><i class="d-block" data-feather="twitter"></i> </button>
+                  <a href="https://twitter.com/astrosynapselab" target="_blank" class="btn d-flex justify-content-center align-items-center"><i class="d-block" data-feather="twitter"></i> </a>
                 </div>
               </div>
 
@@ -229,6 +244,11 @@ nav .btn {
 nav .btn:hover {
   color: black !important;
   background-color: white;
+}
+
+nav .btn:hover .asai-icon line {
+  stroke: black !important;
+  stroke-width: 10;
 }
 
 .logo {

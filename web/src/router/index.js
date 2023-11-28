@@ -9,16 +9,6 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'asai',
-      component: AsaiChatView
-    },
-    {
-      path: '/login',
-      name: 'login',
-      component: LoginView
-    },
-    {
-      path: '/home',
       name: 'home',
       component: HomeView,
       children: [
@@ -28,6 +18,16 @@ const router = createRouter({
           component: AboutView
         },
       ]
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: LoginView
+    },
+    {
+      path: '/chat',
+      name: 'asai',
+      component: AsaiChatView
     },
   ],
   scrollBehavior(to, from, savedPosition) {
