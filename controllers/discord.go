@@ -33,3 +33,27 @@ func DiscordMsgHandler(session *discordgo.Session, msg *discordgo.MessageCreate)
 		_, _ = session.ChannelMessageSend(msg.ChannelID, response)
 	}
 }
+
+func NewMemberHandler(session *discordgo.Session, addEvent *discordgo.GuildMemberAdd) {
+	asaiChain, err := chains.NewAsaiChain()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	sessionID := addEvent.User.ID
+	userName := addEvent.User.Username
+	channelID := "1112854836371791944"
+
+	asaiChain.SetSessionID(sessionID)
+
+	userPrompt := fmt.Sprintf("New user, %s (%s), has joined the server. Now invoking the onboarding_script.txt to welcome them properly!", userName, sessionID)
+
+	response, err := asaiChain.Prompt(context.Background(), userPrompt)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	_, _ = session.ChannelMessageSend(channelID, response)
+
+}

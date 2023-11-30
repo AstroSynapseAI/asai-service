@@ -46,6 +46,7 @@ func NewAsaiServer() *AsaiServer {
 func (server *AsaiServer) Run() error {
 	// Initialize the Discord client
 	server.discordClient.AddHandler(controllers.DiscordMsgHandler)
+	server.discordClient.AddHandler(controllers.NewMemberHandler)
 	server.discordClient.Identify.Intents = discordgo.IntentsGuildMessages
 
 	err := server.discordClient.Open()
