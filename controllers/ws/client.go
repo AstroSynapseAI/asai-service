@@ -20,7 +20,7 @@ var (
 	// send a new Ping before getting response
 	pingInterval = (pongWait * 9) / 10
 	// Prompt for intializing conversation
-	prompt = "New user, has connected. Invoke the onboarding_script.txt and welcome user."
+	InitiativePrompt = "New user, has connected. Invoke the onboarding_script.txt and welcome user."
 )
 
 type Client struct {
@@ -103,13 +103,14 @@ func (client *Client) ReadMsgs(ctx context.Context) {
 		client.sessionID = request.SessionId
 
 		client.asaiChain.SetSessionID(request.SessionId)
+		client.asaiChain.SetClientType("Web Browser")
 
 		client.asaiChain.Stream = func(ctx context.Context, chunk []byte) {
 			client.egress <- chunk
 		}
 
 		if request.UserPrompt == "new user connected" {
-			request.UserPrompt = prompt
+			request.UserPrompt = InitiativePrompt
 		}
 
 		go func() {

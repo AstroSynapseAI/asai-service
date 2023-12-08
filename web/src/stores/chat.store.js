@@ -13,13 +13,14 @@ export const useChatStore = defineStore({
     retryCount: 0,
     maxRetryCount: 3,
     isLoading: false,
-    messages: [{
-      sender: "ai",
-      content: "Hello there... I'm Asai, How can I help you?",
-      isLoading: false,
-      isAgentRunnig: false,
-      agentName: null
-    }],
+    messages: [],
+    // messages: [{
+    //   sender: "ai",
+    //   content: "Hello there... I'm Asai, How can I help you?",
+    //   isLoading: false,
+    //   isAgentRunnig: false,
+    //   agentName: null
+    // }],
     aiMsg: {
       sender: "ai",
       content: "",
@@ -164,13 +165,10 @@ export const useChatStore = defineStore({
             }
             responseMsgs.push(msg)
           }
-
-          if (responseMsgs.length > 0) {
-            this.newUserConnected();
-          }
-
           this.messages = responseMsgs;
-
+        } else {
+          console.log("No history found. New user connected");
+          this.newUserConnected(userStore);
         }
       } catch (error) {
         console.error(error);
@@ -181,9 +179,18 @@ export const useChatStore = defineStore({
       this.connectionErr.active = false;
     },
 
-    newUserConnected() {
-      const prompt = "new user connected";
-      this.sendPrompt(prompt);
+    newUserConnected(userStore) {
+      const reqData = {
+        session_id: userStore.user.session_id,
+        user_prompt: "new user connected"
+      }
+
+      try {
+        this.socket.send(JSON.stringify(reqData));
+        this.isLoading = true;
+      } catch (error) {
+        console.error("Failed to send prompt:", error);
+      }
     }
   }
 })

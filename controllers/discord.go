@@ -45,6 +45,7 @@ func NewMemberHandler(session *discordgo.Session, addEvent *discordgo.GuildMembe
 	channelID := "1112854836371791944"
 
 	asaiChain.SetSessionID(sessionID)
+	asaiChain.SetClientType("Discord")
 
 	userPrompt := fmt.Sprintf("New user, %s (%s), has joined the server. Invoke the onboarding_script.txt and welcome user to the server.", userName, sessionID)
 

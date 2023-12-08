@@ -16,6 +16,7 @@ var (
 	ErrDBConnection     = errors.New("can't connect to database")
 	ErrDBMigration      = errors.New("can't migrate database")
 	ErrMissingSessionID = errors.New("session id can not be empty")
+	InitiativePrompt    = "New user, has connected. Invoke the onboarding_script.txt and welcome user."
 )
 
 type ChatHistory struct {
@@ -101,6 +102,10 @@ func (history *PersistentChatHistory) Messages(context.Context) ([]schema.ChatMe
 func (history *PersistentChatHistory) AddMessage(ctx context.Context, message schema.ChatMessage) error {
 	if history.sessionID == "" {
 		return ErrMissingSessionID
+	}
+
+	if message.GetContent() == InitiativePrompt {
+		return nil
 	}
 
 	history.messages = append(history.messages, message)

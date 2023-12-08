@@ -3,6 +3,7 @@ package chains
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/AstroSynapseAI/app-service/app"
@@ -25,10 +26,11 @@ import (
 )
 
 type AsaiChain struct {
-	LLM    llms.LanguageModel
-	Memory *memory.AsaiMemory
-	Agents []tools.Tool
-	Stream func(context.Context, []byte)
+	LLM        llms.LanguageModel
+	Memory     *memory.AsaiMemory
+	Agents     []tools.Tool
+	Stream     func(context.Context, []byte)
+	ClientType string
 }
 
 func NewAsaiChain() (*AsaiChain, error) {
@@ -65,23 +67,25 @@ func NewAsaiChain() (*AsaiChain, error) {
 	}, nil
 }
 
-func (chain AsaiChain) SetSessionID(id string) {
+func (chain *AsaiChain) SetSessionID(id string) {
 	chain.Memory.SetSessionID(id)
 }
 
-func (chain AsaiChain) LoadHistory() []schema.ChatMessage {
+func (chain *AsaiChain) SetClientType(clientType string) {
+	chain.ClientType = clientType
+}
+
+func (chain *AsaiChain) LoadHistory() []schema.ChatMessage {
 	return chain.Memory.Messages()
 }
 
-func (chain AsaiChain) Prompt(ctx context.Context, input string) (string, error) {
-	chain.loadTemplate()
-
+func (chain *AsaiChain) Prompt(ctx context.Context, input string) (string, error) {
 	asaiAgent := agents.NewConversationalAgent(
 		chain.LLM,
 		chain.Agents,
 	)
 
-	tmplt := chain.loadTemplate()
+	tmplt := chain.loadTemplate(map[string]any{})
 	asaiAgent.Chain = chains.NewLLMChain(chain.LLM, tmplt)
 
 	executor := agents.NewExecutor(
@@ -99,7 +103,7 @@ func (chain AsaiChain) Prompt(ctx context.Context, input string) (string, error)
 
 }
 
-func (chain AsaiChain) Run(ctx context.Context, input string, options ...chains.ChainCallOption) error {
+func (chain *AsaiChain) Run(ctx context.Context, input string, options ...chains.ChainCallOption) error {
 	fmt.Println("Asai Chain Running...")
 
 	// need to try this might be I initally loaded the prompt option wrong in the Executor
@@ -113,8 +117,20 @@ func (chain AsaiChain) Run(ctx context.Context, input string, options ...chains.
 		chain.Agents,
 		agents.WithCallbacksHandler(agentCallback),
 	)
+	
+	obChain, err := NewOnboardingChain(chain.Memory)
+	if err != nil {
+		return err
+	}
 
-	tmplt := chain.loadTemplate()
+	reponse, err := obChain.Call(ctx, input)
+	if err != nil {
+		return err
+	}
+
+	tmplt := chain.loadTemplate(map[string]interface{}{
+		"onboarding": reponse,
+	})
 
 	asaiAgent.Chain = chains.NewLLMChain(chain.LLM, tmplt)
 
@@ -126,7 +142,7 @@ func (chain AsaiChain) Run(ctx context.Context, input string, options ...chains.
 	)
 
 	// run the agent
-	_, err := chains.Run(ctx, executor, input, options...)
+	_, err = chains.Run(ctx, executor, input, options...)
 	if err != nil {
 		return err
 	}
@@ -134,12 +150,23 @@ func (chain AsaiChain) Run(ctx context.Context, input string, options ...chains.
 	return nil
 }
 
-func (chain AsaiChain) loadTemplate() prompts.PromptTemplate {
+func (chain *AsaiChain) loadTemplate(values map[string]any) prompts.PromptTemplate {
 	// load Asai persona prompt template
 	template, err := templates.Load("persona.txt")
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	script := ""
+	if values["onboarding"] == "Yes" {
+		tmplContent, err := os.ReadFile("./engine/documents/onboarding_script.txt")
+		if err != nil {
+			fmt.Println("Error reading onboarding script:", err)
+		}
+		script = string(tmplContent)
+	}
+
+	
 
 	// create agent prompt template
 	return prompts.PromptTemplate{
@@ -150,6 +177,9 @@ func (chain AsaiChain) loadTemplate() prompts.PromptTemplate {
 			"agent_names":        asaiTools.Names(chain.Agents),
 			"agent_descriptions": asaiTools.Descriptions(chain.Agents),
 			"date":               time.Now().Format("January 02, 2006"),
+			"client_type":        chain.ClientType,
+			"onboarding":         values["onboarding"],
+			"script":             script,
 			"history":            "",
 		},
 	}

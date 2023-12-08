@@ -59,9 +59,6 @@ func (agent *DocumentsTool) Description() string {
 		- Name: ASAI Impressum
 		  - FileName: asai_impressum.txt
 		  - Description: ASAI Architecture describes the code and technologies used to build and run ASAI. Use this document to understand how ASAI works and to answer any technical questions about ASAI.
-		- Name: Onboarding Script
-		  - FileName: onboarding_script.txt
-		  - Description: Welcome script for new users. Use this document when you are prompted to welcome or onboard a new user to our system.
 		
 		**Error Handling**:
 		If you encounter an error or cannot fetch the requested document, inform the user and offer alternative assistance or information.

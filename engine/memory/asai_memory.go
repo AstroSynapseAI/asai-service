@@ -15,7 +15,7 @@ type AsaiMemory struct {
 	chatHistory *PersistentChatHistory
 }
 
-var DefaultMemoryBufferTokenSize = 20048
+var DefaultMemoryBufferTokenSize = 4048
 
 // NewMemory creates a new instance of AsaiMemory.
 //
