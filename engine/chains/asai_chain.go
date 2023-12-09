@@ -166,7 +166,6 @@ func (chain *AsaiChain) loadTemplate(values map[string]any) prompts.PromptTempla
 		script = string(tmplContent)
 	}
 
-	
 
 	// create agent prompt template
 	return prompts.PromptTemplate{
