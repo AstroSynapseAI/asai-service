@@ -16,7 +16,7 @@ var (
 	ErrDBConnection     = errors.New("can't connect to database")
 	ErrDBMigration      = errors.New("can't migrate database")
 	ErrMissingSessionID = errors.New("session id can not be empty")
-	InitiativePrompt    = "New user, has connected. Invoke the onboarding_script.txt and welcome user."
+	InitiativePrompt    = "New user, has connected."
 )
 
 type ChatHistory struct {

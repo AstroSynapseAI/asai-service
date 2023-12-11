@@ -123,13 +123,13 @@ func (chain *AsaiChain) Run(ctx context.Context, input string, options ...chains
 		return err
 	}
 
-	reponse, err := obChain.Call(ctx, input)
+	response, err := obChain.Call(ctx, input)
 	if err != nil {
 		return err
 	}
 
 	tmplt := chain.loadTemplate(map[string]interface{}{
-		"onboarding": reponse,
+		"onboarding": response,
 	})
 
 	asaiAgent.Chain = chains.NewLLMChain(chain.LLM, tmplt)
@@ -165,7 +165,6 @@ func (chain *AsaiChain) loadTemplate(values map[string]any) prompts.PromptTempla
 		}
 		script = string(tmplContent)
 	}
-
 
 	// create agent prompt template
 	return prompts.PromptTemplate{
