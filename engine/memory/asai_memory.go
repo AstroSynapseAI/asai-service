@@ -15,22 +15,23 @@ type AsaiMemory struct {
 	chatHistory *PersistentChatHistory
 }
 
-var DefaultMemoryBufferTokenSize = 4048
+const DefaultMemoryBufferTokenSize = 4024
 
 // NewMemory creates a new instance of AsaiMemory.
 //
 // It takes a dsn postgred string as a parameter and returns a pointer to AsaiMemory.
 func NewMemory(dsn string, memorySize ...int) *AsaiMemory {
 
+	bufferTokenSize := DefaultMemoryBufferTokenSize
 	if memorySize != nil {
-		DefaultMemoryBufferTokenSize = memorySize[0]
+		bufferTokenSize = memorySize[0]
 	}
 
 	chatHistory := NewPersistentChatHistory(dsn)
 
 	buffer := memory.NewConversationTokenBuffer(
 		app.CONFIG.LLM,
-		DefaultMemoryBufferTokenSize,
+		bufferTokenSize,
 		memory.WithChatHistory(chatHistory),
 	)
 
