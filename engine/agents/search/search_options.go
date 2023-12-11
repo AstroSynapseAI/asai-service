@@ -11,3 +11,9 @@ func WithMemory(memory schema.Memory) SearchAgentOptions {
 		agent.Memory = memory
 	}
 }
+
+func WithPrimer(primer string) SearchAgentOptions {
+	return func(agent *SearchAgent) {
+		
+	}
+}
