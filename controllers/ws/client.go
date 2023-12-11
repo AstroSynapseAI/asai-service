@@ -20,7 +20,7 @@ var (
 	// send a new Ping before getting response
 	pingInterval = (pongWait * 9) / 10
 	// Prompt for intializing conversation
-	InitiativePrompt = "New user, has connected. Invoke the onboarding_script.txt and welcome user."
+	InitiativePrompt = "New user, has connected."
 )
 
 type Client struct {

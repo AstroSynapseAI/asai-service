@@ -25,12 +25,15 @@ const (
 		- if the conversation history is empty
 		- if user explictly requested it
 
+		Onboarding process should not start:
+		- if the conversation history is NOT empty
+
 		Onbaording process should end:
 		- if all steps of the onboarding scripts are concluded
 		- if user explictly requested it
 
 		Onbaording process should continue:
-		- if the AI hasen't categorized the new user 
+		- until the AI hasen't categorized the new user 
 		- if user is inquisitive about the Astro Synapse company or ASAI
 
 		Your reponse will always be: 
