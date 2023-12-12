@@ -2,109 +2,88 @@ package controllers
 
 import (
 	"context"
-	"database/sql/driver"
-	"encoding/json"
-	"errors"
 	"fmt"
+	"net/http"
 
-	"github.com/AstroSynapseAI/app-service/app"
+	"github.com/AstroSynapseAI/app-service/engine"
 	"github.com/AstroSynapseAI/app-service/engine/chains"
-	"github.com/GoLangWebSDK/rest"
+	"github.com/AstroSynapseAI/app-service/repositories"
+	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
+	"github.com/AstroSynapseAI/app-service/sdk/rest"
 	"github.com/thanhpk/randstr"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
-type ChatHistory struct {
-	ID           int       `gorm:"primary_key"`
-	SessionID    string    `gorm:"type:varchar(256)"`
-	BufferString string    `gorm:"type:text"`
-	ChatHistory  *Messages `json:"chat_history" gorm:"type:jsonb;column:chat_history"`
+type ApiController struct {
+	*rest.RestController	
+	repo *repositories.ApiRepository
 }
 
-type Messages []Message
-
-type Message struct {
-	Type    string `json:"type"`
-	Content string `json:"text"`
+func NewApiController(db *database.Database) *ApiController {
+	return &ApiController{
+		repo: repositories.NewApiRepository(db),
+	}
 }
 
-func (m Messages) Value() (driver.Value, error) {
-	return json.Marshal(m)
-}
+func (ctrl *ApiController) Run() {
+	
+	// Get Chat History endpoint.
+	ctrl.Get("/chat/history", func(ctx *rest.Context) {
+		sessionId := ctx.GetParam("session_id")
+		history := ctrl.repo.GetChatHistory(sessionId)
 
-// Scan implements the sql.Scanner interface, this method allows us to
-// define how we convert the Message data from the database into our Message type.
-func (m *Messages) Scan(src interface{}) error {
-	if bytes, ok := src.([]byte); ok {
-		return json.Unmarshal(bytes, m)
-	}
-	return errors.New("could not scan type into Message")
-}
+		_ = ctx.JsonResponse(http.StatusOK, history.ChatHistory)
+	})
 
-func GetHistory(ctx *rest.Context) {
-	fmt.Println("Fetching history...")
-	// dsn := config.SetupPostgreDSN()
-	dsn := app.CONFIG.DSN
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	// Send Chat Message endpoint.
+	ctrl.Post("/chat/msg", func(ctx *rest.Context) {
+		
+		// Parse the incoming http request
+		var request struct {
+			SessionId  string `json:"session_id"`
+			UserPrompt string `json:"user_prompt"`
+		}
 
-	var sessionID = ctx.GetParam("session_id")
-	var history *ChatHistory
+		err := ctx.JsonDecode(&request)
+		if err != nil {
+			fmt.Println("Bad Request: %w", err)
+			_ = ctx.JsonResponse(http.StatusBadRequest, err)
+			return
+		}
 
-	err = db.Where(ChatHistory{SessionID: sessionID}).Find(&history).Error
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
 
-	_ = ctx.JsonResponse(200, history.ChatHistory)
-}
+		// Initialize Asai Chain
+		asaiConfig := engine.NewConfig(ctrl.repo.DB)
+		asaiChain, _ := chains.NewAsaiChain(asaiConfig)
+		asaiChain.SetSessionID(request.SessionId)
 
-func GetSession(ctx *rest.Context) {
-	sessionID := randstr.String(16)
+		// Send user prompt to Asai Chain
+		response, err := asaiChain.Prompt(context.Background(), request.UserPrompt)
+		if err != nil {
+			fmt.Println(err)
+			_ = ctx.JsonResponse(http.StatusInternalServerError, err)
+			return
+		}
 
-	var reponseJson struct {
-		SessionId string `json:"session_id"`
-	}
+		// Send response to user
+		var responseJson struct {
+			Content string `json:"content"`
+		}
 
-	reponseJson.SessionId = sessionID
-	_ = ctx.JsonResponse(200, reponseJson)
+		responseJson.Content = response
 
-}
+		_ = ctx.JsonResponse(http.StatusOK, responseJson)
+	})
 
-func PostHandler(ctx *rest.Context) {
-	asaiChain, _ := chains.NewAsaiChain()
-	// Parse the incoming http request
-	var request struct {
-		SessionId  string `json:"session_id"`
-		UserPrompt string `json:"user_prompt"`
-	}
+	// Create new User session endpoint.
+	ctrl.Get("/users/session", func(ctx *rest.Context) {
+		sessionID := randstr.String(16)
 
-	err := ctx.JsonDecode(&request)
-	if err != nil {
-		fmt.Println("Bad Request: %w", err)
-		_ = ctx.JsonResponse(400, err)
-		return
-	}
-
-	asaiChain.SetSessionID(request.SessionId)
-
-	response, err := asaiChain.Prompt(context.Background(), request.UserPrompt)
-	if err != nil {
-		fmt.Println(err)
-		_ = ctx.JsonResponse(500, err)
-		return
-	}
-
-	var responseJson struct {
-		Content string `json:"content"`
-	}
-
-	responseJson.Content = response
-
-	_ = ctx.JsonResponse(200, responseJson)
+		var reponseJson struct {
+			SessionId string `json:"session_id"`
+		}
+	
+		reponseJson.SessionId = sessionID
+		
+		_ = ctx.JsonResponse(http.StatusOK, reponseJson)
+	})
 }

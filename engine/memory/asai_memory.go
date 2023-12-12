@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/AstroSynapseAI/app-service/app"
-
+	"github.com/AstroSynapseAI/app-service/engine"
+	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/tmc/langchaingo/memory"
 	"github.com/tmc/langchaingo/schema"
 )
@@ -13,24 +13,18 @@ import (
 type AsaiMemory struct {
 	buffer      schema.Memory
 	chatHistory *PersistentChatHistory
+	db          *database.Database
 }
-
-var DefaultMemoryBufferTokenSize = 4048
 
 // NewMemory creates a new instance of AsaiMemory.
 //
 // It takes a dsn postgred string as a parameter and returns a pointer to AsaiMemory.
-func NewMemory(dsn string, memorySize ...int) *AsaiMemory {
-
-	if memorySize != nil {
-		DefaultMemoryBufferTokenSize = memorySize[0]
-	}
-
-	chatHistory := NewPersistentChatHistory(dsn)
+func NewMemory(config engine.AvatarConfig) *AsaiMemory {
+	chatHistory := NewPersistentChatHistory(config)
 
 	buffer := memory.NewConversationTokenBuffer(
-		app.CONFIG.LLM,
-		DefaultMemoryBufferTokenSize,
+		config.GetAvatarLLM(),
+		config.GetAvatarMemorySize(),
 		memory.WithChatHistory(chatHistory),
 	)
 

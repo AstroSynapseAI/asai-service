@@ -1,25 +1,34 @@
 package app
 
+// Ollama example for dockerized ollama, keep alive for now
+
+// cnf.LLM, err = ollama.New(
+// 	ollama.WithModel("mistral"),
+// 	ollama.WithServerURL("http://host.docker.internal:11434/"),
+// )
+
 import (
 	"fmt"
 	"os"
 
-	"github.com/tmc/langchaingo/llms"
-	"github.com/tmc/langchaingo/llms/openai"
+	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
+	"github.com/AstroSynapseAI/app-service/sdk/crud/database/adapters"
+	"github.com/AstroSynapseAI/app-service/sdk/crud/orms/gorm"
 	"gopkg.in/yaml.v2"
 )
 
-var CONFIG *Config
+const (
+	DefaultDevDSN = "postgresql://asai-admin:asai-password@asai-db:5432/asai-db"
+)
 
 type ServerAdapter interface {
-	Run() error
+	Run(*database.Database) error
 }
 
 type Config struct {
-	LLM        llms.LanguageModel
+	DB         *database.Database
 	ENV        string
 	DSN        string
-	MemorySize int
 }
 
 func NewConfig() *Config {
@@ -27,24 +36,33 @@ func NewConfig() *Config {
 		ENV: os.Getenv("ENVIRONMENT"),
 	}
 
-	CONFIG = config
 	return config
 }
 
 func (cnf *Config) RunServer(server ServerAdapter) error {
-	return server.Run()
+	return server.Run(cnf.DB)
 }
 
 func (cnf *Config) InitDB() {
-	if cnf.ENV == "HEROKU DEV" {
-		cnf.DSN = os.Getenv("DATABASE_URL")
-		return
+	if cnf.DSN == "" {
+		fmt.Println("Empty DSN, setting default.")
+		cnf.DSN = DefaultDevDSN
 	}
-	cnf.DSN = "postgresql://asai-admin:asai-password@asai-db:5432/asai-db"
+
+	adapter := adapters.NewPostgres(
+		database.WithDSN(cnf.DSN),
+	)
+
+	cnf.DB = database.New(adapter)
+
+	migration := gorm.NewGormMigrator(cnf.DB)
+	migration.AddMigrations(&Migrations{})
+	migration.Run()
 }
 
 func (cnf *Config) LoadEnvironment() {
 	fmt.Println("Current Environment:", cnf.ENV)
+	
 	if cnf.ENV == "LOCAL DEV" {
 		cnf.setupLocalDev()
 		return
@@ -54,21 +72,17 @@ func (cnf *Config) LoadEnvironment() {
 		cnf.setupHeroku()
 		return
 	}
+
+	fmt.Println("Unknown Environment")
 }
 
 func (cnf *Config) setupHeroku() {
-	var err error
-	cnf.LLM, err = openai.NewChat(openai.WithModel("gpt-4"))
-	cnf.MemorySize = 4048
-
-	if err != nil {
-		fmt.Println("Error creating default LLM:", err)
-		return
-	}
+	cnf.DSN = os.Getenv("DATABASE_URL")
 }
 
 func (cnf *Config) setupLocalDev() {
-
+	cnf.DSN = DefaultDevDSN
+	
 	var Config struct {
 		OpenAPIKey    string `yaml:"open_api_key"`
 		SerpAPIKey    string `yaml:"serpapi_api_key"`
@@ -105,21 +119,6 @@ func (cnf *Config) setupLocalDev() {
 	err = os.Setenv("DISCORD_API_KEY", Config.DiscordApiKey)
 	if err != nil {
 		fmt.Println("Error setting environment variable:", err)
-		return
-	}
-
-	// cnf.LLM, err = openai.NewChat(openai.WithModel("gpt-4-1106-preview"))
-	// cnf.MemorySize = 20048
-
-	cnf.MemorySize = 4024
-	// cnf.LLM, err = ollama.New(
-	// 	ollama.WithModel("mistral"),
-	// 	ollama.WithServerURL("http://host.docker.internal:11434/"),
-	// )
-
-	cnf.LLM, err = openai.NewChat(openai.WithModel("gpt-4"))
-	if err != nil {
-		fmt.Println("Error creating default LLM:", err)
 		return
 	}
 }

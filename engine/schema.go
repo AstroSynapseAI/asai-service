@@ -1,24 +1,29 @@
 package engine
 
-import "github.com/tmc/langchaingo/llms"
+import (
+	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
+	"github.com/tmc/langchaingo/llms"
+)
 
-type EngineConfig interface {
+type AvatarConfig interface {
+	GetDB() *database.Database
 	GetAvatarName() string
-	GetAvatarModel() *llms.ChatLLM
+	GetAvatarLLM() llms.LanguageModel
 	GetAvatarPrimer() string
+	GetAvatarMemorySize() int
 	AvatarIsPublic() bool
-	GetAgents() []any
-	GetTools() []any
-	GetPlugins() []any
+	GetAgents() []AgentConfig
+	GetTools() []ToolConfig
+	GetPlugins() []PluginConfig
 }
 
 type AgentConfig interface {
-	GetName() string
-	GetModel() *llms.LLM
-	GetPrimer() string
-	IsPublic() bool
-	IsActive() bool
-	GetTools() []any
+	GetAgentName(agentID string) string
+	GetAgentModel(agentID string) *llms.LLM
+	GetAgentPrimer(agentID string) string
+	IsAgentPublic(agentID string) bool
+	IsAgentActive(agentID string) bool
+	GetAgentTools(agentID string) []any
 }
 
 type ToolConfig interface {

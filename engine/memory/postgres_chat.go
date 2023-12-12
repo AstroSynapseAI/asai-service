@@ -2,13 +2,12 @@ package memory
 
 import (
 	"context"
-	"database/sql/driver"
-	"encoding/json"
 	"errors"
 	"fmt"
 
+	"github.com/AstroSynapseAI/app-service/engine"
+	"github.com/AstroSynapseAI/app-service/models"
 	"github.com/tmc/langchaingo/schema"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -19,41 +18,28 @@ var (
 	InitiativePrompt    = "New user, has connected."
 )
 
-type ChatHistory struct {
-	ID           int       `gorm:"primary_key"`
-	SessionID    string    `gorm:"type:varchar(256)"`
-	BufferString string    `gorm:"type:text"`
-	ChatHistory  *Messages `json:"chat_history" gorm:"type:jsonb;column:chat_history"`
-}
-
-type Messages []Message
-
-type Message struct {
-	Type    string `json:"type"`
-	Content string `json:"text"`
-}
-
 type PersistentChatHistory struct {
 	db        *gorm.DB
-	records   *ChatHistory
+	records   *models.ChatHistory
 	messages  []schema.ChatMessage
 	sessionID string
 }
 
 var _ schema.ChatMessageHistory = &PersistentChatHistory{}
 
-func NewPersistentChatHistory(dsn string) *PersistentChatHistory {
-	history := &PersistentChatHistory{}
-
-	gorm, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+func NewPersistentChatHistory(config engine.AvatarConfig) *PersistentChatHistory {
+	db := config.GetDB()
+	
+	gorm, err := gorm.Open(db.Adapter.Gorm(), &gorm.Config{})
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
 
+	history := &PersistentChatHistory{}
 	history.db = gorm
 
-	err = history.db.AutoMigrate(ChatHistory{})
+	err = history.db.AutoMigrate(models.ChatHistory{})
 	if err != nil {
 		fmt.Println(err)
 		return nil
@@ -75,7 +61,7 @@ func (history *PersistentChatHistory) Messages(context.Context) ([]schema.ChatMe
 		return []schema.ChatMessage{}, ErrMissingSessionID
 	}
 
-	err := history.db.Where(ChatHistory{SessionID: history.sessionID}).Find(&history.records).Error
+	err := history.db.Where(models.ChatHistory{SessionID: history.sessionID}).Find(&history.records).Error
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +146,7 @@ func (history *PersistentChatHistory) SetMessages(ctx context.Context, messages 
 func (history *PersistentChatHistory) Clear(context.Context) error {
 	history.messages = []schema.ChatMessage{}
 
-	err := history.db.Where(ChatHistory{SessionID: history.sessionID}).Delete(&history.records).Error
+	err := history.db.Where(models.ChatHistory{SessionID: history.sessionID}).Delete(&history.records).Error
 	if err != nil {
 		return err
 	}
@@ -168,29 +154,14 @@ func (history *PersistentChatHistory) Clear(context.Context) error {
 	return nil
 }
 
-func (history *PersistentChatHistory) loadNewMessages() *Messages {
-	newMsgs := Messages{}
+func (history *PersistentChatHistory) loadNewMessages() *models.Messages {
+	newMsgs := models.Messages{}
 	for _, msg := range history.messages {
-		newMsgs = append(newMsgs, Message{
+		newMsgs = append(newMsgs, models.Message{
 			Type:    string(msg.GetType()),
 			Content: msg.GetContent(),
 		})
 	}
 
 	return &newMsgs
-}
-
-// Value implements the driver.Valuer interface, this method allows us to
-// customize how we store the Message type in the database.
-func (m Messages) Value() (driver.Value, error) {
-	return json.Marshal(m)
-}
-
-// Scan implements the sql.Scanner interface, this method allows us to
-// define how we convert the Message data from the database into our Message type.
-func (m *Messages) Scan(src interface{}) error {
-	if bytes, ok := src.([]byte); ok {
-		return json.Unmarshal(bytes, m)
-	}
-	return errors.New("could not scan type into Message")
 }

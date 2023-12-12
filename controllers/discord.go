@@ -5,16 +5,36 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/AstroSynapseAI/app-service/engine"
 	"github.com/AstroSynapseAI/app-service/engine/chains"
+	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/bwmarrin/discordgo"
 )
 
-func DiscordMsgHandler(session *discordgo.Session, msg *discordgo.MessageCreate) {
-	asaiChain, err := chains.NewAsaiChain()
-	if err != nil {
-		fmt.Println(err)
-		return
+type DiscordController struct {
+	db 				  *database.Database
+	asaiChain   *chains.AsaiChain
+	WelcomeChID string
+	ClientType  string
+}
+
+func NewDiscordController(db *database.Database) *DiscordController {
+	ctrl := &DiscordController{
+		db: db,
+		WelcomeChID: "1112854836371791944",
+		ClientType: "Discord",
 	}
+
+	asaiConfig := engine.NewConfig(db)
+	asaiChain, _ := chains.NewAsaiChain(asaiConfig)
+
+	ctrl.asaiChain = asaiChain
+	ctrl.asaiChain.SetClientType(ctrl.ClientType)
+
+	return ctrl
+}
+
+func (ctrl *DiscordController) MsgHandler(session *discordgo.Session, msg *discordgo.MessageCreate) {
 	if msg.Author.ID == session.State.User.ID {
 		return
 	}
@@ -23,8 +43,9 @@ func DiscordMsgHandler(session *discordgo.Session, msg *discordgo.MessageCreate)
 	userPrompt := msg.Content
 
 	if strings.Contains(msg.Content, "@"+session.State.User.ID) {
-		asaiChain.SetSessionID(sessionID)
-		response, err := asaiChain.Prompt(context.Background(), userPrompt)
+		ctrl.asaiChain.SetSessionID(sessionID)
+		
+		response, err := ctrl.asaiChain.Prompt(context.Background(), userPrompt)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -34,27 +55,19 @@ func DiscordMsgHandler(session *discordgo.Session, msg *discordgo.MessageCreate)
 	}
 }
 
-func NewMemberHandler(session *discordgo.Session, addEvent *discordgo.GuildMemberAdd) {
-	asaiChain, err := chains.NewAsaiChain()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+func (ctrl *DiscordController) NewMemberHandler(session *discordgo.Session, addEvent *discordgo.GuildMemberAdd) {
 	sessionID := addEvent.User.ID
 	userName := addEvent.User.Username
-	channelID := "1112854836371791944"
 
-	asaiChain.SetSessionID(sessionID)
-	asaiChain.SetClientType("Discord")
+	ctrl.asaiChain.SetSessionID(sessionID)
+	
+	userPrompt := fmt.Sprintf("New user, %s (%s), has joined the server.", userName, sessionID)
 
-	userPrompt := fmt.Sprintf("New user, %s (%s), has joined the server. Invoke the onboarding_script.txt and welcome user to the server.", userName, sessionID)
-
-	response, err := asaiChain.Prompt(context.Background(), userPrompt)
+	response, err := ctrl.asaiChain.Prompt(context.Background(), userPrompt)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	_, _ = session.ChannelMessageSend(channelID, response)
-
+	_, _ = session.ChannelMessageSend(ctrl.WelcomeChID, response)
 }

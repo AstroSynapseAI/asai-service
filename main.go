@@ -10,9 +10,9 @@ import (
 func main() {
 	app := app.NewConfig()
 
-	app.InitDB()
-
 	app.LoadEnvironment()
+
+	app.InitDB()
 
 	asaiServer := server.NewAsaiServer()
 

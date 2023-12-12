@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/AstroSynapseAI/app-service/app"
+	"github.com/AstroSynapseAI/app-service/engine"
 	"github.com/AstroSynapseAI/app-service/engine/memory"
 	"github.com/tmc/langchaingo/chains"
 	"github.com/tmc/langchaingo/prompts"
@@ -60,9 +60,9 @@ type OnboardingChain struct {
 	memory *memory.AsaiMemory
 }
 
-func NewOnboardingChain(memory *memory.AsaiMemory) (*OnboardingChain, error) {
+func NewOnboardingChain(config engine.AvatarConfig, memory *memory.AsaiMemory) (*OnboardingChain, error) {
 	prompt := prompts.NewPromptTemplate(PromptTemplate, []string{"history", "input", "script"})
-	chain := chains.NewLLMChain(app.CONFIG.LLM, prompt)
+	chain := chains.NewLLMChain(config.GetAvatarLLM(), prompt)
 	onbaording :=  &OnboardingChain{
 		Chain: chain,
 		memory: memory,

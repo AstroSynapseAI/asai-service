@@ -1,12 +1,13 @@
 package ws
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"sync"
 
+	"github.com/AstroSynapseAI/app-service/engine"
 	"github.com/AstroSynapseAI/app-service/engine/chains"
+	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/gorilla/websocket"
 )
 
@@ -17,15 +18,15 @@ var websocketUpgrader = websocket.Upgrader{
 }
 
 type Manager struct {
-	ctx context.Context
 	sync.RWMutex
 	clients map[*Client]bool
+	db      *database.Database
 }
 
-func NewManager(ctx context.Context) *Manager {
+func NewManager(db *database.Database) *Manager {
 	mng := &Manager{
 		clients: make(map[*Client]bool),
-		ctx:     ctx,
+		db:      db,
 	}
 
 	return mng
@@ -38,15 +39,16 @@ func (m *Manager) Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	asaiChain, _ := chains.NewAsaiChain()
+	asaiConfig := engine.NewConfig(m.db)
+	asaiChain, _ := chains.NewAsaiChain(asaiConfig)
 
 	client := NewClient(conn, m, asaiChain)
-
 	m.addClient(client)
 
-	go client.MaintainConnection(m.ctx)
-	go client.ReadMsgs(m.ctx)
-	go client.SendMsgs(m.ctx)
+	// Rember this context was passed to the client if there are issues later on
+	go client.MaintainConnection(r.Context())
+	go client.ReadMsgs(r.Context())
+	go client.SendMsgs(r.Context())
 
 }
 

@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/AstroSynapseAI/app-service/app"
+	"github.com/AstroSynapseAI/app-service/engine"
 	"github.com/AstroSynapseAI/app-service/engine/agents/browser"
 	"github.com/AstroSynapseAI/app-service/engine/agents/search"
 	"github.com/AstroSynapseAI/app-service/engine/callbacks"
@@ -31,10 +31,11 @@ type AsaiChain struct {
 	Agents     []tools.Tool
 	Stream     func(context.Context, []byte)
 	ClientType string
+	config     engine.AvatarConfig
 }
 
-func NewAsaiChain() (*AsaiChain, error) {
-	asaiMemory := memory.NewMemory(app.CONFIG.DSN, app.CONFIG.MemorySize)
+func NewAsaiChain(config engine.AvatarConfig) (*AsaiChain, error) {
+	asaiMemory := memory.NewMemory(config)
 
 	// create search agent
 	searchAgent, err := search.NewSearchAgent()
@@ -57,7 +58,7 @@ func NewAsaiChain() (*AsaiChain, error) {
 	}
 
 	return &AsaiChain{
-		LLM:    app.CONFIG.LLM,
+		LLM:    config.GetAvatarLLM(),
 		Memory: asaiMemory,
 		Agents: []tools.Tool{
 			searchAgent,
@@ -118,7 +119,7 @@ func (chain *AsaiChain) Run(ctx context.Context, input string, options ...chains
 		agents.WithCallbacksHandler(agentCallback),
 	)
 	
-	obChain, err := NewOnboardingChain(chain.Memory)
+	obChain, err := NewOnboardingChain(chain.config, chain.Memory)
 	if err != nil {
 		return err
 	}
