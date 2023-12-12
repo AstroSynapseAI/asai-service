@@ -9,31 +9,25 @@ import (
 )
 
 type ApiRepository struct {
-	DB *database.Database
+	DB   *database.Database
 	Gorm *gorm.DB
 }
 
 func NewApiRepository(db *database.Database) *ApiRepository {
-	gorm, err := gorm.Open(db.Adapter.Gorm(), &gorm.Config{})
-
-	if err != nil {
-		fmt.Println(err)
-		return nil
-	}
 	return &ApiRepository{
-		DB: db,
-		Gorm: gorm,
+		DB:   db,
+		Gorm: db.Adapter.Gorm(),
 	}
 }
 
 func (repo *ApiRepository) GetChatHistory(ID string) *models.ChatHistory {
 	var history *models.ChatHistory
-	
+
 	err := repo.Gorm.Where(models.ChatHistory{SessionID: ID}).Find(&history).Error
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
-	
+
 	return history
 }

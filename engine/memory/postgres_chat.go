@@ -28,18 +28,10 @@ type PersistentChatHistory struct {
 var _ schema.ChatMessageHistory = &PersistentChatHistory{}
 
 func NewPersistentChatHistory(config engine.AvatarConfig) *PersistentChatHistory {
-	db := config.GetDB()
-	
-	gorm, err := gorm.Open(db.Adapter.Gorm(), &gorm.Config{})
-	if err != nil {
-		fmt.Println(err)
-		return nil
-	}
-
 	history := &PersistentChatHistory{}
-	history.db = gorm
+	history.db = config.GetDB().Adapter.Gorm()
 
-	err = history.db.AutoMigrate(models.ChatHistory{})
+	err := history.db.AutoMigrate(models.ChatHistory{})
 	if err != nil {
 		fmt.Println(err)
 		return nil

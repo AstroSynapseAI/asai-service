@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/AstroSynapseAI/app-service/engine"
-	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/tmc/langchaingo/memory"
 	"github.com/tmc/langchaingo/schema"
 )
@@ -13,7 +12,6 @@ import (
 type AsaiMemory struct {
 	buffer      schema.Memory
 	chatHistory *PersistentChatHistory
-	db          *database.Database
 }
 
 // NewMemory creates a new instance of AsaiMemory.

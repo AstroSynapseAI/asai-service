@@ -26,9 +26,9 @@ type ServerAdapter interface {
 }
 
 type Config struct {
-	DB         *database.Database
-	ENV        string
-	DSN        string
+	DB  *database.Database
+	ENV string
+	DSN string
 }
 
 func NewConfig() *Config {
@@ -57,12 +57,13 @@ func (cnf *Config) InitDB() {
 
 	migration := gorm.NewGormMigrator(cnf.DB)
 	migration.AddMigrations(&Migrations{})
+
 	migration.Run()
 }
 
 func (cnf *Config) LoadEnvironment() {
 	fmt.Println("Current Environment:", cnf.ENV)
-	
+
 	if cnf.ENV == "LOCAL DEV" {
 		cnf.setupLocalDev()
 		return
@@ -82,7 +83,7 @@ func (cnf *Config) setupHeroku() {
 
 func (cnf *Config) setupLocalDev() {
 	cnf.DSN = DefaultDevDSN
-	
+
 	var Config struct {
 		OpenAPIKey    string `yaml:"open_api_key"`
 		SerpAPIKey    string `yaml:"serpapi_api_key"`
