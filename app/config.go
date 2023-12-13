@@ -88,6 +88,7 @@ func (cnf *Config) setupLocalDev() {
 		OpenAPIKey    string `yaml:"open_api_key"`
 		SerpAPIKey    string `yaml:"serpapi_api_key"`
 		DiscordApiKey string `yaml:"discord_api_key"`
+		WelcomeChID   string `yaml:"welcome_channel_id"`
 	}
 
 	keys, err := os.ReadFile("./app/keys.yaml")
@@ -118,6 +119,13 @@ func (cnf *Config) setupLocalDev() {
 
 	//Set the Discord API key as env variable
 	err = os.Setenv("DISCORD_API_KEY", Config.DiscordApiKey)
+	if err != nil {
+		fmt.Println("Error setting environment variable:", err)
+		return
+	}
+
+	// Set the Discord welcome channel ID as env variable
+	err = os.Setenv("WELCOME_CHANNEL_ID", Config.WelcomeChID)
 	if err != nil {
 		fmt.Println("Error setting environment variable:", err)
 		return

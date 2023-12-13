@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/AstroSynapseAI/app-service/engine"
@@ -21,7 +22,7 @@ type DiscordController struct {
 func NewDiscordController(db *database.Database) *DiscordController {
 	ctrl := &DiscordController{
 		db:          db,
-		WelcomeChID: "1112854836371791944",
+		WelcomeChID: os.Getenv("WELCOME_CHANNEL_ID"),
 		ClientType:  "Discord",
 	}
 
