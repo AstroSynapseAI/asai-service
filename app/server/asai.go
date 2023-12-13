@@ -25,9 +25,7 @@ func NewAsaiServer() *AsaiServer {
 	var err error
 	server := &AsaiServer{}
 
-	token := os.Getenv("DISCORD_API_KEY")
-	
-	server.discordClient, err = discordgo.New("Bot " + token)
+	server.discordClient, err = discordgo.New("Bot " + os.Getenv("DISCORD_API_KEY"))
 	if err != nil {
 		fmt.Println("Failed to create Discord session:", err)
 	}
@@ -38,10 +36,14 @@ func NewAsaiServer() *AsaiServer {
 func (server *AsaiServer) Run(db *database.Database) error {
 	router := rest.NewRouter()
 	router.Mux.StrictSlash(true)
-	
+
 	// API server
 	routes := app.NewRoutes(router, db)
 	router.Load(routes)
+
+	// Websocket server
+	wsManager := ws.NewManager(db)
+	router.Mux.HandleFunc("/ws/chat", wsManager.Handler)
 
 	// Web client server
 	staticDir := "./web/static"
@@ -50,10 +52,6 @@ func (server *AsaiServer) Run(db *database.Database) error {
 
 	router.Mux.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", assets))
 	router.Mux.Handle("/", static)
-
-	// Websocket server
-	wsManager := ws.NewManager(db)
-	router.Mux.HandleFunc("/api/chat/socket", wsManager.Handler)
 
 	// Fallback to index.html for Vue Router
 	router.Mux.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -91,7 +89,7 @@ func (server *AsaiServer) Run(db *database.Database) error {
 
 	// Cleanly close down the Discord session.
 	server.discordClient.Close()
-	
+
 	//
 	// Start the HTTP server using the router and the listener
 	port := os.Getenv("PORT")
@@ -116,6 +114,6 @@ func (server *AsaiServer) Run(db *database.Database) error {
 		fmt.Println("Failed to serve:", err)
 		return err
 	}
-	
+
 	return nil
 }

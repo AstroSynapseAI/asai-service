@@ -39,10 +39,6 @@ func NewConfig() *Config {
 	return config
 }
 
-func (cnf *Config) RunServer(server ServerAdapter) error {
-	return server.Run(cnf.DB)
-}
-
 func (cnf *Config) InitDB() {
 	if cnf.DSN == "" {
 		fmt.Println("Empty DSN, setting default.")
@@ -59,6 +55,10 @@ func (cnf *Config) InitDB() {
 	migration.AddMigrations(&Migrations{})
 
 	migration.Run()
+}
+
+func (cnf *Config) RunServer(server ServerAdapter) error {
+	return server.Run(cnf.DB)
 }
 
 func (cnf *Config) LoadEnvironment() {

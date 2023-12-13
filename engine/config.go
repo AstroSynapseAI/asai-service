@@ -22,7 +22,6 @@ func NewConfig(db *database.Database) *Config {
 
 func (cnf *Config) GetDB() *database.Database {
 	return cnf.DB
-
 }
 
 func (cnf *Config) GetAvatarName() string {
@@ -61,4 +60,3 @@ func (cnf *Config) GetTools() []ToolConfig {
 func (cnf *Config) GetPlugins() []PluginConfig {
 	return nil
 }
-

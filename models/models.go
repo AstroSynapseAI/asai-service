@@ -1,5 +1,8 @@
 package models
 
+// I keep my models in a single file when I need to work on table relationships,
+// makes it easier to manage when you have overview of all models in a single file.
+
 // type User struct {
 // 	gorm.Model
 // 	ID 			 int
@@ -49,7 +52,7 @@ package models
 // 	ID   	 int
 // 	Name 	 string
 // 	Slug   string
-// 	Agents []Agent `gorm:"many2many:avatar_plugins;"`
+// 	Avatars []Avatar `gorm:"many2many:avatar_plugins;"`
 // }
 
 // type Role struct {

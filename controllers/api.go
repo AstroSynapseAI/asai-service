@@ -14,29 +14,31 @@ import (
 )
 
 type ApiController struct {
-	*rest.RestController	
-	repo *repositories.ApiRepository
+	rest.RestController
+	Repo *repositories.ApiRepository
 }
+
+var _ rest.Controller = (*ApiController)(nil)
 
 func NewApiController(db *database.Database) *ApiController {
 	return &ApiController{
-		repo: repositories.NewApiRepository(db),
+		Repo: repositories.NewApiRepository(db),
 	}
 }
 
 func (ctrl *ApiController) Run() {
-	
+
 	// Get Chat History endpoint.
 	ctrl.Get("/chat/history", func(ctx *rest.Context) {
 		sessionId := ctx.GetParam("session_id")
-		history := ctrl.repo.GetChatHistory(sessionId)
+		history := ctrl.Repo.GetChatHistory(sessionId)
 
 		_ = ctx.JsonResponse(http.StatusOK, history.ChatHistory)
 	})
 
 	// Send Chat Message endpoint.
 	ctrl.Post("/chat/msg", func(ctx *rest.Context) {
-		
+
 		// Parse the incoming http request
 		var request struct {
 			SessionId  string `json:"session_id"`
@@ -50,9 +52,8 @@ func (ctrl *ApiController) Run() {
 			return
 		}
 
-
 		// Initialize Asai Chain
-		asaiConfig := engine.NewConfig(ctrl.repo.DB)
+		asaiConfig := engine.NewConfig(ctrl.Repo.DB)
 		asaiChain, _ := chains.NewAsaiChain(asaiConfig)
 		asaiChain.SetSessionID(request.SessionId)
 
@@ -81,9 +82,9 @@ func (ctrl *ApiController) Run() {
 		var reponseJson struct {
 			SessionId string `json:"session_id"`
 		}
-	
+
 		reponseJson.SessionId = sessionID
-		
+
 		_ = ctx.JsonResponse(http.StatusOK, reponseJson)
 	})
 }
