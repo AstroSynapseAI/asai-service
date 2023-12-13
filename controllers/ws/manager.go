@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"sync"
@@ -40,15 +41,20 @@ func (m *Manager) Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	asaiConfig := engine.NewConfig(m.db)
-	asaiChain, _ := chains.NewAsaiChain(asaiConfig)
+	asaiChain, err := chains.NewAsaiChain(asaiConfig)
+	if err != nil {
+		fmt.Println("Failed to initate socket:", err)
+		return
+	}
 
 	client := NewClient(conn, m, asaiChain)
 	m.addClient(client)
 
-	// Rember this context was passed to the client if there are issues later on
-	go client.MaintainConnection(r.Context())
-	go client.ReadMsgs(r.Context())
-	go client.SendMsgs(r.Context())
+	ctx := context.Background()
+
+	go client.MaintainConnection(ctx)
+	go client.ReadMsgs(ctx)
+	go client.SendMsgs(ctx)
 
 }
 

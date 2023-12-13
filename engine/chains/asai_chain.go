@@ -60,6 +60,7 @@ func NewAsaiChain(config engine.AvatarConfig) (*AsaiChain, error) {
 	return &AsaiChain{
 		LLM:    config.GetAvatarLLM(),
 		Memory: asaiMemory,
+		config: config,
 		Agents: []tools.Tool{
 			searchAgent,
 			scraperAgent,
@@ -86,7 +87,20 @@ func (chain *AsaiChain) Prompt(ctx context.Context, input string) (string, error
 		chain.Agents,
 	)
 
-	tmplt := chain.loadTemplate(map[string]any{})
+	obChain, err := NewOnboardingChain(chain.config, chain.Memory)
+	if err != nil {
+		return "", err
+	}
+
+	obResponse, err := obChain.Call(ctx, input)
+	if err != nil {
+		return "", err
+	}
+
+	tmplt := chain.loadTemplate(map[string]interface{}{
+		"onboarding": obResponse,
+	})
+
 	asaiAgent.Chain = chains.NewLLMChain(chain.LLM, tmplt)
 
 	executor := agents.NewExecutor(
@@ -118,7 +132,7 @@ func (chain *AsaiChain) Run(ctx context.Context, input string, options ...chains
 		chain.Agents,
 		agents.WithCallbacksHandler(agentCallback),
 	)
-	
+
 	obChain, err := NewOnboardingChain(chain.config, chain.Memory)
 	if err != nil {
 		return err

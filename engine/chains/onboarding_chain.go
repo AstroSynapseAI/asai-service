@@ -62,9 +62,15 @@ type OnboardingChain struct {
 
 func NewOnboardingChain(config engine.AvatarConfig, memory *memory.AsaiMemory) (*OnboardingChain, error) {
 	prompt := prompts.NewPromptTemplate(PromptTemplate, []string{"history", "input", "script"})
+
+	if config == nil {
+		return nil, fmt.Errorf("config cannot be nil")
+	}
+
 	chain := chains.NewLLMChain(config.GetAvatarLLM(), prompt)
-	onbaording :=  &OnboardingChain{
-		Chain: chain,
+
+	onbaording := &OnboardingChain{
+		Chain:  chain,
 		memory: memory,
 	}
 

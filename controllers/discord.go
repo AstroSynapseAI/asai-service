@@ -12,7 +12,7 @@ import (
 )
 
 type DiscordController struct {
-	db 				  *database.Database
+	db          *database.Database
 	asaiChain   *chains.AsaiChain
 	WelcomeChID string
 	ClientType  string
@@ -20,13 +20,17 @@ type DiscordController struct {
 
 func NewDiscordController(db *database.Database) *DiscordController {
 	ctrl := &DiscordController{
-		db: db,
+		db:          db,
 		WelcomeChID: "1112854836371791944",
-		ClientType: "Discord",
+		ClientType:  "Discord",
 	}
 
 	asaiConfig := engine.NewConfig(db)
-	asaiChain, _ := chains.NewAsaiChain(asaiConfig)
+	asaiChain, err := chains.NewAsaiChain(asaiConfig)
+	if err != nil {
+		fmt.Println("Failed to initate socket:", err)
+		return nil
+	}
 
 	ctrl.asaiChain = asaiChain
 	ctrl.asaiChain.SetClientType(ctrl.ClientType)
@@ -44,7 +48,7 @@ func (ctrl *DiscordController) MsgHandler(session *discordgo.Session, msg *disco
 
 	if strings.Contains(msg.Content, "@"+session.State.User.ID) {
 		ctrl.asaiChain.SetSessionID(sessionID)
-		
+
 		response, err := ctrl.asaiChain.Prompt(context.Background(), userPrompt)
 		if err != nil {
 			fmt.Println(err)
@@ -60,7 +64,7 @@ func (ctrl *DiscordController) NewMemberHandler(session *discordgo.Session, addE
 	userName := addEvent.User.Username
 
 	ctrl.asaiChain.SetSessionID(sessionID)
-	
+
 	userPrompt := fmt.Sprintf("New user, %s (%s), has joined the server.", userName, sessionID)
 
 	response, err := ctrl.asaiChain.Prompt(context.Background(), userPrompt)

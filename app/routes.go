@@ -21,8 +21,6 @@ func NewRoutes(router *rest.Rest, db *database.Database) *Routes {
 }
 
 func (routes *Routes) LoadRoutes() {
-	// repo := repositories.NewApiRepository(routes.DB)
-
 	routes.rest.Route("/api").MapController(controllers.NewApiController(routes.DB)).Init()
 }
 

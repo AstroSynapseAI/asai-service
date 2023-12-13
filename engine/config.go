@@ -24,10 +24,6 @@ func (cnf *Config) GetDB() *database.Database {
 	return cnf.DB
 }
 
-func (cnf *Config) GetAvatarName() string {
-	return "Asai"
-}
-
 func (cnf *Config) GetAvatarLLM() llms.LanguageModel {
 	LLM, err := openai.NewChat(openai.WithModel("gpt-4"))
 	if err != nil {
@@ -35,6 +31,10 @@ func (cnf *Config) GetAvatarLLM() llms.LanguageModel {
 		return nil
 	}
 	return LLM
+}
+
+func (cnf *Config) GetAvatarName() string {
+	return "Asai"
 }
 
 func (cnf *Config) GetAvatarPrimer() string {

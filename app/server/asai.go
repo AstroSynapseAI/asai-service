@@ -34,6 +34,18 @@ func NewAsaiServer() *AsaiServer {
 }
 
 func (server *AsaiServer) Run(db *database.Database) error {
+	// Initialize the Discord client
+	discordCtrl := controllers.NewDiscordController(db)
+	server.discordClient.AddHandler(discordCtrl.MsgHandler)
+	server.discordClient.AddHandler(discordCtrl.NewMemberHandler)
+	server.discordClient.Identify.Intents = discordgo.IntentsGuildMessages
+
+	err := server.discordClient.Open()
+	if err != nil {
+		fmt.Println("Failed to open Discord connection:", err)
+		return err
+	}
+
 	router := rest.NewRouter()
 	router.Mux.StrictSlash(true)
 
@@ -68,28 +80,6 @@ func (server *AsaiServer) Run(db *database.Database) error {
 		return
 	})
 
-	// Initialize the Discord client
-	discordCtrl := controllers.NewDiscordController(db)
-	server.discordClient.AddHandler(discordCtrl.MsgHandler)
-	server.discordClient.AddHandler(discordCtrl.NewMemberHandler)
-	server.discordClient.Identify.Intents = discordgo.IntentsGuildMessages
-
-	err := server.discordClient.Open()
-	if err != nil {
-		fmt.Println("Failed to open Discord connection:", err)
-		return err
-	}
-
-	// Setup signal capturing
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, syscall.SIGTERM)
-
-	// Wait for SIGTERM signal
-	<-stop
-
-	// Cleanly close down the Discord session.
-	server.discordClient.Close()
-
 	//
 	// Start the HTTP server using the router and the listener
 	port := os.Getenv("PORT")
@@ -114,6 +104,16 @@ func (server *AsaiServer) Run(db *database.Database) error {
 		fmt.Println("Failed to serve:", err)
 		return err
 	}
+
+	// Setup signal capturing for closing discord connection (I think)
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGTERM)
+
+	// Wait for SIGTERM signal
+	<-stop
+
+	// Cleanly close down the Discord session.
+	server.discordClient.Close()
 
 	return nil
 }
