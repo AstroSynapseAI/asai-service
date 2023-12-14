@@ -24,7 +24,6 @@ func (ctrl *Users) Run() {
 	ctrl.Post("/{user_id}/accounts", ctrl.SaveAccount)
 	ctrl.Get("/{user_id}/accounts", ctrl.GetAccount)
 	ctrl.Get("/{user_id}/avatars/{avatar_slug}", ctrl.GetAvatar)
-
 }
 
 func (ctrl *Users) Login(ctx *rest.Context) {
