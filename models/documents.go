@@ -1,10 +1,9 @@
 package models
 
-// type LLM struct {
+// type Document struct {
 // 	gorm.Model
+// 	Path        string
 // 	Name        string
 // 	Description string
-// 	Slug        string
 // 	Avatars     []Avatar
-// 	Agents      []Agent
 // }

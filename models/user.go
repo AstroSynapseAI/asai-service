@@ -1,16 +1,19 @@
 package models
 
-import "gorm.io/gorm"
+// type User struct {
+// 	gorm.Model
+// 	Username string
+// 	Password string
+// 	Accounts []Account
+// 	Roles    []Role `gorm:"foreignKey:UserID;"`
+// }
 
-type User struct {
-	gorm.Model
-	ID       int
-	Email    string
-	Password string
-	Username string
-	AvatarID int
-	Avatar   *Avatar
-	Avatars  []Avatar `gorm:"many2many:user_avatars;"`
-	RoleID   int
-	Role     *Role
-}
+// type Role struct {
+// 	gorm.Model
+// 	Name     string
+// 	Slug     string
+// 	UserID   sql.NullInt64
+// 	AvatarID sql.NullInt64
+// 	User     User   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+// 	Avatar   Avatar `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+// }

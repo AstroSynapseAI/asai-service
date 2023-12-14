@@ -12,10 +12,12 @@ var _ database.Migrations = (*Migrations)(nil)
 
 func (*Migrations) Models() []interface{} {
 	return []interface{}{
+		&models.Account{},
 		&models.Agent{},
 		&models.Avatar{},
+		&models.Document{},
 		&models.LLM{},
-		&models.Plugins{},
+		&models.Plugin{},
 		&models.Role{},
 		&models.Tool{},
 		&models.User{},

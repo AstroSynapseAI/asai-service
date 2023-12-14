@@ -1,16 +1,23 @@
 package models
 
-import "gorm.io/gorm"
+// type Agent struct {
+// 	gorm.Model
+// 	ID           int
+// 	Name         string
+// 	Description  string
+// 	Slug         string
+// 	Primer       string
+// 	ActiveAgents []ActiveAgents `gorm:"foreignKey:AgentID;"`
+// 	AgentTools   []AgentTool    `gorm:"foreignKey:AgentID;"`
+// }
 
-type Agent struct {
-  gorm.Model
-  ID    				int
-  Name  				string
-	Slug  				string
-	LLMID   			int
-	LLM   				*LLM
-	DefaultPrimer string
-	Primer 				string
-	IsActive 			bool
-  Tools 				[]Tool `gorm:"many2many:agent_tools;"`
-}
+// type AgentTool struct {
+// 	gorm.Model
+// 	IsActive bool
+// 	IsPublic bool
+// 	Token    string
+// 	AgentID  int
+// 	ToolID   int
+// 	Agent    *Agent `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+// 	Tool     *Tool  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+// }
