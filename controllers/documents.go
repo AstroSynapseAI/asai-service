@@ -1,21 +1,19 @@
 package controllers
 
 import (
-	"github.com/AstroSynapseAI/app-service/models"
-	"github.com/AstroSynapseAI/app-service/sdk/crud"
+	"github.com/AstroSynapseAI/app-service/repositories"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
-	"github.com/AstroSynapseAI/app-service/sdk/crud/orms/gorm"
 	"github.com/AstroSynapseAI/app-service/sdk/rest"
 )
 
 type DocumentsController struct {
 	rest.RestController
-	Repo crud.Repository[models.Document]
+	Document *repositories.DocumentsRepository
 }
 
 func NewDocumentsController(db *database.Database) *DocumentsController {
 	return &DocumentsController{
-		Repo: gorm.NewRepository[models.Document](db, models.Document{}),
+		Document: repositories.NewDocumentsRepository(db),
 	}
 }
 

@@ -27,7 +27,6 @@ func NewApiController(db *database.Database) *ApiController {
 }
 
 func (ctrl *ApiController) Run() {
-
 	// Get Chat History endpoint.
 	ctrl.Get("/chat/history/{session_id}", func(ctx *rest.Context) {
 		sessionId := ctx.GetParam("session_id")

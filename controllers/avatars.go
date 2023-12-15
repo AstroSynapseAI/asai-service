@@ -1,20 +1,19 @@
 package controllers
 
 import (
-	"github.com/AstroSynapseAI/app-service/models"
+	"github.com/AstroSynapseAI/app-service/repositories"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
-	"github.com/AstroSynapseAI/app-service/sdk/crud/orms/gorm"
 	"github.com/AstroSynapseAI/app-service/sdk/rest"
 )
 
 type AvatarsController struct {
 	rest.RestController
-	Repo *gorm.Repository[models.Avatar]
+	Avatar *repositories.AvatarsRepository
 }
 
 func NewAvatarsController(db *database.Database) *AvatarsController {
 	return &AvatarsController{
-		Repo: gorm.NewRepository[models.Avatar](db, models.Avatar{}),
+		Avatar: repositories.NewAvatarsRepository(db),
 	}
 }
 

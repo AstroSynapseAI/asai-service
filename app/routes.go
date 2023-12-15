@@ -1,8 +1,8 @@
 package app
 
 import (
-	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/AstroSynapseAI/app-service/controllers"
 	"github.com/AstroSynapseAI/app-service/models"
@@ -26,21 +26,14 @@ func NewRoutes(router *rest.Rest, db *database.Database) *Routes {
 }
 
 func (routes *Routes) LoadRoutes() {
-	routes.rest.Mux.Use(func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-			fmt.Println("Middleware called in the beginging ?")
-
-			next.ServeHTTP(w, r)
-		})
-	})
-
 	//TMP API Controller
 	routes.rest.Route("/api").MapController(controllers.NewApiController(routes.DB)).Init()
 
 	// CUSTOM CONTROLLERS
 	// Route custom UsersController
 	routes.rest.Route("/api/users").MapController(controllers.NewUsersController(routes.DB)).Init()
+	// Route custom AvatarsController
+	routes.rest.Route("/api/avatars").MapController(controllers.NewAvatarsController(routes.DB)).Init()
 	// Route custom AgentsController
 	routes.rest.Route("/api/agents").MapController(controllers.NewAgentsController(routes.DB)).Init()
 	// Route custom DocumentsController
@@ -77,10 +70,18 @@ func (routes *Routes) LoadRoutes() {
 }
 
 func (routes *Routes) LoadMiddlewares() {
+	// TMP API Auth Middleware
 	routes.rest.Mux.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			secret := "test-secret"
+			tokenString := r.Header.Get("Authorization")
 
-			fmt.Println("Middleware called in the end ?")
+			if strings.HasPrefix(r.URL.Path, "/api") {
+				if tokenString != secret {
+					w.WriteHeader(http.StatusUnauthorized)
+					return
+				}
+			}
 
 			next.ServeHTTP(w, r)
 		})
