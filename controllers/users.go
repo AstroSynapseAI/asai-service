@@ -1,47 +1,62 @@
 package controllers
 
 import (
-	"github.com/AstroSynapseAI/app-service/models"
-	"github.com/AstroSynapseAI/app-service/sdk/crud"
+	"net/http"
+
+	"github.com/AstroSynapseAI/app-service/repositories"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
-	"github.com/AstroSynapseAI/app-service/sdk/crud/orms/gorm"
 	"github.com/AstroSynapseAI/app-service/sdk/rest"
 )
 
-type Users struct {
+type UsersController struct {
 	rest.RestController
-	Repo crud.Repository[models.User]
+	User *repositories.UsersRepository
 }
 
-func NewUsersController(db *database.Database) *Users {
-	return &Users{
-		Repo: gorm.NewRepository[models.User](db, models.User{}),
+func NewUsersController(db *database.Database) *UsersController {
+	return &UsersController{
+		User: repositories.NewUsersRepository(db),
 	}
 }
 
-func (ctrl *Users) Run() {
+func (ctrl *UsersController) Run() {
 	ctrl.Post("/login", ctrl.Login)
 	ctrl.Post("/{user_id}/accounts", ctrl.SaveAccount)
 	ctrl.Get("/{user_id}/accounts", ctrl.GetAccount)
 	ctrl.Get("/{user_id}/avatars/{avatar_slug}", ctrl.GetAvatar)
 }
 
-func (ctrl *Users) Login(ctx *rest.Context) {
+func (ctrl *UsersController) Login(ctx *rest.Context) {
+	username := ctx.GetParam("username")
+	password := ctx.GetParam("password")
+	loggedIn := ctrl.User.Login(username, password)
+
+	if !loggedIn {
+		_ = ctx.JsonResponse(http.StatusUnauthorized, nil)
+		return
+	}
+
+	user := ctrl.User.GetByUsername(username)
+	if user == nil {
+		_ = ctx.JsonResponse(http.StatusUnauthorized, nil)
+		return
+	}
+
+	_ = ctx.JsonResponse(http.StatusOK, user)
+}
+
+func (ctrl *UsersController) SaveAccount(ctx *rest.Context) {
 
 }
 
-func (ctrl *Users) SaveAccount(ctx *rest.Context) {
+func (ctrl *UsersController) GetAccount(ctx *rest.Context) {
 
 }
 
-func (ctrl *Users) GetAccount(ctx *rest.Context) {
+func (ctrl *UsersController) DeleteAccount(ctx *rest.Context) {
 
 }
 
-func (ctrl *Users) DeleteAccount(ctx *rest.Context) {
-
-}
-
-func (ctrl *Users) GetAvatar(ctx *rest.Context) {
+func (ctrl *UsersController) GetAvatar(ctx *rest.Context) {
 
 }

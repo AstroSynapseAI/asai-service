@@ -10,12 +10,12 @@ import (
 
 type AgentsController struct {
 	rest.RestController
-	Repo crud.Repository[models.Agent]
+	Agent crud.Repository[models.Agent]
 }
 
 func NewAgentsController(db *database.Database) *AgentsController {
 	return &AgentsController{
-		Repo: gorm.NewRepository[models.Agent](db, models.Agent{}),
+		Agent: gorm.NewRepository[models.Agent](db, models.Agent{}),
 	}
 }
 

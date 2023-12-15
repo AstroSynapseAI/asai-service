@@ -26,6 +26,15 @@ func NewRoutes(router *rest.Rest, db *database.Database) *Routes {
 }
 
 func (routes *Routes) LoadRoutes() {
+	routes.rest.Mux.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+			fmt.Println("Middleware called in the beginging ?")
+
+			next.ServeHTTP(w, r)
+		})
+	})
+
 	//TMP API Controller
 	routes.rest.Route("/api").MapController(controllers.NewApiController(routes.DB)).Init()
 
@@ -71,7 +80,7 @@ func (routes *Routes) LoadMiddlewares() {
 	routes.rest.Mux.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-			fmt.Println("Middleware called")
+			fmt.Println("Middleware called in the end ?")
 
 			next.ServeHTTP(w, r)
 		})
