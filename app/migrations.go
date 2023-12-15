@@ -14,7 +14,12 @@ func (*Migrations) Models() []interface{} {
 	return []interface{}{
 		&models.Account{},
 		&models.Agent{},
+		&models.AgentTool{},
 		&models.Avatar{},
+		&models.AvatarRole{},
+		&models.ActiveAgent{},
+		&models.ActiveTool{},
+		&models.ActivePlugin{},
 		&models.Document{},
 		&models.LLM{},
 		&models.Plugin{},

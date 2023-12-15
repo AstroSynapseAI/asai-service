@@ -51,21 +51,23 @@ type Avatar struct {
 	Primer        string
 	IsPublic      bool
 	Roles         []AvatarRole   `gorm:"foreignKey:AvatarID;"`
-	ActiveAgents  []ActiveAgents `gorm:"foreignKey:AvatarID;"`
+	ActiveAgents  []ActiveAgent  `gorm:"foreignKey:AvatarID;"`
 	ActiveTools   []ActiveTool   `gorm:"foreignKey:AvatarID;"`
 	ActivePlugins []ActivePlugin `gorm:"foreignKey:AvatarID;"`
 	Documents     []Document     `gorm:"foreignKey:AvatarID;"`
 }
 
-type ActiveAgents struct {
+type ActiveAgent struct {
 	gorm.Model
 	IsActive bool
 	IsPublic bool
 	Primer   string
+	LLMID    sql.NullInt64
 	AvatarID sql.NullInt64
 	AgentID  sql.NullInt64
-	Avatar   *Avatar `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Agent    *Agent  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	LLM      LLM    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Avatar   Avatar `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Agent    Agent  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 type ActiveTool struct {
@@ -97,8 +99,8 @@ type Agent struct {
 	Description  string
 	Slug         string
 	Primer       string
-	ActiveAgents []ActiveAgents `gorm:"foreignKey:AgentID;"`
-	AgentTool    []AgentTool    `gorm:"foreignKey:AgentID;"`
+	ActiveAgents []ActiveAgent `gorm:"foreignKey:AgentID;"`
+	AgentTool    []AgentTool   `gorm:"foreignKey:AgentID;"`
 }
 
 type AgentTool struct {
@@ -133,11 +135,11 @@ type Plugin struct {
 
 type LLM struct {
 	gorm.Model
-	Name        string
-	Description string
-	Slug        string
-	Avatars     []Avatar
-	Agents      []Agent
+	Name         string
+	Description  string
+	Slug         string
+	Avatars      []Avatar      `gorm:"foreignKey:LLMID;"`
+	ActiveAgents []ActiveAgent `gorm:"foreignKey:LLMID;"`
 }
 
 type Role struct {
