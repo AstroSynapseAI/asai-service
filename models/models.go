@@ -12,10 +12,10 @@ import (
 // USER
 type User struct {
 	gorm.Model
-	Username string
-	Password string
-	Accounts []Account
-	Roles    []AvatarRole `gorm:"foreignKey:UserID;"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Accounts []Account `json:"accounts"`
+	Roles    []AvatarRole `gorm:"foreignKey:UserID;" json:"roles"`
 }
 
 type Account struct {

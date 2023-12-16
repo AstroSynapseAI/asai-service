@@ -15,3 +15,11 @@ func NewAvatarsRepository(db *database.Database) *AvatarsRepository {
 		Repo: gorm.NewRepository[models.Avatar](db, models.Avatar{}),
 	}
 }
+
+func (avatar *AvatarsRepository) SaveAvatar(data *models.Avatar) error {
+	return nil
+}
+
+func (avatar *AvatarsRepository) GetAgents(avatarID uint32) []models.Agent {
+	return nil
+}

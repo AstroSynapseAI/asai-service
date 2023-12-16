@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"syscall"
 
 	"github.com/AstroSynapseAI/app-service/app"
@@ -49,40 +48,23 @@ func (server *AsaiServer) Run(db *database.Database) error {
 	router := rest.NewRouter()
 	router.Mux.StrictSlash(true)
 
-	// API server
+	// Serve API controllers
 	routes := app.NewRoutes(router, db)
 	router.Load(routes)
 
-	// Websocket server
+	// Serve WebSocket
 	wsManager := ws.NewManager(db)
 	router.Mux.HandleFunc("/ws/chat", wsManager.Handler)
 
-	// Web client server
-	staticDir := "./web/static"
-	static := http.FileServer(http.Dir(staticDir))
-	assets := http.FileServer(http.Dir(staticDir + "/assets"))
-
-	router.Mux.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", assets))
-	router.Mux.Handle("/", static)
-
-	// Fallback to index.html for Vue Router
-	router.Mux.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		path := filepath.Join(staticDir + r.URL.Path)
-		_, err := os.Stat(path)
-
-		if os.IsNotExist(err) {
-			http.ServeFile(w, r, staticDir+"/index.html")
-			return
-		}
-
-		// If request is not for a directory, serve with the static file server as normal
-		static.ServeHTTP(w, r)
-		return
-	})
+	// Serve Websites
+	webCtrl := controllers.NewWebController(router)
+	webCtrl.Run()
 
 	//
-	// Start the HTTP server using the router and the listener
+	// PORT is defined by heroku env
 	port := os.Getenv("PORT")
+	
+	// If PORT is not defined, server is running locally
 	if port == "" {
 		err := router.Listen(":8082")
 		if err != nil {
@@ -92,6 +74,8 @@ func (server *AsaiServer) Run(db *database.Database) error {
 		return nil
 	}
 
+	// If PORT is defined, server is running on Heroku
+	// Create a TCP listener with heroku port
 	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		fmt.Println("Failed to listen:", err)
@@ -105,6 +89,8 @@ func (server *AsaiServer) Run(db *database.Database) error {
 		return err
 	}
 
+	// This need to be revised and probably wrapped in an plugins interface
+	// is part of the discord client
 	// Setup signal capturing for closing discord connection (I think)
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGTERM)

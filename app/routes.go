@@ -67,6 +67,13 @@ func (routes *Routes) LoadRoutes() {
 		gorm.NewRepository[models.Role](routes.DB, models.Role{}),
 	)
 	routes.rest.Route("/api/roles").MapController(rolesCtrl).Init()
+
+	// Routing CRUD Accounts controller
+	accountsCtrl := rest.NewCRUDController[models.Account](
+		models.Account{},
+		gorm.NewRepository[models.Account](routes.DB, models.Account{}),
+	)
+	routes.rest.Route("/api/accounts").MapController(accountsCtrl).Init()
 }
 
 func (routes *Routes) LoadMiddlewares() {
