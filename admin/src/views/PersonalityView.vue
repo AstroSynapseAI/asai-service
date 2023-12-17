@@ -62,7 +62,6 @@ onMounted(() => {
 
 </script>
 
-
 <template>
   
           
@@ -289,14 +288,23 @@ onMounted(() => {
     </div>
   </div>
         
-  </template>
+</template>
 
-  <style scoped>
+<style scoped>
 
-  .container-fluid {
-    color: white;
-  }
-  .model-select {
-    height: 58px;
-  }
-  </style>
+.container-fluid {
+  color: white;
+}
+.model-select {
+  height: 58px;
+}
+
+.card-body {
+  background-color: #19232E !important;
+  color: white !important;
+}
+
+.card-body .container {
+  min-height: 85vh;
+}
+</style>

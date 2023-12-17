@@ -98,16 +98,16 @@ const avatarName = userStore.user.avatar
 
 <style scoped>
 .sidebar-content {
-	background-color: #221f1f;
-	border-right: 4px solid white
+	background-color: #19232E;
+	/* border-right: 4px solid white */
 }
 .sidebar-link, a.sidebar-link {
-	background-color: #221f1f;
+	background-color: #19232E;
 	color: white;
 }
 .sidebar .card {
   box-shadow: inset 0 3px 3px rgba(0, 0, 0, .1);
-  border: 2px solid #ddd; 
+  /* border: 2px solid #ddd;  */
   border-radius: 6px;
   padding: 15px;
 }

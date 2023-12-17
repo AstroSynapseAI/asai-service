@@ -59,7 +59,12 @@ const { messages } = storeToRefs(chatStore);
 .container-fluid {
   color: white;
 }
+
 .card-body .container {
   min-height: 85vh;
+}
+.card-body {
+  background-color: #19232E !important;
+  color: white !important;
 }
 </style>

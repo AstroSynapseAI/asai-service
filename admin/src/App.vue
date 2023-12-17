@@ -20,8 +20,11 @@ import Navbar  from './components/Navbar.vue';
 </template>
 
 <style scoped>
-.content {
-  background-color: black;
+h1, h2, h3, h4, h5, h6 {
+  color: white;
 }
-
+.content {
+  background-color: #141A21;
+  color: white;
+}
 </style>

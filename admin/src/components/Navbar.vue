@@ -33,13 +33,13 @@
 
 <style scoped>
 .navbar, .sidebar-toggle {
-  background-color: #221f1f;
+  background-color: #141A21;
   color: white;
   
 }
 
 .navbar {
-  border-bottom: 4px solid white;
+  /* border-bottom: 4px solid white; */
 }
 
 
