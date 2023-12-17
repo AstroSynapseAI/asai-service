@@ -9,11 +9,8 @@ const usersURL = `${apiUrl}/users`;
 export const useUsersStore = defineStore({
   id: 'users',
   state: () => ({
-    // user: JSON.parse(localStorage.getItem('user')),
-    user: {
-      id: 'UDID-01',
-      avatar: 'asai',
-    }
+    userData: {},
+    allUsers: {}
   }),
   actions: {
     async getUsers() {
@@ -24,19 +21,29 @@ export const useUsersStore = defineStore({
       
     },
     
-    async getUserAvatar() {
-      
+    async getUserAvatar(user_id) {
+      try {
+        const avatar = await fetchWrapper.get(`${usersURL}/${user_id}/avatars`);
+        user = this.user;
+        user.avatar = avatar
+        localStorage.setItem('user', JSON.stringify(user));
+      } catch (error) {
+        console.error(error);
+      }
     },
 
-    async getUserAgents() {
-      
+    async getUserAccounts(user_id) {
+      try {
+        const accounts = await fetchWrapper.get(`${usersURL}/${user_id}/accounts`);
+        user = this.user;
+        user.accounts = accounts;
+        localStorage.setItem('user', JSON.stringify(user));
+      } catch (error) {
+        console.error(error);
+      }
     },
 
-    async getUserPlugins() {
-      
-    },
-
-    async getUserModels() {
+    async getUserRole() {
       
     },
 
@@ -53,7 +60,6 @@ export const useUsersStore = defineStore({
           }];
           const user = await fetchWrapper.get(`${usersURL}/session`);
           localStorage.setItem('user', JSON.stringify(user));
-          this.user = user;
         } catch (error) {
           console.error(error);
         }    

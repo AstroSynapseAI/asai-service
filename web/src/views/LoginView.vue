@@ -1,6 +1,22 @@
 <script setup>
+import { ref } from 'vue';
 import { onMounted } from 'vue';
 import { Form, Field, useForm } from 'vee-validate';
+import { useUsersStore } from '@/admin/src/stores/user.store'; 
+const { handleSubmit } = useForm();
+const user = useUsersStore();
+
+let username = ref('');
+let password = ref('');
+
+const submitLogin = handleSubmit(values => {
+  if (user.login(values.username, values.password)) {
+    window.location.href = '/admin/';
+  }
+  else {
+    alert('Invalid username or password');
+  }
+});
 
 
 onMounted(() => {
@@ -38,10 +54,10 @@ onMounted(() => {
         <div class="card">
           <div class="card-body">
             
-            <Form class="form-control">
-              <Field id="Email" name="Email" type="email" class="email-input d-block" placeholder="Email"></Field>
-              <Field id="Password" name="Password" type="password" class="pass-input d-block" placeholder="Password"></Field>
-              <button class="send-button btn btn-light" @click="''"> Login</button>
+            <Form class="form-control" @submit="submitLogin">
+              <Field v-model="username" id="Email" name="Username" type="email" class="email-input d-block" placeholder="Username"></Field>
+              <Field v-model="password" id="Password" name="Password" type="password" class="pass-input d-block" placeholder="Password"></Field>
+              <button class="send-button btn btn-light"> Login</button>
           </Form>
             
           </div>

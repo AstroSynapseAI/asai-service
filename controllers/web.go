@@ -77,6 +77,5 @@ func (ctrl *WebController) vueFallback() {
 
 		// If request is not for a directory, serve with the static file server as normal
 		homepage.ServeHTTP(w, r)
-		return
 	})
 }

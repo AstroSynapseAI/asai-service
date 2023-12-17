@@ -37,12 +37,4 @@
   color: white;
   
 }
-
-.navbar {
-  /* border-bottom: 4px solid white; */
-}
-
-
-
-
 </style>

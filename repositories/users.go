@@ -26,6 +26,14 @@ func (user *UsersRepository) Login(username string, password string) bool {
 }
 
 func (user *UsersRepository) Register(username string, password string) bool {
+	user.Repo.Model.Username = username
+	user.Repo.Model.Password = password
+
+	err := user.Repo.Create(user.Repo.Model)
+	if err != nil {
+		return false
+	}
+
 	return true
 }
 
@@ -33,6 +41,12 @@ func (user *UsersRepository) GetByUsername(username string) *models.User {
 	var result *models.User
 	user.Repo.DB.Where("username = ?", username).First(&result)
 
+	return result
+}
+
+func (user *UsersRepository) GetByInviteToken(token string) *models.User {
+	var result *models.User
+	user.Repo.DB.Where("invite_token = ?", token).First(&result)
 	return result
 }
 

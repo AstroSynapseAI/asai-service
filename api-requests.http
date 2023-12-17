@@ -15,3 +15,42 @@ Content-Type: application/json
   "session_id": "67347mRRMHaouxoO",
   "user_prompt": "Who are you?"
 }
+
+
+/// API REQUESTS ///
+
+// USERS
+###
+POST  http://localhost:8082/api/users/login
+Content-Type: application/json
+
+{
+  "username": "test",
+  "password": "test"
+}
+
+POST  http://localhost:8082/api/users/register/invite/te$tt0k3n
+Content-Type: application/json
+
+{
+  "username": "test",
+  "password": "test"
+}
+
+POST  http://localhost:8082/api/users/register
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin_dmina"
+}
+
+GET  http://localhost:8082/api/users/invite
+Content-Type: application/json
+Authorization: test-secret
+
+
+
+
+
+
