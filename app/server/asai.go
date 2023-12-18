@@ -49,8 +49,7 @@ func (server *AsaiServer) Run(db *database.Database) error {
 	router.Mux.StrictSlash(true)
 
 	// Serve API controllers
-	routes := app.NewRoutes(router, db)
-	router.Load(routes)
+	router.Load(app.NewRoutes(db))
 
 	// Serve WebSocket
 	wsManager := ws.NewManager(db)
@@ -63,10 +62,10 @@ func (server *AsaiServer) Run(db *database.Database) error {
 	//
 	// PORT is defined by heroku env
 	port := os.Getenv("PORT")
-	
+
 	// If PORT is not defined, server is running locally
 	if port == "" {
-		err := router.Listen(":8082")
+		err := http.ListenAndServe(":8082", router.Mux)
 		if err != nil {
 			fmt.Println("Failed to listen:", err)
 			return err

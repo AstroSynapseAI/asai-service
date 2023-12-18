@@ -14,11 +14,9 @@ import (
 )
 
 type ApiController struct {
-	rest.RestController
+	rest.Controller
 	Repo *repositories.ApiRepository
 }
-
-var _ rest.Controller = (*ApiController)(nil)
 
 func NewApiController(db *database.Database) *ApiController {
 	return &ApiController{

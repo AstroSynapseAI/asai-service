@@ -7,7 +7,7 @@ import (
 )
 
 type DocumentsController struct {
-	rest.RestController
+	rest.Controller
 	Document *repositories.DocumentsRepository
 }
 

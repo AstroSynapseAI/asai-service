@@ -10,7 +10,7 @@ import (
 )
 
 type UsersController struct {
-	rest.RestController
+	rest.Controller
 	User *repositories.UsersRepository
 }
 
@@ -28,13 +28,10 @@ func (ctrl *UsersController) Run() {
 	ctrl.Get("/{id}/accounts", ctrl.GetAccounts)
 	ctrl.Get("/{id}/accounts/{account_id}", ctrl.GetAccount)
 	ctrl.Get("/{id}/avatars", ctrl.GetAvatar)
-
-	// ctrl.Get("/", ctrl.ReadAll)
 }
 
 // Default CRUD routes
 func (ctrl *UsersController) ReadAll(ctx *rest.Context) {
-	fmt.Println("Fetching all users")
 	users, err := ctrl.User.Repo.ReadAll()
 	if err != nil {
 		ctx.SetStatus(http.StatusInternalServerError)
@@ -44,6 +41,7 @@ func (ctrl *UsersController) ReadAll(ctx *rest.Context) {
 }
 
 func (ctrl *UsersController) Read(ctx *rest.Context) {
+	fmt.Println("Fetching user")
 	userID := ctx.GetID("id")
 	user, err := ctrl.User.Repo.Read(userID)
 	if err != nil {
