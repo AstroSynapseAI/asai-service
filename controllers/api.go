@@ -32,7 +32,7 @@ func (ctrl *ApiController) Run() {
 		sessionId := ctx.GetParam("session_id")
 		history := ctrl.Repo.GetChatHistory(sessionId)
 
-		_ = ctx.JsonResponse(http.StatusOK, history.ChatHistory)
+		ctx.JsonResponse(http.StatusOK, history.ChatHistory)
 	})
 
 	// Send Chat Message endpoint.
@@ -47,7 +47,7 @@ func (ctrl *ApiController) Run() {
 		err := ctx.JsonDecode(&request)
 		if err != nil {
 			fmt.Println("Bad Request: %w", err)
-			_ = ctx.JsonResponse(http.StatusBadRequest, err)
+			ctx.SetStatus(http.StatusBadRequest)
 			return
 		}
 
@@ -60,7 +60,7 @@ func (ctrl *ApiController) Run() {
 		response, err := asaiChain.Prompt(context.Background(), request.UserPrompt)
 		if err != nil {
 			fmt.Println(err)
-			_ = ctx.JsonResponse(http.StatusInternalServerError, err)
+			ctx.JsonResponse(http.StatusInternalServerError, err)
 			return
 		}
 
@@ -71,7 +71,7 @@ func (ctrl *ApiController) Run() {
 
 		responseJson.Content = response
 
-		_ = ctx.JsonResponse(http.StatusOK, responseJson)
+		ctx.JsonResponse(http.StatusOK, responseJson)
 	})
 
 	// Create new User session endpoint.
@@ -84,6 +84,6 @@ func (ctrl *ApiController) Run() {
 
 		reponseJson.SessionId = sessionID
 
-		_ = ctx.JsonResponse(http.StatusOK, reponseJson)
+		ctx.JsonResponse(http.StatusOK, reponseJson)
 	})
 }

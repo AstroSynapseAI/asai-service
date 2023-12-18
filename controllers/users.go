@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/AstroSynapseAI/app-service/repositories"
@@ -21,57 +22,78 @@ func NewUsersController(db *database.Database) *UsersController {
 
 func (ctrl *UsersController) Run() {
 	ctrl.Post("/login", ctrl.Login)
-	ctrl.Post("/register/invite/{token}", ctrl.RegisterInvite)
+	ctrl.Post("/register", ctrl.Register)
+	ctrl.Post("/register/invite", ctrl.RegisterInvite)
+	ctrl.Get("/invite", ctrl.CreateInvite)
 	ctrl.Get("/{id}/accounts", ctrl.GetAccounts)
 	ctrl.Get("/{id}/accounts/{account_id}", ctrl.GetAccount)
 	ctrl.Get("/{id}/avatars", ctrl.GetAvatar)
+
+	// ctrl.Get("/", ctrl.ReadAll)
 }
 
 // Default CRUD routes
 func (ctrl *UsersController) ReadAll(ctx *rest.Context) {
+	fmt.Println("Fetching all users")
 	users, err := ctrl.User.Repo.ReadAll()
 	if err != nil {
-		_ = ctx.JsonResponse(http.StatusInternalServerError, nil)
+		ctx.SetStatus(http.StatusInternalServerError)
 		return
 	}
-	_ = ctx.JsonResponse(http.StatusOK, users)
+	ctx.JsonResponse(http.StatusOK, users)
 }
 
 func (ctrl *UsersController) Read(ctx *rest.Context) {
 	userID := ctx.GetID("id")
 	user, err := ctrl.User.Repo.Read(userID)
 	if err != nil {
-		_ = ctx.JsonResponse(http.StatusInternalServerError, nil)
+		ctx.SetStatus(http.StatusInternalServerError)
 		return
 	}
-	_ = ctx.JsonResponse(http.StatusOK, user)
+	ctx.JsonResponse(http.StatusOK, user)
 }
 
 // Custom routes
+//
+// create user invite
+func (ctrl *UsersController) CreateInvite(ctx *rest.Context) {
+	err := ctrl.User.CreateInvite()
+	if err != nil {
+		ctx.SetStatus(http.StatusInternalServerError)
+		return
+	}
+
+	ctx.SetStatus(http.StatusOK)
+}
+
+// register invited user
 func (ctrl *UsersController) RegisterInvite(ctx *rest.Context) {
 	var reqData struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
+		Username    string `json:"username"`
+		Password    string `json:"password"`
+		InviteToken string `json:"invite_token"`
 	}
 
-	err := ctx.JsonDecode(reqData)
+	fmt.Println("Register invite token: ")
+
+	err := ctx.JsonDecode(&reqData)
 	if err != nil {
-		_ = ctx.JsonResponse(http.StatusBadRequest, nil)
+		ctx.SetStatus(http.StatusBadRequest)
 		return
 	}
 
-	inviteToken := ctx.GetParam("token")
-	if user := ctrl.User.GetByInviteToken(inviteToken); user != nil {
-		_ = ctx.JsonResponse(http.StatusNotFound, nil)
+	user, err := ctrl.User.ConfirmInvite(
+		reqData.Username,
+		reqData.Password,
+		reqData.InviteToken,
+	)
+
+	if err != nil {
+		ctx.SetStatus(http.StatusInternalServerError)
 		return
 	}
 
-	if ctrl.User.Register(reqData.Username, reqData.Password) {
-		_ = ctx.JsonResponse(http.StatusOK, nil)
-		return
-	}
-
-	_ = ctx.JsonResponse(http.StatusInternalServerError, nil)
+	ctx.JsonResponse(http.StatusOK, user)
 }
 
 func (ctrl *UsersController) Register(ctx *rest.Context) {
@@ -80,18 +102,19 @@ func (ctrl *UsersController) Register(ctx *rest.Context) {
 		Password string `json:"password"`
 	}
 
-	err := ctx.JsonDecode(reqData)
+	err := ctx.JsonDecode(&reqData)
 	if err != nil {
-		_ = ctx.JsonResponse(http.StatusBadRequest, nil)
+		ctx.SetStatus(http.StatusBadRequest)
 		return
 	}
 
-	if ctrl.User.Register(reqData.Username, reqData.Password) {
-		_ = ctx.JsonResponse(http.StatusOK, nil)
+	user, err := ctrl.User.Register(reqData.Username, reqData.Password)
+	if err != nil {
+		ctx.SetStatus(http.StatusUnauthorized)
 		return
 	}
 
-	_ = ctx.JsonResponse(http.StatusInternalServerError, nil)
+	ctx.JsonResponse(http.StatusOK, user)
 }
 
 func (ctrl *UsersController) Login(ctx *rest.Context) {
@@ -102,59 +125,52 @@ func (ctrl *UsersController) Login(ctx *rest.Context) {
 
 	err := ctx.JsonDecode(reqData)
 	if err != nil {
-		_ = ctx.JsonResponse(http.StatusBadRequest, nil)
+		ctx.SetStatus(http.StatusBadRequest)
 		return
 	}
 
-	loggedIn := ctrl.User.Login(reqData.Username, reqData.Password)
-
-	if !loggedIn {
-		_ = ctx.JsonResponse(http.StatusUnauthorized, nil)
+	user, err := ctrl.User.Login(reqData.Username, reqData.Password)
+	if err != nil {
+		ctx.SetStatus(http.StatusUnauthorized)
 		return
 	}
 
-	user := ctrl.User.GetByUsername(reqData.Username)
-	if user == nil {
-		_ = ctx.JsonResponse(http.StatusNotFound, nil)
-		return
-	}
-
-	_ = ctx.JsonResponse(http.StatusOK, user)
+	ctx.JsonResponse(http.StatusOK, user)
 }
 
 func (ctrl *UsersController) GetAccounts(ctx *rest.Context) {
 	userID := ctx.GetID("id")
 	user, err := ctrl.User.Repo.Read(userID)
 	if err != nil {
-		_ = ctx.JsonResponse(http.StatusInternalServerError, nil)
+		ctx.SetStatus(http.StatusInternalServerError)
 		return
 	}
 	accounts := user.Accounts
 
 	if accounts != nil {
-		_ = ctx.JsonResponse(http.StatusOK, accounts)
+		ctx.JsonResponse(http.StatusOK, accounts)
 	}
 
-	_ = ctx.JsonResponse(http.StatusNotFound, nil)
+	ctx.SetStatus(http.StatusNotFound)
 }
 
 func (ctrl *UsersController) GetAccount(ctx *rest.Context) {
 	accountID := ctx.GetID("account_id")
-	account := ctrl.User.GetUserAccount(ctx.GetID(), accountID)
-
-	if account != nil {
-		_ = ctx.JsonResponse(http.StatusOK, account)
+	account, err := ctrl.User.GetUserAccount(ctx.GetID(), accountID)
+	if err != nil {
+		ctx.SetStatus(http.StatusNotFound)
+		return
 	}
 
-	_ = ctx.JsonResponse(http.StatusNotFound, nil)
+	ctx.JsonResponse(http.StatusOK, account)
 }
 
 func (ctrl *UsersController) GetAvatar(ctx *rest.Context) {
-	avatar := ctrl.User.GetUserAvatar(ctx.GetID())
-
-	if avatar != nil {
-		_ = ctx.JsonResponse(http.StatusOK, avatar)
+	avatar, err := ctrl.User.GetUserAvatar(ctx.GetID())
+	if err != nil {
+		ctx.SetStatus(http.StatusNotFound)
+		return
 	}
 
-	_ = ctx.JsonResponse(http.StatusNotFound, nil)
+	ctx.JsonResponse(http.StatusOK, avatar)
 }

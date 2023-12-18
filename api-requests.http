@@ -20,6 +20,33 @@ Content-Type: application/json
 /// API REQUESTS ///
 
 // USERS
+// Create user invite
+###
+GET  http://localhost:8082/api/users/invite
+Content-Type: application/json
+Authorization: 45df515194bfab778db59c9d9e4a47a07ddb81495358684e7bf4b92f4c271d01fe4b7d64f6d74fb58ce1e774cbedc9452da6fdca92e38e97be5292e9b8a06c78
+
+// user register
+###
+POST  http://localhost:8082/api/users/register/invite
+Content-Type: application/json
+
+{
+  "username": "marconi",
+  "password": "mia_rea",
+  "invite_token": "5dadfa35a9ce6c1ff9673838b1f0394aca2c7d0077a2e398365c4bb9c9bf08005fa290d7a03aa5eb10563538f9651f51bf88f80680ce60a2696bd8451ed48ff1"
+}
+
+###
+POST  http://localhost:8082/api/users/register
+Content-Type: application/json
+
+{
+  "username": "SuperAdmin",
+  "password": "admin_admin"
+}
+
+// user login
 ###
 POST  http://localhost:8082/api/users/login
 Content-Type: application/json
@@ -29,25 +56,10 @@ Content-Type: application/json
   "password": "test"
 }
 
-POST  http://localhost:8082/api/users/register/invite/te$tt0k3n
+###
+GET  http://localhost:8082/api/users/5
 Content-Type: application/json
-
-{
-  "username": "test",
-  "password": "test"
-}
-
-POST  http://localhost:8082/api/users/register
-Content-Type: application/json
-
-{
-  "username": "admin",
-  "password": "admin_dmina"
-}
-
-GET  http://localhost:8082/api/users/invite
-Content-Type: application/json
-Authorization: test-secret
+Authorization: 45df515194bfab778db59c9d9e4a47a07ddb81495358684e7bf4b92f4c271d01fe4b7d64f6d74fb58ce1e774cbedc9452da6fdca92e38e97be5292e9b8a06c78
 
 
 

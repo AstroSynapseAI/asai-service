@@ -6,6 +6,7 @@ import (
 
 	"github.com/AstroSynapseAI/app-service/controllers"
 	"github.com/AstroSynapseAI/app-service/models"
+	"github.com/AstroSynapseAI/app-service/repositories"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/orms/gorm"
 	"github.com/AstroSynapseAI/app-service/sdk/rest"
@@ -27,7 +28,7 @@ func NewRoutes(router *rest.Rest, db *database.Database) *Routes {
 
 func (routes *Routes) LoadRoutes() {
 	//TMP API Controller
-	routes.rest.Route("/api").MapController(controllers.NewApiController(routes.DB)).Init()
+	// routes.rest.Route("/api").MapController(controllers.NewApiController(routes.DB)).Init()
 
 	// CUSTOM CONTROLLERS
 	// Route custom UsersController
@@ -80,11 +81,25 @@ func (routes *Routes) LoadMiddlewares() {
 	// TMP API Auth Middleware
 	routes.rest.Mux.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			secret := "test-secret"
 			tokenString := r.Header.Get("Authorization")
 
+			validRoutes := []string{
+				"/api/users/login",
+				"/api/users/register",
+				"/api/users/register/invite/",
+			}
+
+			for _, validRoute := range validRoutes {
+				if r.URL.Path == validRoute {
+					next.ServeHTTP(w, r)
+					return
+				}
+			}
+
 			if strings.HasPrefix(r.URL.Path, "/api") {
-				if tokenString != secret {
+				usersRepo := repositories.NewUsersRepository(routes.DB)
+				_, err := usersRepo.GetByAPIToken(tokenString)
+				if err != nil {
 					w.WriteHeader(http.StatusUnauthorized)
 					return
 				}
