@@ -1,8 +1,12 @@
 package app
 
 import (
+	"net/http"
+	"strings"
+
 	"github.com/AstroSynapseAI/app-service/controllers"
 	"github.com/AstroSynapseAI/app-service/models"
+	"github.com/AstroSynapseAI/app-service/repositories"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/orms/gorm"
 	"github.com/AstroSynapseAI/app-service/sdk/rest"
@@ -73,40 +77,33 @@ func (routes *Routes) LoadRoutes(router *rest.Rest) {
 
 func (routes *Routes) LoadMiddlewares(router *rest.Rest) {
 	// TMP API Auth Middleware
-	// routes.rest.Mux.Use(func(next http.Handler) http.Handler {
-	// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	// 		tokenString := r.Header.Get("Authorization")
+	router.Mux.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			tokenString := r.Header.Get("Authorization")
+			validRoutes := []string{
+				"/api/users/login",
+				"/api/users/register",
+				"/api/users/register/invite/",
+			}
 
-	// 		fmt.Println(r.URL.Path)
+			for _, validRoute := range validRoutes {
+				if r.URL.Path == validRoute {
+					next.ServeHTTP(w, r)
+					return
+				}
+			}
 
-	// 		validRoutes := []string{
-	// 			"/api/tests",
-	// 			"/api/tests/",
-	// 			"/api/tests/my_test",
-	// 			"/api/tests/my_test/",
-	// 			"/api/users/login",
-	// 			"/api/users/register",
-	// 			"/api/users/register/invite/",
-	// 		}
+			if strings.HasPrefix(r.URL.Path, "/api") {
+				usersRepo := repositories.NewUsersRepository(routes.DB)
+				_, err := usersRepo.GetByAPIToken(tokenString)
+				if err != nil {
+					w.WriteHeader(http.StatusUnauthorized)
+					return
+				}
+			}
 
-	// 		for _, validRoute := range validRoutes {
-	// 			if r.URL.Path == validRoute {
-	// 				next.ServeHTTP(w, r)
-	// 				return
-	// 			}
-	// 		}
-
-	// 		if strings.HasPrefix(r.URL.Path, "/api") {
-	// 			usersRepo := repositories.NewUsersRepository(routes.DB)
-	// 			_, err := usersRepo.GetByAPIToken(tokenString)
-	// 			if err != nil {
-	// 				w.WriteHeader(http.StatusUnauthorized)
-	// 				return
-	// 			}
-	// 		}
-
-	// 		next.ServeHTTP(w, r)
-	// 	})
-	// })
+			next.ServeHTTP(w, r)
+		})
+	})
 
 }
