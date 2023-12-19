@@ -5,40 +5,36 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/:avatar',
+      path: '/',
+      redirect: 'avatar/asai' // tmp reroute until avtar name can be set dynamically
+    },
+    {
+      path: '/avatar/:avatar',
       name: 'home',
-      component: HomeView
+      component: () => import('../views/HomeView.vue')
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue')
-    },
-    {
-      path: '/:avatar/personality',
+      path: '/avatar/:avatar/personality',
       name: 'personality',
       component: () => import('../views/PersonalityView.vue')
     },
     {
-      path: '/:avatar/agents',
+      path: '/avatar/:avatar/agents',
       name: 'agents',
       component: () => import('../views/AgentsView.vue')
     },
     {
-      path: '/:avatar/agents/:slug/config',
+      path: '/avatar/:avatar/agents/:slug/config',
       name: 'agent-config',
       component: () => import('../views/AgentConfigView.vue')
     },
     {
-      path: '/:avatar/plugins',
+      path: '/avatar/:avatar/plugins',
       name: 'plugins',
       component: () => import('../views/PluginsView.vue')
     },
     {
-      path: '/:avatar/models',
+      path: '/avatar/:avatar/models',
       name: 'models',
       component: () => import('../views/ModelsView.vue')
     },

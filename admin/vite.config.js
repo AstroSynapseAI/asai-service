@@ -8,7 +8,7 @@ customBuildPath = './static'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
-  base: "/admin/",
+  base: "/admin",
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
@@ -18,4 +18,13 @@ export default defineConfig({
   build: {
     outDir: customBuildPath,
   },
+  server: {
+    proxy: {
+      '/api': { // adjust this to target paths to be rerouted
+        target: 'http://localhost:8082', // your Docker server address
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, '')
+      },
+    },
+  }
 })

@@ -1,7 +1,11 @@
 package app
 
 import (
+	"io"
+	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/AstroSynapseAI/app-service/controllers"
@@ -10,6 +14,7 @@ import (
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/orms/gorm"
 	"github.com/AstroSynapseAI/app-service/sdk/rest"
+	"github.com/gorilla/handlers"
 )
 
 type Routes struct {
@@ -79,21 +84,21 @@ func (routes *Routes) LoadMiddlewares(router *rest.Rest) {
 	// TMP API Auth Middleware
 	router.Mux.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			tokenString := r.Header.Get("Authorization")
-			validRoutes := []string{
-				"/api/users/login",
-				"/api/users/register",
-				"/api/users/register/invite/",
-			}
-
-			for _, validRoute := range validRoutes {
-				if r.URL.Path == validRoute {
-					next.ServeHTTP(w, r)
-					return
-				}
-			}
-
 			if strings.HasPrefix(r.URL.Path, "/api") {
+				tokenString := r.Header.Get("Authorization")
+				validRoutes := []string{
+					"/api/users/login",
+					"/api/users/register",
+					"/api/users/register/invite/",
+				}
+
+				for _, validRoute := range validRoutes {
+					if r.URL.Path == validRoute {
+						next.ServeHTTP(w, r)
+						return
+					}
+				}
+
 				usersRepo := repositories.NewUsersRepository(routes.DB)
 				_, err := usersRepo.GetByAPIToken(tokenString)
 				if err != nil {
@@ -105,5 +110,39 @@ func (routes *Routes) LoadMiddlewares(router *rest.Rest) {
 			next.ServeHTTP(w, r)
 		})
 	})
+
+	if os.Getenv("ENVIRONMENT") == "LOCAL DEV" {
+		// CORS Middleware
+		headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
+		originsOk := handlers.AllowedOrigins([]string{"http://localhost:5173"})
+		methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"})
+
+		cors := handlers.CORS(headersOk, originsOk, methodsOk)
+		router.Mux.Use(cors)
+
+		// LOGGING MIDDLEWARE
+		router.Mux.Use(func(next http.Handler) http.Handler {
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if strings.HasPrefix(r.URL.Path, "/api") {
+					log.Printf("%s %s %s\n", r.RemoteAddr, r.Method, r.URL)
+
+					if r.Method == "POST" || r.Method == "PUT" {
+						bodyBytes, err := io.ReadAll(r.Body)
+						if err != nil {
+							log.Printf("Error reading body: %v", err)
+							http.Error(w, "can't read body", http.StatusBadRequest)
+							return
+						}
+
+						// After reading the body, you need to replace it for further handlers
+						r.Body = ioutil.NopCloser(strings.NewReader(string(bodyBytes)))
+
+						log.Printf("Body: %s\n", string(bodyBytes))
+					}
+				}
+				next.ServeHTTP(w, r)
+			})
+		})
+	}
 
 }

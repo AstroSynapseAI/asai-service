@@ -46,7 +46,7 @@ func (ctrl *WebController) RunAdmin() {
 	assets := http.FileServer(http.Dir(ctrl.adminDir + "/assets"))
 
 	ctrl.router.Mux.PathPrefix("/admin/assets/").Handler(http.StripPrefix("/admin/assets/", assets))
-	ctrl.router.Mux.Handle("/admin/", static)
+	ctrl.router.Mux.Handle("/admin", static)
 }
 
 func (ctrl *WebController) vueFallback() {

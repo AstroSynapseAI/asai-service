@@ -121,7 +121,7 @@ func (ctrl *UsersController) Login(ctx *rest.Context) {
 		Password string `json:"password"`
 	}
 
-	err := ctx.JsonDecode(reqData)
+	err := ctx.JsonDecode(&reqData)
 	if err != nil {
 		ctx.SetStatus(http.StatusBadRequest)
 		return

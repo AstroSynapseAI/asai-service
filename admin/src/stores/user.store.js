@@ -10,7 +10,12 @@ export const useUsersStore = defineStore({
   id: 'users',
   state: () => ({
     userData: {},
-    allUsers: {}
+    allUsers: {},
+    user: {
+      // This is tmp for dev and testing
+      id: 'UDID-01',
+      avatar: 'asai',
+    }
   }),
   actions: {
     async getUsers() {

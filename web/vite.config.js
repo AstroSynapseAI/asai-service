@@ -17,4 +17,13 @@ export default defineConfig({
   build: {
     outDir: customBuildPath,
   },
+  server: {
+    proxy: {
+      '/api': { // adjust this to target paths to be rerouted
+        target: 'http://localhost:8082', // your Docker server address
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, '')
+      },
+    },
+  }
 });
