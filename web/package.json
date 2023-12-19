@@ -9,6 +9,7 @@
     "docker": "env-cmd -f .env.local vite build"
   },
   "dependencies": {
+    "chart.js": "^4.4.0",
     "markdown-it": "^13.0.2",
     "pinia": "^2.1.6",
     "vee-validate": "^4.11.8",

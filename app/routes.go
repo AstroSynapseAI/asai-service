@@ -86,13 +86,13 @@ func (routes *Routes) LoadMiddlewares(router *rest.Rest) {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if strings.HasPrefix(r.URL.Path, "/api") {
 				tokenString := r.Header.Get("Authorization")
-				validRoutes := []string{
+				publicRoutes := []string{
 					"/api/users/login",
 					"/api/users/register",
 					"/api/users/register/invite/",
 				}
 
-				for _, validRoute := range validRoutes {
+				for _, validRoute := range publicRoutes {
 					if r.URL.Path == validRoute {
 						next.ServeHTTP(w, r)
 						return
