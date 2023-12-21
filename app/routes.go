@@ -2,7 +2,6 @@ package app
 
 import (
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -34,50 +33,46 @@ func (routes *Routes) LoadRoutes(router *rest.Rest) {
 	// routes.rest.Route("/api").MapController(controllers.NewApiController(routes.DB)).Init()
 
 	// CUSTOM CONTROLLERS
+	api := router.API()
 	// Route custom UsersController
-	router.Route("/api/users").MapController(controllers.NewUsersController(routes.DB))
+	api.Route("/users").Controller(controllers.NewUsersController(routes.DB))
 	// Route custom AvatarsController
-	router.Route("/api/avatars").MapController(controllers.NewAvatarsController(routes.DB))
+	api.Route("/avatars").Controller(controllers.NewAvatarsController(routes.DB))
 	// Route custom AgentsController
-	router.Route("/api/agents").MapController(controllers.NewAgentsController(routes.DB))
+	api.Route("/agents").Controller(controllers.NewAgentsController(routes.DB))
 	// Route custom DocumentsController
-	router.Route("/api/documents").MapController(controllers.NewDocumentsController(routes.DB))
+	api.Route("/documents").Controller(controllers.NewDocumentsController(routes.DB))
 
 	// CRUD CONTROLLERS
 	// Routing CRUD Tools controller
 	toolsCtrl := rest.NewCRUDController[models.Tool](
-		models.Tool{},
 		gorm.NewRepository[models.Tool](routes.DB, models.Tool{}),
 	)
-	router.Route("/api/tools").MapController(toolsCtrl)
+	api.Route("/tools").Controller(toolsCtrl)
 
 	// Routing CRUD Plugins controller
 	pluginsCtr := rest.NewCRUDController[models.Plugin](
-		models.Plugin{},
 		gorm.NewRepository[models.Plugin](routes.DB, models.Plugin{}),
 	)
-	router.Route("/api/plugins").MapController(pluginsCtr)
+	api.Route("/plugins").Controller(pluginsCtr)
 
 	// Routing CRUD LLMs controller
 	llmsCtrl := rest.NewCRUDController[models.LLM](
-		models.LLM{},
 		gorm.NewRepository[models.LLM](routes.DB, models.LLM{}),
 	)
-	router.Route("/api/llms").MapController(llmsCtrl)
+	api.Route("/llms").Controller(llmsCtrl)
 
 	// Routing CRUD Roles controller
 	rolesCtrl := rest.NewCRUDController[models.Role](
-		models.Role{},
 		gorm.NewRepository[models.Role](routes.DB, models.Role{}),
 	)
-	router.Route("/api/roles").MapController(rolesCtrl)
+	api.Route("/roles").Controller(rolesCtrl)
 
 	// Routing CRUD Accounts controller
 	accountsCtrl := rest.NewCRUDController[models.Account](
-		models.Account{},
 		gorm.NewRepository[models.Account](routes.DB, models.Account{}),
 	)
-	router.Route("/api/accounts").MapController(accountsCtrl)
+	api.Route("/accounts").Controller(accountsCtrl)
 }
 
 func (routes *Routes) LoadMiddlewares(router *rest.Rest) {
@@ -135,7 +130,7 @@ func (routes *Routes) LoadMiddlewares(router *rest.Rest) {
 						}
 
 						// After reading the body, you need to replace it for further handlers
-						r.Body = ioutil.NopCloser(strings.NewReader(string(bodyBytes)))
+						r.Body = io.NopCloser(strings.NewReader(string(bodyBytes)))
 
 						log.Printf("Body: %s\n", string(bodyBytes))
 					}
