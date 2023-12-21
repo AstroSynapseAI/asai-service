@@ -50,7 +50,7 @@ onMounted(() => {
 
               <div class="col-auto">
                 <router-link :to="{name: 'login'}" class="btn text-white">
-                  <i class="align-middle feather-icon" data-feather="log-in"></i>
+                  <i class="align-middle" data-feather="log-in"></i>
                 </router-link>
               </div>
             </div>
@@ -188,7 +188,7 @@ onMounted(() => {
 
               <div class="row">
                 <div class="col-4 d-flex justify-content-center align-items-center">
-                  <a href="https://github.com/AstroSynapseAI" target="_blank" class="btn d-flex justify-content-center align-items-center"><i class="d-block feather-icon" data-feather="github"></i></a>
+                  <a href="https://github.com/AstroSynapseAI" target="_blank" class="btn d-flex justify-content-center align-items-center"><i class="d-block" data-feather="github"></i></a>
                 </div>
                 <div class="col-4 d-flex justify-content-center align-items-center">
                   <a href="https://discord.gg/yDb4AbEprY" target="_blank" class="btn">
@@ -199,7 +199,7 @@ onMounted(() => {
                   </a>
                 </div>
                 <div class="col-4 d-flex justify-content-center align-items-center">
-                  <a href="https://twitter.com/astrosynapselab" target="_blank" class="btn d-flex justify-content-center align-items-center"><i class="d-block feather-icon" data-feather="twitter"></i> </a>
+                  <a href="https://twitter.com/astrosynapselab" target="_blank" class="btn d-flex justify-content-center align-items-center"><i class="d-block" data-feather="twitter"></i> </a>
                 </div>
               </div>
 
@@ -222,11 +222,6 @@ onMounted(() => {
 <style scoped>
 a {
   color: white;
-  text-decoration: underline;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  color: white;
 }
 
 a:hover {
@@ -244,7 +239,6 @@ nav .btn {
   border-color: white;
   border-radius: 0;
   text-decoration: none;
-  font-size: 18px;
 }
 
 nav .btn:hover {
@@ -255,11 +249,6 @@ nav .btn:hover {
 nav .btn:hover .asai-icon line {
   stroke: black !important;
   stroke-width: 10;
-}
-
-.feather-icon {
-  width: 24px;
-  height: 24px;
 }
 
 .logo {
