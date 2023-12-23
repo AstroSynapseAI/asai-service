@@ -29,7 +29,6 @@ func NewWebController(router *rest.Rest) *WebController {
 
 func (ctrl *WebController) Run() {
 	ctrl.RunHomepage()
-	ctrl.vueFallback()
 }
 
 func (ctrl *WebController) RunHomepage() {
@@ -38,6 +37,8 @@ func (ctrl *WebController) RunHomepage() {
 
 	ctrl.router.Mux.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", assets))
 	ctrl.router.Mux.Handle("/", static)
+
+	ctrl.vueFallback()
 }
 
 func (ctrl *WebController) vueFallback() {

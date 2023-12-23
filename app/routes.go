@@ -79,21 +79,21 @@ func (routes *Routes) LoadMiddlewares(router *rest.Rest) {
 	// TMP API Auth Middleware
 	router.Mux.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			publicRoutes := []string{
+				"/api/users/login",
+				"/api/users/register",
+				"/api/users/register/invite/",
+			}
+
+			for _, validRoute := range publicRoutes {
+				if r.URL.Path == validRoute {
+					next.ServeHTTP(w, r)
+					return
+				}
+			}
+
 			if strings.HasPrefix(r.URL.Path, "/api") {
 				tokenString := r.Header.Get("Authorization")
-				publicRoutes := []string{
-					"/api/users/login",
-					"/api/users/register",
-					"/api/users/register/invite/",
-				}
-
-				for _, validRoute := range publicRoutes {
-					if r.URL.Path == validRoute {
-						next.ServeHTTP(w, r)
-						return
-					}
-				}
-
 				usersRepo := repositories.NewUsersRepository(routes.DB)
 				_, err := usersRepo.GetByAPIToken(tokenString)
 				if err != nil {
