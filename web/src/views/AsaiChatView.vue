@@ -110,6 +110,37 @@ onMounted(() => {
 </template>
 
 <style scoped>
+@font-face {
+  font-family: 'SF Pro Text';
+  src: url('./assets/fonts/SFProText-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'SF Pro Text';
+  src: url('./assets/fonts/SFProText-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: black;
+  color: white;
+  font-family: 'SF Pro Text', sans-serif;
+  font-weight: 400;
+}
+
+#app {
+  width: 1280px;
+  margin: 0 auto;
+}
+
 .error-container {
   position: fixed;
   bottom: 180px;

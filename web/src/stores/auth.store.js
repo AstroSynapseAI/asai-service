@@ -16,15 +16,14 @@ export const useAuthStore = defineStore({
         username: username,
         password: password
       }
-
       try {
         const user = await fetchWrapper.post(`${usersURL}/login`, reqBody);
         if (user) {
-          localStorage.setItem('user', JSON.stringify(user));
           if (user.apiToken) {
             this.apiToken = user.apiToken
           }
           this.isLogedIn = true
+          localStorage.setItem('user', JSON.stringify(user));
           return true
         }
 

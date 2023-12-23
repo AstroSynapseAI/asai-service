@@ -56,6 +56,9 @@ const { messages } = storeToRefs(chatStore);
 </template>
 
 <style scoped>
+main {
+  display: block !important;
+}
 .container-fluid {
   color: white;
 }
