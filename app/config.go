@@ -59,7 +59,12 @@ func (cnf *Config) InitDB() {
 
 	seeder := gorm.NewGormSeeder(cnf.DB)
 	seeders := seeder.AddSeeder(
+		&models.Agent{},
+		&models.LLM{},
+		&models.Plugin{},
+		&models.Role{},
 		&models.Tool{},
+		&models.User{},
 	)
 
 	err := seeders.Run()

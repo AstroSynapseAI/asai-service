@@ -1,49 +1,58 @@
 package models
 
-// type Avatar struct {
-// 	gorm.Model
-// 	Name          string
-// 	Slug          string
-// 	LLMID         sql.NullInt64
-// 	LLM           LLM
-// 	DefaultPrimer string
-// 	Primer        string
-// 	IsPublic      bool
-// 	Roles         []Role         `gorm:"foreignKey:AvatarID;"`
-// 	ActiveAgents  []ActiveAgents `gorm:"foreignKey:AvatarID;"`
-// 	ActiveTools   []ActiveTool   `gorm:"foreignKey:AvatarID;"`
-// 	ActivePlugins []ActivePlugin `gorm:"foreignKey:AvatarID;"`
-// }
+import (
+	"database/sql"
 
-// type ActiveAgents struct {
-// 	gorm.Model
-// 	IsActive bool
-// 	IsPublic bool
-// 	Primer   string
-// 	AvatarID sql.NullInt64
-// 	AgentID  sql.NullInt64
-// 	Avatar   *Avatar `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-// 	Agent    *Agent  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-// }
+	"gorm.io/gorm"
+)
 
-// type ActiveTool struct {
-// 	gorm.Model
-// 	IsActive bool
-// 	IsPublic bool
-// 	Token    string
-// 	AvatarID sql.NullInt64
-// 	ToolID   sql.NullInt64
-// 	Avatar   Avatar `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-// 	Tool     Tool   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-// }
+type Avatar struct {
+	gorm.Model
+	Name          string         `json:"name,omitempty"`
+	Slug          string         `json:"slug,omitempty"`
+	LLMID         sql.NullInt64  `json:"llm_id"`
+	LLM           LLM            `json:"llm"`
+	DefaultPrimer string         `json:"default_primer,omitempty"`
+	Primer        string         `json:"primer,omitempty"`
+	IsPublic      bool           `json:"is_public,omitempty"`
+	Roles         []AvatarRole   `gorm:"foreignKey:AvatarID;" json:"roles"`
+	ActiveAgents  []ActiveAgent  `gorm:"foreignKey:AvatarID;" json:"active_agents"`
+	ActiveTools   []ActiveTool   `gorm:"foreignKey:AvatarID;" json:"active_tools"`
+	ActivePlugins []ActivePlugin `gorm:"foreignKey:AvatarID;" json:"active_plugins"`
+	Documents     []Document     `gorm:"foreignKey:AvatarID;" json:"documents"`
+}
 
-// type ActivePlugin struct {
-// 	gorm.Model
-// 	IsActive bool
-// 	IsPublic bool
-// 	Token    string
-// 	AvatarID sql.NullInt64
-// 	PluginID sql.NullInt64
-// 	Avatar   Avatar `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-// 	Plugin   Plugin `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-// }
+type ActiveAgent struct {
+	gorm.Model
+	IsActive bool          `json:"is_active,omitempty"`
+	IsPublic bool          `json:"is_public,omitempty"`
+	Primer   string        `json:"primer,omitempty"`
+	LLMID    sql.NullInt64 `json:"llm_id"`
+	AvatarID sql.NullInt64 `json:"avatar_id"`
+	AgentID  sql.NullInt64 `json:"agent_id"`
+	LLM      LLM           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"llm"`
+	Avatar   Avatar        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"avatar"`
+	Agent    Agent         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"agent"`
+}
+
+type ActiveTool struct {
+	gorm.Model
+	IsActive bool          `json:"is_active,omitempty"`
+	IsPublic bool          `json:"is_public,omitempty"`
+	Token    string        `json:"token,omitempty"`
+	AvatarID sql.NullInt64 `json:"avatar_id"`
+	ToolID   sql.NullInt64 `json:"tool_id"`
+	Avatar   Avatar        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"avatar"`
+	Tool     Tool          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"tool"`
+}
+
+type ActivePlugin struct {
+	gorm.Model
+	IsActive bool          `json:"is_active,omitempty"`
+	IsPublic bool          `json:"is_public,omitempty"`
+	Token    string        `json:"token,omitempty"`
+	AvatarID sql.NullInt64 `json:"avatar_id"`
+	PluginID sql.NullInt64 `json:"plugin_id"`
+	Avatar   Avatar        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"avatar"`
+	Plugin   Plugin        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"plugin"`
+}
