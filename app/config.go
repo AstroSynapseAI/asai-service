@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/AstroSynapseAI/app-service/models"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database/adapters"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/orms/gorm"
@@ -55,6 +56,17 @@ func (cnf *Config) InitDB() {
 	migration.AddMigrations(&Migrations{})
 
 	migration.Run()
+
+	seeder := gorm.NewGormSeeder(cnf.DB)
+	seeders := seeder.AddSeeder(
+		&models.Tool{},
+	)
+
+	err := seeders.Run()
+	if err != nil {
+		fmt.Println("Error running seeders:", err)
+		return
+	}
 }
 
 func (cnf *Config) RunServer(server ServerAdapter) error {
