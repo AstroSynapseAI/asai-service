@@ -11,7 +11,7 @@ type Role struct {
 	Description string       `json:"description,omitempty"`
 	Permission  string       `json:"permission,omitempty"`
 	Slug        string       `json:"slug,omitempty"`
-	AvatarRoles []AvatarRole `gorm:"foreignKey:RoleID;" json:"avatar_roles"`
+	AvatarRoles []AvatarRole `gorm:"foreignKey:RoleID;" json:"avatar_roles,omitempty"`
 }
 
 func (*Role) SeedModel(db *database.Database) error {

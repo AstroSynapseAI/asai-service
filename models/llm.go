@@ -11,8 +11,8 @@ type LLM struct {
 	Description  string        `json:"description,omitempty"`
 	Provider     string        `json:"provider,omitempty"`
 	Slug         string        `json:"slug,omitempty"`
-	Avatars      []Avatar      `gorm:"foreignKey:LLMID;" json:"avatars"`
-	ActiveAgents []ActiveAgent `gorm:"foreignKey:LLMID;" json:"active_agents"`
+	Avatars      []Avatar      `gorm:"foreignKey:LLMID;" json:"avatars,omitempty"`
+	ActiveAgents []ActiveAgent `gorm:"foreignKey:LLMID;" json:"active_agents,omitempty"`
 }
 
 func (*LLM) SeedModel(db *database.Database) error {

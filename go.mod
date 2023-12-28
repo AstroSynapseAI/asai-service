@@ -9,6 +9,7 @@ require (
 	github.com/gorilla/handlers v1.5.2
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/websocket v1.5.0
+	github.com/jinzhu/gorm v1.9.16
 	github.com/thanhpk/randstr v1.0.6
 	github.com/tmc/langchaingo v0.0.0-20231110174329-09a09b3b6093
 	gopkg.in/yaml.v2 v2.3.0

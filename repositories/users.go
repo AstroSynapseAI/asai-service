@@ -139,9 +139,15 @@ func (user *UsersRepository) GetUserAccount(userID uint, accountID uint) (models
 }
 
 func (user *UsersRepository) GetUserAvatar(userID uint) (models.Avatar, error) {
-	var record models.AvatarRole
+	query := user.Repo.DB
+	query = query.Preload("Avatar").Preload("Avatar.Documents").Preload("Avatar.LLM")
+	query = query.Preload("Avatar.ActiveAgents").Preload("Avatar.ActiveAgents.Agent")
+	query = query.Preload("Avatar.ActiveTools").Preload("Avatar.ActiveTools.Tool")
+	query = query.Preload("Avatar.ActivePlugins").Preload("Avatar.ActivePlugins.Plugin")
+	query = query.Where("user_id = ? and role_id = ?", userID, 1)
 
-	err := user.Repo.DB.Where("user_id = ? and name = ?", userID, "owner").First(&record).Error
+	var record models.AvatarRole
+	err := query.First(&record).Error
 	if err != nil {
 		return models.Avatar{}, err
 	}

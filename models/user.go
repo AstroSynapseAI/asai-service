@@ -10,21 +10,21 @@ import (
 type User struct {
 	gorm.Model
 	Username    string       `json:"username,omitempty"`
-	Password    string       `json:"password"`
-	ApiToken    string       `json:"api_token"`
-	InviteToken string       `json:"invite_token"`
-	Accounts    []Account    `json:"accounts"`
-	Roles       []AvatarRole `gorm:"foreignKey:UserID;" json:"roles"`
+	Password    string       `json:"password,omitempty"`
+	ApiToken    string       `json:"api_token,omitempty"`
+	InviteToken string       `json:"invite_token,omitempty"`
+	Accounts    []Account    `json:"accounts,omitempty"`
+	Roles       []AvatarRole `gorm:"foreignKey:UserID;" json:"roles,omitempty"`
 }
 
 type AvatarRole struct {
 	gorm.Model
-	RoleID   sql.NullInt64 `json:"role_id"`
-	UserID   sql.NullInt64 `json:"user_id"`
-	AvatarID sql.NullInt64 `json:"avatar_id"`
-	Role     Role          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"role"`
-	User     User          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"user"`
-	Avatar   Avatar        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"avatar"`
+	RoleID   sql.NullInt64 `json:"role_id,omitempty"`
+	UserID   sql.NullInt64 `json:"user_id,omitempty"`
+	AvatarID sql.NullInt64 `json:"avatar_id,omitempty"`
+	Role     Role          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"role,omitempty"`
+	User     User          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"user,omitempty"`
+	Avatar   Avatar        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"avatar,omitempty"`
 }
 
 func (*User) SeedModel(db *database.Database) error {

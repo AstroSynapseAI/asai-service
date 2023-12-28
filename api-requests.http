@@ -66,10 +66,40 @@ Content-Type: application/json
 
 // AVATARS
 //
-// get avatar
+// get user avatar
 ###
-GET  http://localhost:8082/api/avatars
+GET  http://localhost:8082/api/users/1/avatars
 Content-Type: application/json
+Authorization: tmp_token_superadmin_123
+
+
+//save avatar
+###
+POST  http://localhost:8082/api/avatars/save
+Content-Type: application/json
+Authorization: tmp_token_superadmin_123
+
+{
+  "avatar_id": 10,
+  "avatar_llm_id": 1,
+  "avatar_name": "My New Avatar",
+  "avatar_primer": "You are a helpful AI assistant."
+}
+
+// get avatar agents
+###
+GET  http://localhost:8082/api/avatars/10/agents
+Content-Type: application/json
+Authorization: tmp_token_superadmin_123
+
+
+// AGENTS
+//
+// get agents
+###
+GET  http://localhost:8082/api/agents
+Content-Type: application/json
+Authorization: tmp_token_superadmin_123
 
 // TOOLS
 //
@@ -77,5 +107,22 @@ Content-Type: application/json
 ###
 GET  http://localhost:8082/api/tools
 Content-Type: application/json
+Authorization: tmp_token_superadmin_123
 
 
+// PLUGINS
+//
+// get plugins
+###
+GET  http://localhost:8082/api/plugins
+Content-Type: application/json
+Authorization: tmp_token_superadmin_123
+
+
+// LLMS
+//
+// get llms
+###
+GET  http://localhost:8082/api/llms
+Content-Type: application/json
+Authorization: tmp_token_superadmin_123
