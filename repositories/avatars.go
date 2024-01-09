@@ -1,9 +1,13 @@
 package repositories
 
 import (
+	"database/sql"
+
 	"github.com/AstroSynapseAI/app-service/models"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/orms/gorm"
+
+	db "gorm.io/gorm"
 )
 
 type AvatarsRepository struct {
@@ -34,10 +38,11 @@ func (avatar *AvatarsRepository) Create(userID uint, data models.Avatar) (models
 		return models.Avatar{}, result.Error
 	}
 
-	var userRole models.AvatarRole
-	userRole.User = user
-	userRole.Role = role
-	userRole.Avatar = avatarRecord
+	userRole := models.AvatarRole{
+		User:   user,
+		Role:   role,
+		Avatar: avatarRecord,
+	}
 
 	result = avatar.Repo.DB.Create(&userRole)
 	if result.Error != nil {
@@ -84,6 +89,32 @@ func (avatar *AvatarsRepository) Fetch(ID uint) (models.Avatar, error) {
 	return record, nil
 }
 
+func (avatar *AvatarsRepository) SaveActiveAgent(avatarData models.ActiveAgent) error {
+	result := avatar.Repo.DB.Save(&avatarData)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (avatar *AvatarsRepository) SetActiveAgent(avatarID uint, agentID uint) error {
+	var activeAgent models.ActiveAgent
+
+	result := avatar.Repo.DB.Where("avatar_id = ? AND agent_id = ?", avatarID, agentID).First(&activeAgent)
+	if result.Error == db.ErrRecordNotFound {
+		activeAgent.AgentID = sql.NullInt64{Int64: int64(agentID), Valid: true}
+		activeAgent.AvatarID = sql.NullInt64{Int64: int64(avatarID), Valid: true}
+	}
+
+	activeAgent.IsActive = true
+	result = avatar.Repo.DB.Save(&activeAgent)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
 func (avatar *AvatarsRepository) GetActiveAgents(avatarID uint) []models.ActiveAgent {
 	query := avatar.Repo.DB
 	query = query.Preload("Agent").Preload("LLM")
@@ -97,6 +128,20 @@ func (avatar *AvatarsRepository) GetActiveAgents(avatarID uint) []models.ActiveA
 	}
 
 	return activeAgents
+}
+
+func (avatar *AvatarsRepository) GetActiveAgent(avatarID uint, agentID uint) (models.ActiveAgent, error) {
+	query := avatar.Repo.DB
+	query = query.Preload("Agent").Preload("LLM")
+	query = query.Where("avatar_id = ? AND agent_id = ?", avatarID, agentID)
+
+	var activeAgent models.ActiveAgent
+	result := query.First(&activeAgent)
+	if result.Error != nil {
+		return models.ActiveAgent{}, result.Error
+	}
+
+	return activeAgent, nil
 }
 
 func (avatar *AvatarsRepository) GetActiveTools(avatarID uint) []models.ActiveTool {

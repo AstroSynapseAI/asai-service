@@ -27,6 +27,8 @@ func NewAvatarsController(db *database.Database) *AvatarsController {
 func (ctrl *AvatarsController) Run() {
 	ctrl.Post("/save", ctrl.SaveAvatar)
 	ctrl.Get("/{id}/agents", ctrl.GetAgents)
+	ctrl.Get("/{id}/agents/{agent_id}", ctrl.GetAgent)
+	ctrl.Post("/agents/save", ctrl.SaveAgent)
 	ctrl.Get("/{id}/tools", ctrl.GetTools)
 	ctrl.Get("/{id}/plugins", ctrl.GetAgents)
 	ctrl.Get("/{id}/documents", ctrl.GetDocuments)
@@ -54,13 +56,16 @@ func (ctrl *AvatarsController) SaveAvatar(ctx *rest.Context) {
 		ctx.SetStatus(http.StatusBadRequest)
 		return
 	}
-	var avatar models.Avatar
-	avatar.Name = input.AvatarName
-	avatar.Slug = createSlug(input.AvatarName)
-	avatar.Primer = input.AvatarPrimer
-	avatar.LLMID = sql.NullInt64{
-		Int64: int64(input.AvatarLLMID),
-		Valid: true,
+	avatar := models.Avatar {
+		Name: input.AvatarName,
+		Slug: createSlug(input.AvatarName),
+		Primer: input.AvatarPrimer,
+		DefaultPrimer: input.AvatarPrimer,
+		IsPublic: false,
+		LLMID: sql.NullInt64{
+			Int64: int64(input.AvatarLLMID),
+			Valid: true,
+		},
 	}
 
 	if input.AvatarID != 0 {
@@ -83,12 +88,45 @@ func (ctrl *AvatarsController) SaveAvatar(ctx *rest.Context) {
 	ctx.JsonResponse(http.StatusOK, record)
 }
 
+func (ctrl *AvatarsController) SaveAgent(ctx *rest.Context) {
+	fmt.Println("AvatarsController.SaveAgent")
+
+	var activeAgent models.ActiveAgent
+	err := ctx.JsonDecode(&activeAgent)
+	if err != nil {
+		ctx.SetStatus(http.StatusBadRequest)
+		return
+	}
+
+	err = ctrl.Avatar.SaveActiveAgent(activeAgent)
+	if err != nil {
+		ctx.SetStatus(http.StatusInternalServerError)
+		return
+	}
+
+	ctx.SetStatus(http.StatusOK)
+}
+
 func (ctrl *AvatarsController) GetAgents(ctx *rest.Context) {
 	fmt.Println("AvatarsController.GetAgents")
 	ID := ctx.GetID()
 	records := ctrl.Avatar.GetActiveAgents(ID)
 
 	ctx.JsonResponse(http.StatusOK, records)
+}
+
+func (ctrl *AvatarsController) GetAgent(ctx *rest.Context) {
+	fmt.Println("AvatarsController.GetAgent")
+	ID := ctx.GetID()
+	agentID := ctx.GetID("agent_id")
+
+	record, err := ctrl.Avatar.GetActiveAgent(ID, agentID)
+	if err != nil {
+		ctx.SetStatus(http.StatusInternalServerError)
+		return
+	}
+
+	ctx.JsonResponse(http.StatusOK, record)
 }
 
 func (ctrl *AvatarsController) GetTools(ctx *rest.Context) {

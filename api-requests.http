@@ -92,6 +92,20 @@ GET  http://localhost:8082/api/avatars/10/agents
 Content-Type: application/json
 Authorization: tmp_token_superadmin_123
 
+// save avatar agent
+###
+POST http://localhost:8082/api/avatars/agents/save
+Content-Type: application/json
+Authorization: tmp_token_superadmin_123
+
+{
+  "avatar_id": 10,
+  "agent_id": 1,
+  "llm_id": 1,
+  "primer": "Some Primer",
+  "is_active": true
+}
+
 
 // AGENTS
 //
