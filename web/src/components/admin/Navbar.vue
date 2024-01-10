@@ -32,9 +32,9 @@
 </template>
 
 <style scoped>
-.navbar, .sidebar-toggle {
+/* .navbar, .sidebar-toggle {
   background-color: #141A21;
   color: white;
   
-}
+} */
 </style>

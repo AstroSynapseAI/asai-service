@@ -94,9 +94,9 @@ const avatarName = "asai"
 </template>
 
 <style scoped>
-.sidebar-content {
+/* .sidebar-content {
 	background-color: #19232E;
-	/* border-right: 4px solid white */
+	border-right: 4px solid white
 }
 .sidebar-link, a.sidebar-link {
 	background-color: #19232E;
@@ -104,7 +104,7 @@ const avatarName = "asai"
 }
 .sidebar .card {
   box-shadow: inset 0 3px 3px rgba(0, 0, 0, .1);
-  /* border: 2px solid #ddd;  */
+  border: 2px solid #ddd; 
   border-radius: 6px;
   padding: 15px;
 }
@@ -112,5 +112,5 @@ const avatarName = "asai"
 .list-group-item {
 	background-color: transparent;
 	overflow: hidden;
-}
+} */
 </style>

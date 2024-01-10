@@ -34,11 +34,6 @@ func (ctrl *AvatarsController) Run() {
 	ctrl.Get("/{id}/documents", ctrl.GetDocuments)
 }
 
-func (ctrl *AvatarsController) Read(ctx *rest.Context) {
-	fmt.Println("AvatarsController.Read")
-
-}
-
 func (ctrl *AvatarsController) SaveAvatar(ctx *rest.Context) {
 	fmt.Println("AvatarsController.SaveAvatar")
 
@@ -56,12 +51,12 @@ func (ctrl *AvatarsController) SaveAvatar(ctx *rest.Context) {
 		ctx.SetStatus(http.StatusBadRequest)
 		return
 	}
-	avatar := models.Avatar {
-		Name: input.AvatarName,
-		Slug: createSlug(input.AvatarName),
-		Primer: input.AvatarPrimer,
+	avatar := models.Avatar{
+		Name:          input.AvatarName,
+		Slug:          createSlug(input.AvatarName),
+		Primer:        input.AvatarPrimer,
 		DefaultPrimer: input.AvatarPrimer,
-		IsPublic: false,
+		IsPublic:      false,
 		LLMID: sql.NullInt64{
 			Int64: int64(input.AvatarLLMID),
 			Valid: true,
