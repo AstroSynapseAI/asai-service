@@ -20,10 +20,6 @@ func NewAgentsController(db *database.Database) *AgentsController {
 	}
 }
 
-func (ctrl *AgentsController) Run() {
-
-}
-
 func (ctrl *AgentsController) ReadAll(ctx *rest.Context) {
 	fmt.Println("AgentsController.ReadAll")
 	records, err := ctrl.Agent.Repo.ReadAll()
@@ -31,6 +27,29 @@ func (ctrl *AgentsController) ReadAll(ctx *rest.Context) {
 		ctx.SetStatus(http.StatusInternalServerError)
 		return
 	}
+
+	ctx.JsonResponse(http.StatusOK, records)
+}
+
+func (ctrl *AgentsController) Read(ctx *rest.Context) {
+	fmt.Println("AgentsController.Read")
+	record, err := ctrl.Agent.Repo.Read(ctx.GetID())
+	if err != nil {
+		ctx.SetStatus(http.StatusNotFound)
+		return
+	}
+
+	ctx.JsonResponse(http.StatusOK, record)
+}
+
+func (ctrl *AvatarsController) SaveTool(ctx *rest.Context) {
+	fmt.Println("AvatarsController.SaveTools")
+}
+
+func (ctrl *AvatarsController) GetTools(ctx *rest.Context) {
+	fmt.Println("AvatarsController.GetTools")
+	ID := ctx.GetID()
+	records := ctrl.Avatar.GetActiveTools(ID)
 
 	ctx.JsonResponse(http.StatusOK, records)
 }

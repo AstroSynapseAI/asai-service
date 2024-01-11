@@ -26,11 +26,17 @@ func NewAvatarsController(db *database.Database) *AvatarsController {
 
 func (ctrl *AvatarsController) Run() {
 	ctrl.Post("/save", ctrl.SaveAvatar)
+
+	ctrl.Post("/agents/save", ctrl.SaveAgent)
+	ctrl.Post("/agents/{agent_id}/active", ctrl.SetActiveAgent)
 	ctrl.Get("/{id}/agents", ctrl.GetAgents)
 	ctrl.Get("/{id}/agents/{agent_id}", ctrl.GetAgent)
-	ctrl.Post("/agents/save", ctrl.SaveAgent)
-	ctrl.Get("/{id}/tools", ctrl.GetTools)
-	ctrl.Get("/{id}/plugins", ctrl.GetAgents)
+
+	ctrl.Post("/{id}/plugins/save", ctrl.SavePlugin)
+	ctrl.Post("/{id}/plugins/{plugin_id}/active", ctrl.SetActivePlugin)
+	ctrl.Get("/{id}/plugins", ctrl.GetPlugins)
+	ctrl.Get("/{id}/plugins/{plugin_id}", ctrl.GetPlugin)
+
 	ctrl.Get("/{id}/documents", ctrl.GetDocuments)
 }
 
@@ -102,6 +108,10 @@ func (ctrl *AvatarsController) SaveAgent(ctx *rest.Context) {
 	ctx.SetStatus(http.StatusOK)
 }
 
+func (ctrl *AvatarsController) SetActiveAgent(ctx *rest.Context) {
+	fmt.Println("AvatarsController.SetActiveAgent")
+}
+
 func (ctrl *AvatarsController) GetAgents(ctx *rest.Context) {
 	fmt.Println("AvatarsController.GetAgents")
 	ID := ctx.GetID()
@@ -124,12 +134,12 @@ func (ctrl *AvatarsController) GetAgent(ctx *rest.Context) {
 	ctx.JsonResponse(http.StatusOK, record)
 }
 
-func (ctrl *AvatarsController) GetTools(ctx *rest.Context) {
-	fmt.Println("AvatarsController.GetTools")
-	ID := ctx.GetID()
-	records := ctrl.Avatar.GetActiveTools(ID)
+func (ctrl *AvatarsController) SavePlugin(ctx *rest.Context) {
+	fmt.Println("AvatarsController.SavePlugins")
+}
 
-	ctx.JsonResponse(http.StatusOK, records)
+func (ctrl *AvatarsController) SetActivePlugin(ctx *rest.Context) {
+	fmt.Println("AvatarsController.SetActivePlugin")
 }
 
 func (ctrl *AvatarsController) GetPlugins(ctx *rest.Context) {
@@ -138,6 +148,10 @@ func (ctrl *AvatarsController) GetPlugins(ctx *rest.Context) {
 	records := ctrl.Avatar.GetActivePlugins(ID)
 
 	ctx.JsonResponse(http.StatusOK, records)
+}
+
+func (ctrl *AvatarsController) GetPlugin(ctx *rest.Context) {
+
 }
 
 func (ctrl *AvatarsController) GetDocuments(ctx *rest.Context) {
