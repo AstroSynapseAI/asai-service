@@ -42,14 +42,11 @@ func (ctrl *AgentsController) Read(ctx *rest.Context) {
 	ctx.JsonResponse(http.StatusOK, record)
 }
 
-func (ctrl *AvatarsController) SaveTool(ctx *rest.Context) {
+func (ctrl *AgentsController) SaveTool(ctx *rest.Context) {
 	fmt.Println("AvatarsController.SaveTools")
 }
 
-func (ctrl *AvatarsController) GetTools(ctx *rest.Context) {
+func (ctrl *AgentsController) GetTools(ctx *rest.Context) {
 	fmt.Println("AvatarsController.GetTools")
-	ID := ctx.GetID()
-	records := ctrl.Avatar.GetActiveTools(ID)
 
-	ctx.JsonResponse(http.StatusOK, records)
 }

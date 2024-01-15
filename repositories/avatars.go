@@ -97,7 +97,7 @@ func (avatar *AvatarsRepository) SaveActiveAgent(avatarData models.ActiveAgent) 
 	return nil
 }
 
-func (avatar *AvatarsRepository) SetActiveAgent(avatarID uint, agentID uint) error {
+func (avatar *AvatarsRepository) ToggleActiveAgent(avatarID uint, agentID uint, active bool) error {
 	var activeAgent models.ActiveAgent
 
 	result := avatar.Repo.DB.Where("avatar_id = ? AND agent_id = ?", avatarID, agentID).First(&activeAgent)
@@ -106,7 +106,7 @@ func (avatar *AvatarsRepository) SetActiveAgent(avatarID uint, agentID uint) err
 		activeAgent.AvatarID = sql.NullInt64{Int64: int64(avatarID), Valid: true}
 	}
 
-	activeAgent.IsActive = true
+	activeAgent.IsActive = active
 	result = avatar.Repo.DB.Save(&activeAgent)
 	if result.Error != nil {
 		return result.Error
@@ -144,6 +144,34 @@ func (avatar *AvatarsRepository) GetActiveAgent(avatarID uint, agentID uint) (mo
 	return activeAgent, nil
 }
 
+func (avatar *AvatarsRepository) SaveActiveTool(avatarData models.ActiveTool) error {
+	result := avatar.Repo.DB.Save(&avatarData)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (avatar *AvatarsRepository) ToggleActiveTool(avatarID uint, toolID uint, active bool) error {
+	var activeTool models.ActiveTool
+
+	result := avatar.Repo.DB.Where("avatar_id = ? AND tool_id = ?", avatarID, toolID).First(&activeTool)
+	if result.Error == db.ErrRecordNotFound {
+		activeTool.ToolID = sql.NullInt64{Int64: int64(toolID), Valid: true}
+		activeTool.AvatarID = sql.NullInt64{Int64: int64(avatarID), Valid: true}
+	}
+
+	activeTool.IsActive = active
+
+	result = avatar.Repo.DB.Save(&activeTool)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
 func (avatar *AvatarsRepository) GetActiveTools(avatarID uint) []models.ActiveTool {
 	query := avatar.Repo.DB
 	query = query.Preload("Tool")
@@ -159,6 +187,47 @@ func (avatar *AvatarsRepository) GetActiveTools(avatarID uint) []models.ActiveTo
 	return activeTools
 }
 
+func (avatar *AvatarsRepository) GetActiveTool(avatarID uint, toolID uint) (models.ActiveTool, error) {
+	query := avatar.Repo.DB
+	query = query.Preload("Tool")
+	query = query.Where("avatar_id = ? AND tool_id = ?", avatarID, toolID)
+
+	var activeTool models.ActiveTool
+
+	result := query.First(&activeTool)
+	if result.Error != nil {
+		return models.ActiveTool{}, result.Error
+	}
+
+	return activeTool, nil
+}
+
+func (avatar *AvatarsRepository) SaveActivePlugin(avatarData models.ActivePlugin) error {
+	result := avatar.Repo.DB.Save(&avatarData)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (avatar *AvatarsRepository) ToggleActivePlugin(avatarID uint, pluginID uint, active bool) error {
+	var activePlugin models.ActivePlugin
+
+	result := avatar.Repo.DB.Where("avatar_id = ? AND plugin_id = ?", avatarID, pluginID).First(&activePlugin)
+	if result.Error == db.ErrRecordNotFound {
+		activePlugin.PluginID = sql.NullInt64{Int64: int64(pluginID), Valid: true}
+		activePlugin.AvatarID = sql.NullInt64{Int64: int64(avatarID), Valid: true}
+	}
+
+	activePlugin.IsActive = active
+	result = avatar.Repo.DB.Save(&activePlugin)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
 func (avatar *AvatarsRepository) GetActivePlugins(avatarID uint) []models.ActivePlugin {
 	query := avatar.Repo.DB
 	query = query.Preload("Plugin")
@@ -171,6 +240,78 @@ func (avatar *AvatarsRepository) GetActivePlugins(avatarID uint) []models.Active
 	}
 
 	return activePlugins
+}
+
+func (avatar *AvatarsRepository) GetActivePlugin(avatarID uint, pluginID uint) (models.ActivePlugin, error) {
+	query := avatar.Repo.DB
+	query = query.Preload("Plugin")
+	query = query.Where("avatar_id = ? AND plugin_id = ?", avatarID, pluginID)
+
+	var activePlugin models.ActivePlugin
+
+	result := query.First(&activePlugin)
+	if result.Error != nil {
+		return models.ActivePlugin{}, result.Error
+	}
+
+	return activePlugin, nil
+}
+
+func (avatar *AvatarsRepository) SaveActiveLLM(avatarData models.ActiveLLM) error {
+	result := avatar.Repo.DB.Save(&avatarData)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (avatar *AvatarsRepository) ToggleActiveLLM(avatarID uint, LLMID uint, active bool) error {
+	var activeLLM models.ActiveLLM
+
+	result := avatar.Repo.DB.Where("avatar_id = ? AND LLM_id = ?", avatarID, LLMID).First(&activeLLM)
+	if result.Error == db.ErrRecordNotFound {
+		activeLLM.LLMID = sql.NullInt64{Int64: int64(LLMID), Valid: true}
+		activeLLM.AvatarID = sql.NullInt64{Int64: int64(avatarID), Valid: true}
+	}
+
+	activeLLM.IsActive = active
+
+	result = avatar.Repo.DB.Save(&activeLLM)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (avatar *AvatarsRepository) GetActiveLLMs(avatarID uint) []models.ActiveLLM {
+	query := avatar.Repo.DB
+	query = query.Preload("LLM")
+	query = query.Where("avatar_id = ?", avatarID)
+
+	var activeLLMs []models.ActiveLLM
+
+	result := query.Find(&activeLLMs)
+	if result.Error != nil {
+		return []models.ActiveLLM{}
+	}
+
+	return activeLLMs
+}
+
+func (avatar *AvatarsRepository) GetActiveLLM(avatarID uint, LLMID uint) (models.ActiveLLM, error) {
+	query := avatar.Repo.DB
+	query = query.Preload("LLM")
+	query = query.Where("avatar_id = ? AND LLM_id = ?", avatarID, LLMID)
+
+	var activeLLM models.ActiveLLM
+
+	result := query.First(&activeLLM)
+	if result.Error != nil {
+		return models.ActiveLLM{}, result.Error
+	}
+
+	return activeLLM, nil
 }
 
 func (avatar *AvatarsRepository) GetDocuments(avatarID uint) []models.Document {

@@ -56,3 +56,13 @@ type ActivePlugin struct {
 	Avatar   Avatar        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"avatar,omitempty"`
 	Plugin   Plugin        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"plugin,omitempty"`
 }
+
+type ActiveLLM struct {
+	gorm.Model
+	IsActive bool          `json:"is_active,omitempty"`
+	Token    string        `json:"token,omitempty"`
+	AvatarID sql.NullInt64 `json:"avatar_id,omitempty"`
+	Avatar   Avatar        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"avatar,omitempty"`
+	LLM      LLM           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"llm,omitempty"`
+	LLMID    sql.NullInt64 `json:"llm_id,omitempty"`
+}
