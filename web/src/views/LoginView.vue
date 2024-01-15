@@ -83,9 +83,17 @@ onMounted(() => {
 </template>
 
 <style scoped>
+a {
+  color: white !important;
+}
+
 nav {
   margin-top: 50px;
   margin-bottom: 15em;
+}
+
+.navbar-brand {
+  color: white !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -94,8 +102,8 @@ h1, h2, h3, h4, h5, h6 {
 
 
 .feather-icon {
-  width: 24px;
-  height: 24px;
+  width: 24px !important;
+  height: 24px !important;
 }
 
 .logo {

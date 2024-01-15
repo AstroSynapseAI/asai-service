@@ -227,7 +227,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 a {
-  color: white;
+  color: white !important;
   text-decoration: underline;
 }
 
@@ -239,6 +239,7 @@ a:hover {
 nav {
   margin-top: 50px;
   margin-bottom: 6em;
+  color: white;
 }
 
 nav .btn {
@@ -247,6 +248,7 @@ nav .btn {
   border-radius: 0;
   text-decoration: none;
   height: 36px;
+  color: white;
 }
 
 nav .btn:hover {
@@ -259,6 +261,9 @@ nav .btn:hover .asai-icon line {
   stroke-width: 10;
 }
 
+.navbar-brand {
+  color: white !important;
+}
 .home-wrapper {
   margin: 0;
   display: flex;
@@ -271,8 +276,8 @@ nav .btn:hover .asai-icon line {
   margin: 0 auto;
 }
 .feather-icon {
-  width: 24px;
-  height: 24px;
+  width: 24px !important;
+  height: 24px !important;
 }
 
 .logo {
@@ -315,7 +320,7 @@ table i {
 }
 
 .contacts .btn:hover {
-  color: black;
+  color: black !important;
   background-color: white;
 }
 
