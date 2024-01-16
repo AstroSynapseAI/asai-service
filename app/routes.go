@@ -42,26 +42,14 @@ func (routes *Routes) LoadRoutes(router *rest.Rest) {
 	api.Route("/agents").Controller(controllers.NewAgentsController(routes.DB))
 	// Route custom DocumentsController
 	api.Route("/documents").Controller(controllers.NewDocumentsController(routes.DB))
+	// Route custom ToolsController
+	api.Route("/tools").Controller(controllers.NewToolsController(routes.DB))
+	// Route custom PluginsController
+	api.Route("/plugins").Controller(controllers.NewPluginsController(routes.DB))
+	// Route custom LLMSController
+	api.Route("/llms").Controller(controllers.NewLLMSController(routes.DB))
 
 	// CRUD CONTROLLERS
-	// Routing CRUD Tools controller
-	toolsCtrl := rest.NewCRUDController[models.Tool](
-		gorm.NewRepository[models.Tool](routes.DB, models.Tool{}),
-	)
-	api.Route("/tools").Controller(toolsCtrl)
-
-	// Routing CRUD Plugins controller
-	pluginsCtr := rest.NewCRUDController[models.Plugin](
-		gorm.NewRepository[models.Plugin](routes.DB, models.Plugin{}),
-	)
-	api.Route("/plugins").Controller(pluginsCtr)
-
-	// Routing CRUD LLMs controller
-	llmsCtrl := rest.NewCRUDController[models.LLM](
-		gorm.NewRepository[models.LLM](routes.DB, models.LLM{}),
-	)
-	api.Route("/llms").Controller(llmsCtrl)
-
 	// Routing CRUD Roles controller
 	rolesCtrl := rest.NewCRUDController[models.Role](
 		gorm.NewRepository[models.Role](routes.DB, models.Role{}),
@@ -82,7 +70,7 @@ func (routes *Routes) LoadMiddlewares(router *rest.Rest) {
 			publicRoutes := []string{
 				"/api/users/login",
 				"/api/users/register",
-				"/api/users/register/invite/",
+				"/api/users/register/invite",
 			}
 
 			for _, validRoute := range publicRoutes {

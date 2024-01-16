@@ -1,0 +1,70 @@
+package controllers
+
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/AstroSynapseAI/app-service/models"
+	"github.com/AstroSynapseAI/app-service/repositories"
+	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
+	"github.com/AstroSynapseAI/app-service/sdk/rest"
+)
+
+type LLMSController struct {
+	rest.Controller
+	LLM *repositories.LLMSRepository
+}
+
+func NewLLMSController(db *database.Database) *LLMSController {
+	return &LLMSController{
+		LLM: repositories.NewLLMSRepository(db),
+	}
+}
+
+func (ctrl *LLMSController) Run() {
+	ctrl.Post("/active/save", ctrl.SaveActiveLLM)
+	ctrl.Post("/{id}/toggle/active", ctrl.ToggleActiveLLM)
+}
+
+func (ctrl *LLMSController) SaveActiveLLM(ctx *rest.Context) {
+	fmt.Println("AvatarsController.SaveLLM")
+
+	var llm models.ActiveLLM
+
+	err := ctx.JsonDecode(&llm)
+	if err != nil {
+		ctx.SetStatus(http.StatusBadRequest)
+		return
+	}
+
+	err = ctrl.LLM.SaveActiveLLM(llm)
+	if err != nil {
+		ctx.SetStatus(http.StatusInternalServerError)
+		return
+	}
+
+	ctx.SetStatus(http.StatusOK)
+}
+
+func (ctrl *LLMSController) ToggleActiveLLM(ctx *rest.Context) {
+	fmt.Println("AvatarsController.ToggleActiveLLM")
+
+	var input struct {
+		AvatarID  uint `json:"avatar_id"`
+		ActiveLLM bool `json:"activeLLM"`
+	}
+
+	err := ctx.JsonDecode(&input)
+	if err != nil {
+		ctx.SetStatus(http.StatusBadRequest)
+		return
+	}
+
+	err = ctrl.LLM.ToggleActiveLLM(input.AvatarID, ctx.GetID(), input.ActiveLLM)
+	if err != nil {
+		ctx.SetStatus(http.StatusInternalServerError)
+		return
+	}
+
+	ctx.SetStatus(http.StatusOK)
+}

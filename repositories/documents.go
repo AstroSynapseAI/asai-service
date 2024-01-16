@@ -15,3 +15,13 @@ func NewDocumentsRepository(db *database.Database) *DocumentsRepository {
 		Repo: gorm.NewRepository[models.Document](db, models.Document{}),
 	}
 }
+
+func (document *DocumentsRepository) GetDocuments(avatarID uint) []models.Document {
+	var docs []models.Document
+	result := document.Repo.DB.Where("avatar_id = ?", avatarID).Find(&docs)
+	if result.Error != nil {
+		return []models.Document{}
+	}
+
+	return docs
+}

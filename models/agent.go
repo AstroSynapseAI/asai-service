@@ -14,7 +14,7 @@ type Agent struct {
 	Slug         string        `json:"slug,omitempty"`
 	Primer       string        `json:"primer,omitempty"`
 	ActiveAgents []ActiveAgent `gorm:"foreignKey:AgentID;" json:"active_agents"`
-	AgentTool    []AgentTool   `gorm:"foreignKey:AgentID;" json:"agent_tool"`
+	AgentTools   []AgentTool   `gorm:"foreignKey:AgentID;" json:"agent_tools"`
 }
 
 type AgentTool struct {
