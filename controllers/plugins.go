@@ -22,7 +22,7 @@ func NewPluginsController(db *database.Database) *PluginsController {
 }
 
 func (ctrl *PluginsController) Run() {
-	ctrl.Post("/active/save", ctrl.SaveActivePlugin)
+	ctrl.Post("/save/active", ctrl.SaveActivePlugin)
 	ctrl.Post("/{id}/toggle/active", ctrl.ToggleActivePlugin)
 }
 

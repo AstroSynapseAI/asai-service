@@ -81,12 +81,18 @@ func (routes *Routes) LoadMiddlewares(router *rest.Rest) {
 			}
 
 			if strings.HasPrefix(r.URL.Path, "/api") {
-				tokenString := r.Header.Get("Authorization")
-				usersRepo := repositories.NewUsersRepository(routes.DB)
-				_, err := usersRepo.GetByAPIToken(tokenString)
-				if err != nil {
-					w.WriteHeader(http.StatusUnauthorized)
-					return
+				authHeader := r.Header.Get("Authorization")
+				if authHeader != "" {
+					headerParts := strings.Split(authHeader, " ")
+					if len(headerParts) == 2 && strings.EqualFold(headerParts[0], "Bearer") {
+						tokenString := headerParts[1]
+						usersRepo := repositories.NewUsersRepository(routes.DB)
+						_, err := usersRepo.GetByAPIToken(tokenString)
+						if err != nil {
+							w.WriteHeader(http.StatusUnauthorized)
+							return
+						}
+					}
 				}
 			}
 

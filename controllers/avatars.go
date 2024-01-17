@@ -69,6 +69,7 @@ func (ctrl *AvatarsController) SaveAvatar(ctx *rest.Context) {
 		AvatarLLMID  uint   `json:"avatar_llm_id"`
 		AvatarName   string `json:"avatar_name"`
 		AvatarPrimer string `json:"avatar_primer"`
+		IsPublic     bool   `json:"is_public"`
 	}
 
 	err := ctx.JsonDecode(&input)
@@ -78,11 +79,10 @@ func (ctrl *AvatarsController) SaveAvatar(ctx *rest.Context) {
 		return
 	}
 	avatar := models.Avatar{
-		Name:          input.AvatarName,
-		Slug:          createSlug(input.AvatarName),
-		Primer:        input.AvatarPrimer,
-		DefaultPrimer: input.AvatarPrimer,
-		IsPublic:      false,
+		Name:     input.AvatarName,
+		Slug:     createSlug(input.AvatarName),
+		Primer:   input.AvatarPrimer,
+		IsPublic: input.IsPublic,
 		LLMID: sql.NullInt64{
 			Int64: int64(input.AvatarLLMID),
 			Valid: true,
@@ -100,6 +100,7 @@ func (ctrl *AvatarsController) SaveAvatar(ctx *rest.Context) {
 		return
 	}
 
+	avatar.DefaultPrimer = input.AvatarPrimer
 	record, err := ctrl.Avatar.Create(input.UserID, avatar)
 	if err != nil {
 		ctx.SetStatus(http.StatusInternalServerError)

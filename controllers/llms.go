@@ -22,8 +22,19 @@ func NewLLMSController(db *database.Database) *LLMSController {
 }
 
 func (ctrl *LLMSController) Run() {
-	ctrl.Post("/active/save", ctrl.SaveActiveLLM)
+	ctrl.Post("/save/active", ctrl.SaveActiveLLM)
 	ctrl.Post("/{id}/toggle/active", ctrl.ToggleActiveLLM)
+}
+
+func (ctrl *LLMSController) ReadAll(ctx *rest.Context) {
+	fmt.Println("LLMSController.ReadAll")
+	records, err := ctrl.LLM.Repo.ReadAll()
+	if err != nil {
+		ctx.SetStatus(http.StatusInternalServerError)
+		return
+	}
+
+	ctx.JsonResponse(http.StatusOK, records)
 }
 
 func (ctrl *LLMSController) SaveActiveLLM(ctx *rest.Context) {
