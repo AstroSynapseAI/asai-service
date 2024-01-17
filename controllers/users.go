@@ -55,13 +55,13 @@ func (ctrl *UsersController) Read(ctx *rest.Context) {
 //
 // create user invite
 func (ctrl *UsersController) CreateInvite(ctx *rest.Context) {
-	err := ctrl.User.CreateInvite()
+	record, err := ctrl.User.CreateInvite()
 	if err != nil {
 		ctx.SetStatus(http.StatusInternalServerError)
 		return
 	}
 
-	ctx.SetStatus(http.StatusOK)
+	ctx.JsonResponse(http.StatusOK, record)
 }
 
 // register invited user

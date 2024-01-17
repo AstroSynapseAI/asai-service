@@ -1,8 +1,6 @@
 package repositories
 
 import (
-	"database/sql"
-
 	"github.com/AstroSynapseAI/app-service/models"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/orms/gorm"
@@ -34,8 +32,8 @@ func (plugin *PluginsRepository) ToggleActivePlugin(avatarID uint, pluginID uint
 
 	result := plugin.Active.DB.Where("avatar_id = ? AND plugin_id = ?", avatarID, pluginID).First(&activePlugin)
 	if result.Error == db.ErrRecordNotFound {
-		activePlugin.PluginID = sql.NullInt64{Int64: int64(pluginID), Valid: true}
-		activePlugin.AvatarID = sql.NullInt64{Int64: int64(avatarID), Valid: true}
+		activePlugin.PluginID = pluginID
+		activePlugin.AvatarID = avatarID
 	}
 
 	activePlugin.IsActive = active

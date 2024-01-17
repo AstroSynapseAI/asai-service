@@ -1,8 +1,6 @@
 package models
 
 import (
-	"database/sql"
-
 	"gorm.io/gorm"
 )
 
@@ -10,7 +8,7 @@ type Avatar struct {
 	gorm.Model
 	Name          string         `json:"name,omitempty"`
 	Slug          string         `json:"slug,omitempty"`
-	LLMID         sql.NullInt64  `json:"llm_id,omitempty"`
+	LLMID         uint           `json:"llm_id,omitempty"`
 	LLM           LLM            `json:"llm,omitempty"`
 	DefaultPrimer string         `json:"default_primer,omitempty"`
 	Primer        string         `json:"primer,omitempty"`
@@ -24,45 +22,45 @@ type Avatar struct {
 
 type ActiveAgent struct {
 	gorm.Model
-	IsActive bool          `json:"is_active,omitempty"`
-	IsPublic bool          `json:"is_public,omitempty"`
-	Primer   string        `json:"primer,omitempty"`
-	LLMID    sql.NullInt64 `json:"llm_id,omitempty"`
-	AvatarID sql.NullInt64 `json:"avatar_id,omitempty"`
-	AgentID  sql.NullInt64 `json:"agent_id,omitempty"`
-	LLM      LLM           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"llm,omitempty"`
-	Avatar   Avatar        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"avatar,omitempty"`
-	Agent    Agent         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"agent,omitempty"`
+	IsActive bool   `json:"is_active,omitempty"`
+	IsPublic bool   `json:"is_public,omitempty"`
+	Primer   string `json:"primer,omitempty"`
+	LLMID    uint   `json:"llm_id,omitempty"`
+	AvatarID uint   `json:"avatar_id,omitempty"`
+	AgentID  uint   `json:"agent_id,omitempty"`
+	LLM      LLM    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"llm,omitempty"`
+	Avatar   Avatar `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"avatar,omitempty"`
+	Agent    Agent  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"agent,omitempty"`
 }
 
 type ActiveTool struct {
 	gorm.Model
-	IsActive bool          `json:"is_active,omitempty"`
-	IsPublic bool          `json:"is_public,omitempty"`
-	Token    string        `json:"token,omitempty"`
-	AvatarID sql.NullInt64 `json:"avatar_id,omitempty"`
-	ToolID   sql.NullInt64 `json:"tool_id,omitempty"`
-	Avatar   Avatar        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"avatar,omitempty"`
-	Tool     Tool          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"tool,omitempty"`
+	IsActive bool   `json:"is_active,omitempty"`
+	IsPublic bool   `json:"is_public,omitempty"`
+	Token    string `json:"token,omitempty"`
+	AvatarID uint   `json:"avatar_id,omitempty"`
+	ToolID   uint   `json:"tool_id,omitempty"`
+	Avatar   Avatar `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"avatar,omitempty"`
+	Tool     Tool   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"tool,omitempty"`
 }
 
 type ActivePlugin struct {
 	gorm.Model
-	IsActive bool          `json:"is_active,omitempty"`
-	IsPublic bool          `json:"is_public,omitempty"`
-	Token    string        `json:"token,omitempty"`
-	AvatarID sql.NullInt64 `json:"avatar_id,omitempty"`
-	PluginID sql.NullInt64 `json:"plugin_id,omitempty"`
-	Avatar   Avatar        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"avatar,omitempty"`
-	Plugin   Plugin        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"plugin,omitempty"`
+	IsActive bool   `json:"is_active,omitempty"`
+	IsPublic bool   `json:"is_public,omitempty"`
+	Token    string `json:"token,omitempty"`
+	AvatarID uint   `json:"avatar_id,omitempty"`
+	PluginID uint   `json:"plugin_id,omitempty"`
+	Avatar   Avatar `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"avatar,omitempty"`
+	Plugin   Plugin `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"plugin,omitempty"`
 }
 
 type ActiveLLM struct {
 	gorm.Model
-	IsActive bool          `json:"is_active,omitempty"`
-	Token    string        `json:"token,omitempty"`
-	AvatarID sql.NullInt64 `json:"avatar_id,omitempty"`
-	Avatar   Avatar        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"avatar,omitempty"`
-	LLM      LLM           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"llm,omitempty"`
-	LLMID    sql.NullInt64 `json:"llm_id,omitempty"`
+	IsActive bool   `json:"is_active,omitempty"`
+	Token    string `json:"token,omitempty"`
+	AvatarID uint   `json:"avatar_id,omitempty"`
+	Avatar   Avatar `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"avatar,omitempty"`
+	LLM      LLM    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"llm,omitempty"`
+	LLMID    uint   `json:"llm_id,omitempty"`
 }

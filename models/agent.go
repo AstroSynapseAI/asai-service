@@ -1,8 +1,6 @@
 package models
 
 import (
-	"database/sql"
-
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"gorm.io/gorm"
 )
@@ -19,13 +17,13 @@ type Agent struct {
 
 type AgentTool struct {
 	gorm.Model
-	IsActive bool          `json:"is_active,omitempty"`
-	IsPublic bool          `json:"is_public,omitempty"`
-	Token    string        `json:"token,omitempty"`
-	AgentID  sql.NullInt64 `json:"agent_id"`
-	ToolID   sql.NullInt64 `json:"tool_id"`
-	Agent    Agent         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"agent"`
-	Tool     Tool          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"tool"`
+	IsActive bool   `json:"is_active,omitempty"`
+	IsPublic bool   `json:"is_public,omitempty"`
+	Token    string `json:"token,omitempty"`
+	AgentID  uint   `json:"agent_id"`
+	ToolID   uint   `json:"tool_id"`
+	Agent    Agent  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"agent"`
+	Tool     Tool   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"tool"`
 }
 
 func (*Agent) SeedModel(db *database.Database) error {

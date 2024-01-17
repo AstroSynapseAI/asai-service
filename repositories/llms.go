@@ -1,8 +1,6 @@
 package repositories
 
 import (
-	"database/sql"
-
 	"github.com/AstroSynapseAI/app-service/models"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/orms/gorm"
@@ -34,8 +32,8 @@ func (llm *LLMSRepository) ToggleActiveLLM(avatarID uint, LLMID uint, active boo
 
 	result := llm.Active.DB.Where("avatar_id = ? AND LLM_id = ?", avatarID, LLMID).First(&activeLLM)
 	if result.Error == db.ErrRecordNotFound {
-		activeLLM.LLMID = sql.NullInt64{Int64: int64(LLMID), Valid: true}
-		activeLLM.AvatarID = sql.NullInt64{Int64: int64(avatarID), Valid: true}
+		activeLLM.LLMID = LLMID
+		activeLLM.AvatarID = avatarID
 	}
 
 	activeLLM.IsActive = active

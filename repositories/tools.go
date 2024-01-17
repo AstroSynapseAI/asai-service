@@ -1,8 +1,6 @@
 package repositories
 
 import (
-	"database/sql"
-
 	"github.com/AstroSynapseAI/app-service/models"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/orms/gorm"
@@ -44,8 +42,8 @@ func (tool *ToolsRepository) ToggleAvatarTool(avatarID uint, toolID uint, active
 
 	result := tool.Active.DB.Where("avatar_id = ? AND tool_id = ?", avatarID, toolID).First(&activeTool)
 	if result.Error == db.ErrRecordNotFound {
-		activeTool.ToolID = sql.NullInt64{Int64: int64(toolID), Valid: true}
-		activeTool.AvatarID = sql.NullInt64{Int64: int64(avatarID), Valid: true}
+		activeTool.ToolID = toolID
+		activeTool.AvatarID = avatarID
 	}
 
 	activeTool.IsActive = active
@@ -63,8 +61,8 @@ func (tool *ToolsRepository) ToggleAgentTool(agentID uint, toolID uint, active b
 
 	result := tool.Agent.DB.Where("agent_id = ? AND tool_id = ?", agentID, toolID).First(&agentTool)
 	if result.Error == db.ErrRecordNotFound {
-		agentTool.ToolID = sql.NullInt64{Int64: int64(toolID), Valid: true}
-		agentTool.AgentID = sql.NullInt64{Int64: int64(agentID), Valid: true}
+		agentTool.ToolID = toolID
+		agentTool.AgentID = agentID
 	}
 
 	agentTool.IsActive = active

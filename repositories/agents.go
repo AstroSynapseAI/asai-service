@@ -1,8 +1,6 @@
 package repositories
 
 import (
-	"database/sql"
-
 	"github.com/AstroSynapseAI/app-service/models"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/orms/gorm"
@@ -34,8 +32,8 @@ func (agent *AgentsRepository) ToggleActiveAgent(avatarID uint, agentID uint, ac
 
 	result := agent.Active.DB.Where("avatar_id = ? AND agent_id = ?", avatarID, agentID).First(&activeAgent)
 	if result.Error == db.ErrRecordNotFound {
-		activeAgent.AgentID = sql.NullInt64{Int64: int64(agentID), Valid: true}
-		activeAgent.AvatarID = sql.NullInt64{Int64: int64(avatarID), Valid: true}
+		activeAgent.AgentID = agentID
+		activeAgent.AvatarID = avatarID
 	}
 
 	activeAgent.IsActive = active

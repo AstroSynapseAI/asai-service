@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"database/sql"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -26,6 +25,11 @@ type AvatarsController struct {
 func NewAvatarsController(db *database.Database) *AvatarsController {
 	return &AvatarsController{
 		Avatar: repositories.NewAvatarsRepository(db),
+		Agent:  repositories.NewAgentsRepository(db),
+		Plugin: repositories.NewPluginsRepository(db),
+		Tool:   repositories.NewToolsRepository(db),
+		LLM:    repositories.NewLLMSRepository(db),
+		Doc:    repositories.NewDocumentsRepository(db),
 	}
 }
 
@@ -83,10 +87,7 @@ func (ctrl *AvatarsController) SaveAvatar(ctx *rest.Context) {
 		Slug:     createSlug(input.AvatarName),
 		Primer:   input.AvatarPrimer,
 		IsPublic: input.IsPublic,
-		LLMID: sql.NullInt64{
-			Int64: int64(input.AvatarLLMID),
-			Valid: true,
-		},
+		LLMID:    input.AvatarLLMID,
 	}
 
 	if input.AvatarID != 0 {

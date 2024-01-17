@@ -55,22 +55,22 @@ func (user *UsersRepository) Register(username string, password string) (models.
 	return newUser, nil
 }
 
-func (user *UsersRepository) CreateInvite() error {
+func (user *UsersRepository) CreateInvite() (models.User, error) {
 	token, err := user.GenerateToken(64)
 	if err != nil {
-		return err
+		return models.User{}, err
 	}
 
 	record := models.User{
 		InviteToken: token,
 	}
 
-	_, err = user.Repo.Create(record)
+	userRecord, err := user.Repo.Create(record)
 	if err != nil {
-		return err
+		return models.User{}, err
 	}
 
-	return nil
+	return userRecord, nil
 }
 
 func (user *UsersRepository) ConfirmInvite(username string, password string, token string) (models.User, error) {
