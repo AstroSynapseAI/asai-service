@@ -10,14 +10,14 @@ import (
 type ToolsRepository struct {
 	Repo   *gorm.Repository[models.Tool]
 	Active *gorm.Repository[models.ActiveTool]
-	Agent  *gorm.Repository[models.AgentTool]
+	Agent  *gorm.Repository[models.ActiveAgentTool]
 }
 
 func NewToolsRepository(db *database.Database) *ToolsRepository {
 	return &ToolsRepository{
 		Repo:   gorm.NewRepository[models.Tool](db, models.Tool{}),
 		Active: gorm.NewRepository[models.ActiveTool](db, models.ActiveTool{}),
-		Agent:  gorm.NewRepository[models.AgentTool](db, models.AgentTool{}),
+		Agent:  gorm.NewRepository[models.ActiveAgentTool](db, models.ActiveAgentTool{}),
 	}
 }
 
@@ -29,7 +29,7 @@ func (tool *ToolsRepository) SaveActiveTool(avatarData models.ActiveTool) error 
 	return nil
 }
 
-func (tool *ToolsRepository) SaveAgentTool(avatarData models.AgentTool) error {
+func (tool *ToolsRepository) SaveAgentTool(avatarData models.ActiveAgentTool) error {
 	result := tool.Agent.DB.Save(&avatarData)
 	if result.Error != nil {
 		return result.Error
@@ -56,13 +56,13 @@ func (tool *ToolsRepository) ToggleAvatarTool(avatarID uint, toolID uint, active
 	return nil
 }
 
-func (tool *ToolsRepository) ToggleAgentTool(agentID uint, toolID uint, active bool) error {
-	var agentTool models.AgentTool
+func (tool *ToolsRepository) ToggleAgentTool(activeAgentID uint, toolID uint, active bool) error {
+	var agentTool models.ActiveAgentTool
 
-	result := tool.Agent.DB.Where("agent_id = ? AND tool_id = ?", agentID, toolID).First(&agentTool)
+	result := tool.Agent.DB.Where("agent_id = ? AND tool_id = ?", activeAgentID, toolID).First(&agentTool)
 	if result.Error == db.ErrRecordNotFound {
 		agentTool.ToolID = toolID
-		agentTool.AgentID = agentID
+		agentTool.ActiveAgentID = activeAgentID
 	}
 
 	agentTool.IsActive = active
@@ -105,31 +105,31 @@ func (tool *ToolsRepository) GetAvatarTool(ID uint, avatarID uint) (models.Activ
 	return activeTool, nil
 }
 
-func (tool *ToolsRepository) GetAgentTools(agentID uint) []models.AgentTool {
+func (tool *ToolsRepository) GetAgentTools(agentID uint) []models.ActiveAgentTool {
 	query := tool.Active.DB
 	query = query.Preload("Tool")
 	query = query.Where("agent_id = ?", agentID)
 
-	var agentTools []models.AgentTool
+	var agentTools []models.ActiveAgentTool
 
 	result := query.Find(&agentTools)
 	if result.Error != nil {
-		return []models.AgentTool{}
+		return []models.ActiveAgentTool{}
 	}
 
 	return agentTools
 }
 
-func (tool *ToolsRepository) GetAgentTool(agentID uint, toolID uint) (models.AgentTool, error) {
+func (tool *ToolsRepository) GetAgentTool(agentID uint, toolID uint) (models.ActiveAgentTool, error) {
 	query := tool.Active.DB
 	query = query.Preload("Tool")
 	query = query.Where("agent_id = ? AND tool_id = ?", agentID, toolID)
 
-	var agentTool models.AgentTool
+	var agentTool models.ActiveAgentTool
 
 	result := query.First(&agentTool)
 	if result.Error != nil {
-		return models.AgentTool{}, result.Error
+		return models.ActiveAgentTool{}, result.Error
 	}
 
 	return agentTool, nil

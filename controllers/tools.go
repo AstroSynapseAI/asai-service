@@ -62,7 +62,7 @@ func (ctrl *ToolsController) SaveAvatarTool(ctx *rest.Context) {
 func (ctrl *ToolsController) SaveAgentTool(ctx *rest.Context) {
 	fmt.Println("AvatarsController.SaveAgentTool")
 
-	var tool models.AgentTool
+	var tool models.ActiveAgentTool
 
 	err := ctx.JsonDecode(&tool)
 	if err != nil {

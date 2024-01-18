@@ -38,7 +38,7 @@ func (ctrl *PluginsController) ReadAll(ctx *rest.Context) {
 }
 
 func (ctrl *PluginsController) SaveActivePlugin(ctx *rest.Context) {
-	fmt.Println("AvatarsController.SavePlugins")
+	fmt.Println("PluginsController.SaveActivePlugins")
 
 	var plugin models.ActivePlugin
 
@@ -58,7 +58,7 @@ func (ctrl *PluginsController) SaveActivePlugin(ctx *rest.Context) {
 }
 
 func (ctrl *PluginsController) ToggleActivePlugin(ctx *rest.Context) {
-	fmt.Println("AvatarsController.SetActivePlugin")
+	fmt.Println("PluginsController.ToggleActivePlugin")
 
 	var input struct {
 		AvatarID     uint `json:"avatar_id"`

@@ -7,12 +7,12 @@ import (
 
 type Tool struct {
 	gorm.Model
-	Name        string       `json:"name,omitempty"`
-	Description string       `json:"description,omitempty"`
-	Slug        string       `json:"slug,omitempty"`
-	Token       string       `json:"token,omitempty"`
-	ActiveTools []ActiveTool `gorm:"foreignKey:ToolID;" json:"active_tools"`
-	AgentTools  []AgentTool  `gorm:"foreignKey:ToolID;" json:"agent_tools"`
+	Name             string            `json:"name,omitempty"`
+	Description      string            `json:"description,omitempty"`
+	Slug             string            `json:"slug,omitempty"`
+	Token            string            `json:"token,omitempty"`
+	ActiveTools      []ActiveTool      `gorm:"foreignKey:ToolID;" json:"active_tools"`
+	ActiveAgentTools []ActiveAgentTool `gorm:"foreignKey:ToolID;" json:"agent_tools"`
 }
 
 func (*Tool) SeedModel(db *database.Database) error {

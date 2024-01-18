@@ -38,7 +38,7 @@ func (ctrl *LLMSController) ReadAll(ctx *rest.Context) {
 }
 
 func (ctrl *LLMSController) SaveActiveLLM(ctx *rest.Context) {
-	fmt.Println("AvatarsController.SaveLLM")
+	fmt.Println("LLMSController.SaveLLM")
 
 	var llm models.ActiveLLM
 
@@ -58,7 +58,7 @@ func (ctrl *LLMSController) SaveActiveLLM(ctx *rest.Context) {
 }
 
 func (ctrl *LLMSController) ToggleActiveLLM(ctx *rest.Context) {
-	fmt.Println("AvatarsController.ToggleActiveLLM")
+	fmt.Println("LLMSController.ToggleActiveLLM")
 
 	var input struct {
 		AvatarID  uint `json:"avatar_id"`

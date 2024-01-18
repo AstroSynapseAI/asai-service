@@ -12,18 +12,6 @@ type Agent struct {
 	Slug         string        `json:"slug,omitempty"`
 	Primer       string        `json:"primer,omitempty"`
 	ActiveAgents []ActiveAgent `gorm:"foreignKey:AgentID;" json:"active_agents"`
-	AgentTools   []AgentTool   `gorm:"foreignKey:AgentID;" json:"agent_tools"`
-}
-
-type AgentTool struct {
-	gorm.Model
-	IsActive bool   `json:"is_active,omitempty"`
-	IsPublic bool   `json:"is_public,omitempty"`
-	Token    string `json:"token,omitempty"`
-	AgentID  uint   `json:"agent_id"`
-	ToolID   uint   `json:"tool_id"`
-	Agent    Agent  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"agent"`
-	Tool     Tool   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"tool"`
 }
 
 func (*Agent) SeedModel(db *database.Database) error {

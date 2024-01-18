@@ -53,7 +53,7 @@ func (ctrl *AgentsController) Read(ctx *rest.Context) {
 }
 
 func (ctrl *AgentsController) SaveActiveAgent(ctx *rest.Context) {
-	fmt.Println("AvatarsController.SaveAgent")
+	fmt.Println("AgentsController.SaveActiveAgent")
 
 	var activeAgent models.ActiveAgent
 	err := ctx.JsonDecode(&activeAgent)
@@ -72,11 +72,11 @@ func (ctrl *AgentsController) SaveActiveAgent(ctx *rest.Context) {
 }
 
 func (ctrl *AgentsController) ToggleActiveAgent(ctx *rest.Context) {
-	fmt.Println("AvatarsController.SetActiveAgent")
+	fmt.Println("AgentsController.ToggleActiveAgent")
 
 	var input struct {
 		AvatarID    uint `json:"avatar_id"`
-		ActiveAgent bool `json:"activeAgent"`
+		ActiveAgent bool `json:"active_agent"`
 	}
 
 	err := ctx.JsonDecode(&input)
@@ -95,13 +95,13 @@ func (ctrl *AgentsController) ToggleActiveAgent(ctx *rest.Context) {
 }
 
 func (ctrl *AgentsController) GetTools(ctx *rest.Context) {
-	fmt.Println("AvatarsController.GetTools")
+	fmt.Println("AgentsController.GetTools")
 	records := ctrl.Tool.GetAgentTools(ctx.GetID())
 	ctx.JsonResponse(http.StatusOK, records)
 }
 
 func (ctrl *AgentsController) GetTool(ctx *rest.Context) {
-	fmt.Println("AvatarsController.GetTool")
+	fmt.Println("AgentsController.GetTool")
 	record, err := ctrl.Tool.GetAgentTool(ctx.GetID("agent_id"), ctx.GetID())
 	if err != nil {
 		ctx.SetStatus(http.StatusNotFound)
