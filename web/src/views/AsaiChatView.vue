@@ -6,11 +6,11 @@ import { storeToRefs } from 'pinia';
 import  MarkdownIt  from 'markdown-it';
 
 import { useChatStore } from '../stores/chat.store.js';
-import { useUsersStore } from '../stores/user.store.js';
+import { useUserStore } from '../stores/user.store.js';
 
 const chatStore = useChatStore();
 const { messages, connectionErr } = storeToRefs(chatStore);
-const usersStore = useUsersStore();
+const usersStore = useUserStore();
 const conversationContainer = ref(null);
 const promptContainer = ref(null);
 const md = new MarkdownIt({breaks: true});

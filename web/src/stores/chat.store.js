@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 
 import { fetchWrapper }  from '../helpers/fetch-wrapper.js';
-import { useUsersStore } from './user.store.js';
+import { useUserStore } from './user.store.js';
 
 const chatURL = `${import.meta.env.VITE_API_URL}/chat`;
 const wsURL = `${import.meta.env.VITE_WS_URL}/ws/chat`;
@@ -128,7 +128,7 @@ export const useChatStore = defineStore({
     },
 
     async sendPrompt(content) {      
-      const userStore = useUsersStore();
+      const userStore = useUserStore();
 
       var userMsg = {
         sender: "human",
@@ -150,7 +150,7 @@ export const useChatStore = defineStore({
       }
     },
     async loadHistory() {
-      const userStore = useUsersStore();
+      const userStore = useUserStore();
       const session_id = userStore.user.session_id;
       var responseMsgs = []
       try {

@@ -1,14 +1,14 @@
 import { defineStore } from 'pinia';
-
 import { fetchWrapper } from '../helpers/fetch-wrapper.js';
 import { useChatStore } from './chat.store.js';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 const usersURL = `${apiUrl}/users`;
 
-export const useUsersStore = defineStore({
+export const useUserStore = defineStore({
   id: 'users',
   state: () => ({
+    currentUser: JSON.parse(localStorage.getItem('user')),
     userData: {},
     allUsers: {},
     user: {

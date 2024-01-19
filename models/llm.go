@@ -22,7 +22,7 @@ func (*LLM) SeedModel(db *database.Database) error {
 	if result.Error == gorm.ErrRecordNotFound {
 		var llms []LLM = []LLM{
 			{
-				Name:        "gpt-4",
+				Name:        "Gpt-4",
 				Slug:        "gpt-4",
 				Description: "OpenAI is a large-scale, open-source AI research project.",
 				Provider:    "OpenAI",
