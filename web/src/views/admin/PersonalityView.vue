@@ -5,30 +5,17 @@ import { useAvatarStore } from '@/stores/avatar.store.js';
 import { useLLMStore } from '@/stores/llm.store.js';
 import { useUserStore } from '@/stores/user.store.js';
 
-
-const llmStore = useLLMStore();
-const avatarStore = useAvatarStore();
-const userStore = useUserStore();
-
+// Initiate stores
+const llm = useLLMStore();
+const avatar = useAvatarStore();
+const user = useUserStore();
 
 // Form data
 const avatarName = ref('');
 const avatarLLMID = ref('');
 const avatarPrimer = ref('');
 
-const llms = toRef(llmStore, 'llms');
-llmStore.getLLMs();
-
-console.log(JSON.parse(localStorage.getItem('user')))
-
-console.log(userStore.currentUser);
-
-const userAvatar = userStore.getUserAvatar(userStore.currentUser.ID);
-if (userAvatar) {
-  avatarName.value = userAvatar.name;
-  avatarLLMID.value = userAvatar.llm_id;
-  avatarPrimer.value = userAvatar.primer;
-}
+const llms = toRef(llm, 'llms');
 
 const submitForm = () => {
   const formData = {
@@ -37,16 +24,28 @@ const submitForm = () => {
     primer: avatarPrimer.value,
   }
 
-  if (userAvatar) {
-    formData.ID = userAvatar.ID;
+  if (user.avatar.ID) {
+    formData.ID = user.avatar.ID;
   }
 
   console.log(formData);
-
-  avatarStore.saveAvatar(formData);
+  avatar.saveAvatar(formData);
 }
 
-onMounted(() => {
+onMounted(async () => {
+  try {
+    await llm.getLLMs();
+    await user.getUserAvatar(user.current.ID);
+    
+    if (user.avatar) {
+      avatarName.value = user.avatar.name;
+      avatarLLMID.value = user.avatar.llm_id;
+      avatarPrimer.value = user.avatar.primer;
+    }
+  } catch (error) {
+    console.log(error);  
+  }
+  
   feather.replace();
 });
 

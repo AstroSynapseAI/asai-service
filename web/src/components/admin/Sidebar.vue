@@ -4,7 +4,7 @@ const avatarName = "asai"
 
 <template>
   <nav id="sidebar" class="sidebar js-sidebar">
-		<div class="sidebar-content js-simplebar">
+		<div class="sidebar-content js-simplebar" data-simplebar="init">
 			<router-link :to="{name: 'admin', params: { avatar: avatarName }}" class="sidebar-brand">
 				<span class="align-middle">AI Avatar</span>
 			</router-link>

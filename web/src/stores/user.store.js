@@ -8,9 +8,9 @@ const usersURL = `${apiUrl}/users`;
 export const useUserStore = defineStore({
   id: 'users',
   state: () => ({
-    currentUser: JSON.parse(localStorage.getItem('user')),
-    userData: {},
-    allUsers: {},
+    current: JSON.parse(localStorage.getItem('user')),
+    avatar: {},
+    all: {},
     user: {
       // This is tmp for dev and testing
       id: 'UDID-01',
@@ -29,9 +29,7 @@ export const useUserStore = defineStore({
     async getUserAvatar(user_id) {
       try {
         const avatar = await fetchWrapper.get(`${usersURL}/${user_id}/avatars`);
-        user = this.user;
-        user.avatar = avatar
-        localStorage.setItem('user', JSON.stringify(user));
+        this.avatar = avatar;
       } catch (error) {
         console.error(error);
       }

@@ -1,5 +1,17 @@
 <script setup>
-  const avatarName = "asai";
+import { onMounted, toRef } from 'vue';
+import { useAgentStore } from '@/stores/agent.store';
+
+
+const avatarName = "asai";
+const agent = useAgentStore();
+const allAgents = toRef(agent, 'allAgents');
+
+onMounted(async () => {
+  await agent.getAgents();
+  feather.replace();
+});
+
 </script>
 
 <template>
@@ -9,8 +21,30 @@
     <div class="row">
       <div class="col-12">
         <div class="container">
+
+          <div class="row" v-for="(agent, index) in allAgents.filter((a, i) => i % 2 === 0)" :key="'row' + index">
+              <!-- Render the current and next agent (if it exists) within the same row -->
+              <div class="col-6" v-for="activeAgent in allAgents.slice(index, index + 2)" :key="activeAgent.ID">
+                <div class="card">
+                  <div class="card-header">
+                    <h5 class="card-title">{{ activeAgent.name }}</h5>
+                    <div class="form-check form-switch float-end">
+                      <label class="form-check-label" for="flexSwitchCheckDefault">Active</label>
+                      <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" v-model="activeAgent.isActive">
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <p>{{ activeAgent.description }}</p>
+                    <div>
+                      <router-link :to="{name: 'agent-config', params: { avatar: activeAgent.name, slug: activeAgent.slug }}" class="btn btn-primary">Configure</router-link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </div>
+
           
-          <div class="row">
+          <!-- <div class="row">
             <div class="col-6">
               <div class="card">
                 <div class="card-header">
@@ -36,6 +70,8 @@
                 </div>
               </div>
             </div>
+
+
             <div class="col-6">
               <div class="card">
                 <div class="card-header">
@@ -61,7 +97,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
 
 
         </div>

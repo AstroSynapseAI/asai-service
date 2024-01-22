@@ -110,7 +110,7 @@ onMounted(() => {
                 <div class="card-body">
                   <div class="row">
                     <div class="col-2 d-flex justify-content-center align-items-center">
-                      <img src="../assets/discord-icon.jpg" width="108" height="108">
+                      <img src="@/assets/discord-mark-white.svg" width="48" height="48">
                     </div>
 
                     <div class="col-10">

@@ -1,10 +1,15 @@
 <script setup>
 import PromptInput from '@/components/admin/PromptInput.vue';
-import { useChatStore } from '@/stores/chat.store';
+import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useChatStore } from '@/stores/chat.store';
 
 const chatStore = useChatStore();
 const { messages } = storeToRefs(chatStore);
+
+onMounted(() => {
+  feather.replace();
+});
 
 </script>
 

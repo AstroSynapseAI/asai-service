@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { fetchWrapper }  from '../helpers/fetch-wrapper.js';
+import router from '@/router/index.js';
 
 const usersURL = `${import.meta.env.VITE_API_URL}/users`;
 
@@ -40,6 +41,7 @@ export const useAuthStore = defineStore({
       localStorage.removeItem('user');
       this.isLogedIn = false
       this.apiToken = null
+      router.push('/login');
     }
   }
 })

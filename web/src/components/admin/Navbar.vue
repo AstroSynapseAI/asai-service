@@ -1,3 +1,11 @@
+<script setup>
+import { useAuthStore } from '@/stores/auth.store.js';
+const authStore = useAuthStore();
+const logout = () => {
+  authStore.logout();
+}
+
+</script>
 
 <template>
   <nav class="navbar navbar-expand navbar-light navbar-bg">
@@ -21,7 +29,7 @@
             <router-link to="/account" class="dropdown-item"><i class="align-middle me-1" data-feather="user"></i> Profile</router-link>
             
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#"><i class="align-middle me-1" data-feather="log-out"></i>Log out</a>
+            <a class="dropdown-item" href="#" @click="logout"><i class="align-middle me-1" data-feather="log-out"></i>Log out</a>
           </div>
         </li>
 
@@ -30,11 +38,3 @@
     </div>
   </nav>
 </template>
-
-<style scoped>
-/* .navbar, .sidebar-toggle {
-  background-color: #141A21;
-  color: white;
-  
-} */
-</style>

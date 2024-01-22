@@ -14,7 +14,6 @@ export const useLLMStore = defineStore({
       try {
         const llms = await fetchWrapper.get(`${apiUrl}/llms`);
         this.llms = llms;
-        console.log(this.llms)
       } catch (error) {
         console.error(error);
       }
