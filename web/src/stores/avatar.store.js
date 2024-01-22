@@ -9,6 +9,8 @@ export const useAvatarStore = defineStore({
   state: () => ({
     currentUser: JSON.parse(localStorage.getItem('user')),
     userAvatar: {},
+    activeAgents: [],
+    activeAgent: {},
   }),
   actions: {
     async saveAvatar(formData) {
@@ -21,12 +23,30 @@ export const useAvatarStore = defineStore({
         }
 
         if (formData.ID) {
-          avatar.ID = formData.ID;
+          avatar.avatar_id = formData.ID;
         }
 
         const userAvatar = await fetchWrapper.post(`${avatarsURL}/save`, avatar);
         this.userAvatar = userAvatar;
 
+      } catch (error) {
+        console.error(error);
+      }
+    }, 
+
+    async getActiveAgents(avatar_id) {
+      try {
+        const agents = await fetchWrapper.get(`${avatarsURLl}/${avatar_id}/agents`);
+        this.activeAgents = agents;
+      } catch (error) {
+        console.error(error);
+      }
+    }, 
+    
+    async getActiveAgent(agent_id, avatar_id) {
+      try {
+        const agent = await fetchWrapper.get(`${avatarsURLl}/${avatar_id}/agents/${agent_id}`);
+        this.activeAgent = agent;
       } catch (error) {
         console.error(error);
       }

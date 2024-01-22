@@ -36,7 +36,7 @@ onMounted(async () => {
                   <div class="card-body">
                     <p>{{ activeAgent.description }}</p>
                     <div>
-                      <router-link :to="{name: 'agent-config', params: { avatar: activeAgent.name, slug: activeAgent.slug }}" class="btn btn-primary">Configure</router-link>
+                      <router-link :to="{name: 'agent-config', params: { avatar: avatarName, slug: activeAgent.slug }}" class="btn btn-primary">Configure</router-link>
                     </div>
                   </div>
                 </div>
