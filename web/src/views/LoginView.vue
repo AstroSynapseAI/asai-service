@@ -2,18 +2,26 @@
 import { ref } from 'vue';
 import { onMounted } from 'vue';
 import { Form, Field, useForm } from 'vee-validate';
-import { useAuthStore } from '../stores/auth.store.js'; 
+import { useAuthStore } from '@/stores/auth.store.js'; 
+import { useUserStore } from '@/stores/user.store.js';
 const { handleSubmit } = useForm();
-const user = useAuthStore();
+
+const auth = useAuthStore();
+const user = useUserStore();
 
 let username = ref('');
 let password = ref('');
 
 const submitLogin = handleSubmit(async values => {
   try {
-    const loggedIn = await user.login(username.value, password.value)
+    const loggedIn = await auth.login(username.value, password.value)
     if (loggedIn) {
-      window.location.href = '/admin/avatar/asai';
+      await user.getUserAvatar(user.current.ID);
+      if (user.avatar) {
+        window.location.href = '/admin/avatar/' + user.avatar.ID;
+        return
+      }
+      window.location.href = '/admin/avatar/create';
     }
     else {
       alert('Invalid username or password');

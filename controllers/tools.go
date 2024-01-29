@@ -39,6 +39,17 @@ func (ctrl *ToolsController) ReadAll(ctx *rest.Context) {
 	ctx.JsonResponse(http.StatusOK, records)
 }
 
+func (ctrl *ToolsController) Read(ctx *rest.Context) {
+	fmt.Println("ToolsController.Read")
+	record, err := ctrl.Tool.Repo.Read(ctx.GetID())
+	if err != nil {
+		ctx.SetStatus(http.StatusNotFound)
+		return
+	}
+
+	ctx.JsonResponse(http.StatusOK, record)
+}
+
 func (ctrl *ToolsController) SaveAvatarTool(ctx *rest.Context) {
 	fmt.Println("AvatarsController.SaveAvatarTool")
 

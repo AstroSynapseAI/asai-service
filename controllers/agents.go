@@ -58,17 +58,18 @@ func (ctrl *AgentsController) SaveActiveAgent(ctx *rest.Context) {
 	var activeAgent models.ActiveAgent
 	err := ctx.JsonDecode(&activeAgent)
 	if err != nil {
+		fmt.Println(err)
 		ctx.SetStatus(http.StatusBadRequest)
 		return
 	}
 
-	err = ctrl.Agent.SaveActiveAgent(activeAgent)
+	record, err := ctrl.Agent.SaveActiveAgent(activeAgent)
 	if err != nil {
 		ctx.SetStatus(http.StatusInternalServerError)
 		return
 	}
 
-	ctx.SetStatus(http.StatusOK)
+	ctx.JsonResponse(http.StatusOK, record)
 }
 
 func (ctrl *AgentsController) ToggleActiveAgent(ctx *rest.Context) {

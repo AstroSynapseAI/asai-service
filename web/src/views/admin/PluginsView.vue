@@ -1,14 +1,34 @@
 <script setup>
-import { Form, Field } from 'vee-validate';
-import { ref, onMounted } from 'vue';
+import { onMounted, toRef } from 'vue';
+import { usePluginStore } from '@/stores/plugin.store';
+import { useUserStore } from '@/stores/user.store';
+import { useAvatarStore } from '@/stores/avatar.store';
 
-let showModal = ref(false);
+const user = useUserStore();
 
-const toggleModal = () => {
-  showModal.value = !showModal.value;
+const plugin = usePluginStore();
+const pluginsRecords = toRef(plugin, 'records');
+
+const avatar = useAvatarStore();
+const activePlugins = toRef(avatar, 'activePlugins');
+
+const pluginIsActive = (pluginID) => {
+  return pluginsRecords.value.some(plugin => plugin.ID === pluginID && plugin.isActive);
 }
 
-onMounted(() => {
+const getActivePluginID = (pluginID) => {
+  const activePlugin = activePlugins.value.find(p => p.tool.ID === pluginID);
+  return activePlugin ? activePlugin.ID : null;
+}
+
+onMounted(async () => {
+  try {
+    await plugin.getPlugins();
+    await avatar.getActivePlugins(user.avatar.ID);
+  }
+  catch (error) {
+    console.log(error);
+  }
   feather.replace();
 });
 </script>
@@ -21,106 +41,41 @@ onMounted(() => {
     <div class="row">
       <div class="col-12">
         <div class="container">
-          <!-- Edit Configure Plugin -->
-          <div class="modal" :class="{ 'd-block': showModal, 'show': showModal }" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title">Configure Plugin</h5>
-                  <button type="button" class="btn-close" @click="showModal = false"></button>
-                </div>
-                <div class="modal-body container">
-                  <div class="row">
-                      <div class="col-12">
-                        <Field 
-                          name="token" 
-                          type="text" 
-                          as="input" 
-                          class="form-control" 
-                          rows="8" 
-                          placeholder="API Token"
-                        ></Field>
-                      </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" @click="showModal = false">Save</button>
-                </div>
-              </div>
-            </div>
-          </div>
           
           <div class="row">
-
-            <div class="col-6">
-              <div class="card">
-                <div class="card-header">
-                  <div class="row">
-                    <div class="col-6">
-                      <h5 class="card-title">Slack</h5>
-                    </div>
-                    <div class="col-6">
-                      <div class="form-check form-switch float-end">
-                        <span @click="toggleModal" style="cursor: pointer; margin-right: 5px;">
-                          <i data-feather="settings" class="float-end"></i>
-                        </span>
-                        <label class="form-check-label me-2" for="flexSwitchCheckDefault">Active</label>
-                        <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
+            <div class="row" v-for="(_, index) in pluginsRecords.filter((a, i) => i % 2 === 0)" :key="'row' + index">
+              <!-- Render the current and next agent (if it exists) within the same row -->
+              <div class="col-6" v-for="plugin in pluginsRecords.slice(index, index + 2)" :key="plugin.ID">
+                <div class="card">
+                  
+                  <div class="card-header">
+                    <div class="row">
+                      <div class="col">
+                        <h5 class="card-title">{{ plugin.name }}</h5>
+                      </div>
+                      <div class="col-auto">
+                        <div class="form-check form-switch d-flex align-items-center" v-if="getActivePluginID(plugin.ID)">
+                          <input class="form-check-input me-2" type="checkbox" id="flexSwitchCheckDefault" :checked="pluginIsActive(plugin.ID)">
+                          <label style="margin-bottom: -5px;" for="flexSwitchCheckDefault">Active</label>
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  
-                </div>
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col-2 d-flex justify-content-center align-items-center">
-                      <i data-feather="slack" class="" style="width: 48px; height: 48px"></i>
-                    </div>
-
-                    <div class="col-10">
-                      <p>Empower your conversations with your AI Avatar on Slack! This dynamic feature translates easily into an assistant for your team, answering inquiries, simplifying tasks, and streamlining information flow like a pro. All this, right within your existing team chats!</p>
+                  <div class="card-body">
+                    <p>{{ plugin.description }}</p>
+                    <div>
+                      <router-link 
+                      :to="{name: 'plugin-config', params: {avatar_id: user.avatar.ID, plugin_id: plugin.ID, active_plugin_id: getActivePluginID(plugin.ID)}}" 
+                      class="btn 
+                      btn-primary">
+                        Configure
+                      </router-link>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-
-            <div class="col-6">
-              <div class="card">
-                <div class="card-header">
-                  <div class="row">
-                    <div class="col-6">
-                      <h5 class="card-title">Discord</h5>
-                    </div>
-                    <div class="col-6">
-                      <div class="form-check form-switch float-end">
-                        <span @click="toggleModal" style="cursor: pointer; margin-right: 5px;">
-                          <i data-feather="settings" class="float-end"></i>
-                        </span>
-                        
-                        <label class="form-check-label me-2" for="flexSwitchCheckDefault">Active</label>
-                        <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
-                      </div>
-                    </div>
-                  </div>
-
-                  
-                </div>
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col-2 d-flex justify-content-center align-items-center">
-                      <img src="@/assets/discord-mark-white.svg" width="48" height="48">
-                    </div>
-
-                    <div class="col-10">
-                      <p>Welcome your AI Avatar into your Discord channels, ready to redefine your community interactions! Providing instant responses and meaningful insights, this feature seamlessly merges with your discussions, adding a layer of efficiency to your community engagements!</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
           </div>
 
 

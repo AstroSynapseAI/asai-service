@@ -11,6 +11,12 @@ export const useAvatarStore = defineStore({
     userAvatar: {},
     activeAgents: [],
     activeAgent: {},
+    activePlugins: [],
+    activePlugin: {},
+    activeLLMs: [],
+    activeLLM: {},
+    activeTools: [],
+    activeTool: {},
   }),
   actions: {
     async saveAvatar(formData) {
@@ -19,11 +25,8 @@ export const useAvatarStore = defineStore({
           user_id: this.currentUser.ID,
           avatar_name: formData.name,
           avatar_primer: formData.primer,
-          avatar_llm_id: formData.llm
-        }
-
-        if (formData.ID) {
-          avatar.avatar_id = formData.ID;
+          avatar_llm_id: formData.llm,
+          avatar_id: formData.ID
         }
 
         const userAvatar = await fetchWrapper.post(`${avatarsURL}/save`, avatar);
@@ -32,21 +35,76 @@ export const useAvatarStore = defineStore({
       } catch (error) {
         console.error(error);
       }
-    }, 
+    },
 
     async getActiveAgents(avatar_id) {
       try {
-        const agents = await fetchWrapper.get(`${avatarsURLl}/${avatar_id}/agents`);
+        const agents = await fetchWrapper.get(`${avatarsURL}/${avatar_id}/agents`);
         this.activeAgents = agents;
       } catch (error) {
         console.error(error);
       }
-    }, 
-    
+    },
+
     async getActiveAgent(agent_id, avatar_id) {
       try {
-        const agent = await fetchWrapper.get(`${avatarsURLl}/${avatar_id}/agents/${agent_id}`);
+        const agent = await fetchWrapper.get(`${avatarsURL}/${avatar_id}/agents/${agent_id}`);
         this.activeAgent = agent;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async getActivePlugins(avatar_id) {
+      try {
+        const plugins = await fetchWrapper.get(`${avatarsURL}/${avatar_id}/plugins`);
+        this.activePlugins = plugins;
+      } catch (error) {
+        console.error(error);
+      }
+
+    },
+
+    async getActivePlugin(avatar_id, plugin_id) {
+      try {
+        const plugin = await fetchWrapper.get(`${avatarsURL}/${avatar_id}/plugins/${plugin_id}`);
+        this.activePlugin = plugin;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async getActiveLLMs(avatar_id) {
+      try {
+        const llms = await fetchWrapper.get(`${avatarsURL}/${avatar_id}/llms`);
+        this.activeLLMs = llms;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async getActiveLLM(avatar_id, llm_id) {
+      try {
+        const llm = await fetchWrapper.get(`${avatarsURL}/${avatar_id}/llms/${llm_id}`);
+        this.activeLLM = llm;
+      } catch (error) {
+        console.error(error);
+      }
+    }, 
+
+    getActiveTools(avatar_id) {
+      try {
+        const tools = fetchWrapper.get(`${avatarsURL}/${avatar_id}/tools`);
+        this.activeTools = tools;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    getActiveTool(avatar_id, tool_id) {
+      try {
+        const tool = fetchWrapper.get(`${avatarsURL}/${avatar_id}/tools/${tool_id}`);
+        this.activeTool = tool;
       } catch (error) {
         console.error(error);
       }

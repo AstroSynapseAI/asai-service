@@ -37,6 +37,17 @@ func (ctrl *PluginsController) ReadAll(ctx *rest.Context) {
 	ctx.JsonResponse(http.StatusOK, records)
 }
 
+func (ctrl *PluginsController) Read(ctx *rest.Context) {
+	fmt.Println("PluginsController.Read")
+	record, err := ctrl.Plugin.Repo.Read(ctx.GetID())
+	if err != nil {
+		ctx.SetStatus(http.StatusNotFound)
+		return
+	}
+
+	ctx.JsonResponse(http.StatusOK, record)
+}
+
 func (ctrl *PluginsController) SaveActivePlugin(ctx *rest.Context) {
 	fmt.Println("PluginsController.SaveActivePlugins")
 

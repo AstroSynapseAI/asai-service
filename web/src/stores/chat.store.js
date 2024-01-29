@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-
 import { fetchWrapper }  from '../helpers/fetch-wrapper.js';
 import { useUserStore } from './user.store.js';
 

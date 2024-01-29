@@ -9,27 +9,22 @@ export const useUserStore = defineStore({
   id: 'users',
   state: () => ({
     current: JSON.parse(localStorage.getItem('user')),
-    avatar: {},
+    avatar: JSON.parse(localStorage.getItem('avatar')),
     all: {},
-    user: {
-      // This is tmp for dev and testing
-      id: 'UDID-01',
-      avatar: 'asai',
-    }
   }),
   actions: {
     async getUsers() {
-      
+
     },
 
     async getUser() {
-      
+
     },
-    
+
     async getUserAvatar(user_id) {
       try {
         const avatar = await fetchWrapper.get(`${usersURL}/${user_id}/avatars`);
-        this.avatar = avatar;
+        localStorage.setItem('avatar', JSON.stringify(avatar));
       } catch (error) {
         console.error(error);
       }
@@ -47,14 +42,14 @@ export const useUserStore = defineStore({
     },
 
     async getUserRole() {
-      
+
     },
 
     async getSession() {
       console.log("Creating session...")
-      const chatStore = useChatStore(); 
+      const chatStore = useChatStore();
       this.user = JSON.parse(localStorage.getItem('user'));
-      
+
       if (!this.user) {
         try {
           chatStore.messages = [{
@@ -65,7 +60,7 @@ export const useUserStore = defineStore({
           localStorage.setItem('user', JSON.stringify(user));
         } catch (error) {
           console.error(error);
-        }    
+        }
       }
 
       if (this.user) {

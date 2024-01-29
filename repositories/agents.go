@@ -19,12 +19,12 @@ func NewAgentsRepository(db *database.Database) *AgentsRepository {
 	}
 }
 
-func (agent *AgentsRepository) SaveActiveAgent(avatarData models.ActiveAgent) error {
-	result := agent.Active.DB.Save(&avatarData)
+func (agent *AgentsRepository) SaveActiveAgent(agentData models.ActiveAgent) (models.ActiveAgent, error) {
+	result := agent.Active.DB.Save(&agentData)
 	if result.Error != nil {
-		return result.Error
+		return models.ActiveAgent{}, result.Error
 	}
-	return nil
+	return agentData, nil
 }
 
 func (agent *AgentsRepository) ToggleActiveAgent(avatarID uint, agentID uint, active bool) error {
