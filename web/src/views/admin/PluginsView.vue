@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, toRef } from 'vue';
+import { onMounted, toRef, ref } from 'vue';
 import { usePluginStore } from '@/stores/plugin.store';
 import { useUserStore } from '@/stores/user.store';
 import { useAvatarStore } from '@/stores/avatar.store';
@@ -12,12 +12,39 @@ const pluginsRecords = toRef(plugin, 'records');
 const avatar = useAvatarStore();
 const activePlugins = toRef(avatar, 'activePlugins');
 
-const pluginIsActive = (pluginID) => {
-  return pluginsRecords.value.some(plugin => plugin.ID === pluginID && plugin.isActive);
+const isActive = (ID) => {
+  const activePlugin = activePlugins.value.find(activePlugin => {
+    return activePlugin.plugin.ID == ID;
+  });
+  
+  return activePlugin ? activePlugin.is_active : false;
+}
+
+const toggleActive = async (ID) => {
+  
+  const activePlugin = activePlugins.value.find(activePlugin => {
+    return activePlugin.plugin.ID == ID;
+  });
+  
+  if(activePlugin){
+    activePlugin.is_active = !activePlugin.is_active;
+  }
+
+  const formData = {
+    is_active: activePlugin ? activePlugin.is_active : false,
+    avatar_id: user.avatar.ID
+  }
+
+  try {    
+    await plugin.toggleActivePlugin(ID, formData)
+  }
+  catch (error) {
+    console.log(error);
+  }
 }
 
 const getActivePluginID = (pluginID) => {
-  const activePlugin = activePlugins.value.find(p => p.tool.ID === pluginID);
+  const activePlugin = activePlugins.value.find(p => p.plugin.ID === pluginID);
   return activePlugin ? activePlugin.ID : null;
 }
 
@@ -55,7 +82,7 @@ onMounted(async () => {
                       </div>
                       <div class="col-auto">
                         <div class="form-check form-switch d-flex align-items-center" v-if="getActivePluginID(plugin.ID)">
-                          <input class="form-check-input me-2" type="checkbox" id="flexSwitchCheckDefault" :checked="pluginIsActive(plugin.ID)">
+                          <input class="form-check-input me-2" type="checkbox" id="flexSwitchCheckDefault" :checked="isActive(plugin.ID)" @click="toggleActive(plugin.ID)">
                           <label style="margin-bottom: -5px;" for="flexSwitchCheckDefault">Active</label>
                         </div>
                       </div>

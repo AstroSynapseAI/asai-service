@@ -37,6 +37,17 @@ func (ctrl *LLMSController) ReadAll(ctx *rest.Context) {
 	ctx.JsonResponse(http.StatusOK, records)
 }
 
+func (ctrl *LLMSController) Read(ctx *rest.Context) {
+	fmt.Println("LLMSController.Read")
+	record, err := ctrl.LLM.Repo.Read(ctx.GetID())
+	if err != nil {
+		ctx.SetStatus(http.StatusNotFound)
+		return
+	}
+
+	ctx.JsonResponse(http.StatusOK, record)
+}
+
 func (ctrl *LLMSController) SaveActiveLLM(ctx *rest.Context) {
 	fmt.Println("LLMSController.SaveLLM")
 
@@ -62,7 +73,7 @@ func (ctrl *LLMSController) ToggleActiveLLM(ctx *rest.Context) {
 
 	var input struct {
 		AvatarID  uint `json:"avatar_id"`
-		ActiveLLM bool `json:"activeLLM"`
+		ActiveLLM bool `json:"is_active"`
 	}
 
 	err := ctx.JsonDecode(&input)

@@ -108,7 +108,7 @@ func (tool *ToolsRepository) GetAvatarTool(ID uint, avatarID uint) (models.Activ
 func (tool *ToolsRepository) GetAgentTools(agentID uint) []models.ActiveAgentTool {
 	query := tool.Active.DB
 	query = query.Preload("Tool")
-	query = query.Where("agent_id = ?", agentID)
+	query = query.Where("active_agent_id = ?", agentID)
 
 	var agentTools []models.ActiveAgentTool
 
@@ -123,7 +123,7 @@ func (tool *ToolsRepository) GetAgentTools(agentID uint) []models.ActiveAgentToo
 func (tool *ToolsRepository) GetAgentTool(agentID uint, toolID uint) (models.ActiveAgentTool, error) {
 	query := tool.Active.DB
 	query = query.Preload("Tool")
-	query = query.Where("agent_id = ? AND tool_id = ?", agentID, toolID)
+	query = query.Where("active_agent_id = ? AND tool_id = ?", agentID, toolID)
 
 	var agentTool models.ActiveAgentTool
 

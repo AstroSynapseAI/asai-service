@@ -51,5 +51,13 @@ export const useAgentStore = defineStore({
         console.error(error);
       }
     },
+
+    async toggleActiveAgent(ID, formData) {
+      try {
+        await fetchWrapper.post(`${agentsURL}/${ID}/toggle/active`, formData);
+      } catch (error) {
+        console.error(error);
+      }
+    }
   }
 })

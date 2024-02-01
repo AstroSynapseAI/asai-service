@@ -14,6 +14,7 @@ const route = useRoute();
 
 const agent = useAgentStore();
 const agentRecord = toRef(agent, 'record');
+const activeTools = toRef(agent, 'activeTools');
 
 const llm = useLLMStore();
 const llmRecords = toRef(llm, 'records');
@@ -26,15 +27,13 @@ const agentName = ref('');
 const activeAgentLLMID = ref('');
 const isActiveAgent = ref(false);
 const isPublicAgent = ref(false);
-const activeTools = ref([]);
-
-const activeToolID = (toolID) => {
-  const activeTool = activeTools.value.find(activeTool => activeTool.tool.ID === toolID);
-  return activeTool ? activeTool.ID : null;
-}
 
 const toolIsActive = (toolID) => {
-  return activeTools.value.some(activeTool => activeTool.tool.ID === toolID);
+  const activeTool = activeTools.value.find(activeTool => {
+    return activeTool.tool.ID == toolID
+  });
+
+  return activeTool ? activeTool.is_active : false
 }
 
 const toggleActive = () => {
@@ -46,17 +45,22 @@ const togglePublic = () => {
 }
 
 const toggleTool = (tool) => {
-  const toolExistsInActiveTools = activeTools.value.some(
-    (activeTool) => activeTool.ID === tool.ID
-  );
+  const activeTool = activeTools.value.find( activeTool => {
+    return activeTool.tool.ID == tool.ID;
+  });
 
-  if (toolExistsInActiveTools) {
-    activeTools.value = activeTools.value.filter(
-      (activeTool) => activeTool.ID !== tool.ID
-    );
-  } else {
-    activeTools.value.push(tool);
+  if (!activeTool) {
+    const toolData = {
+      active_agent_id: agentRecord.value.ID,
+      tool_id: tool.ID,
+      tool: tool,
+      is_active: true,
+    }
+    activeTools.value.push(toolData);
+    return
   }
+
+  activeTool.is_active = !activeTool.is_active;
 }
 
 const submitForm = async () => {
@@ -76,19 +80,8 @@ const submitForm = async () => {
 
   try {
     await agent.saveActiveAgent(formData);
-    for (const tool of activeTools.value) {
-      const toolData = {
-        active_agent_id: agentRecord.value.ID,
-        tool_id: tool.ID,
-        isActiveAgent: true,
-        isPublicAgent: false,
-      }
-
-      if (activeToolID(tool.ID)) {
-        toolData.ID = activeToolID(tool.ID);
-      }
-
-      await agent.saveAgentTool(toolData);
+    for (const activeTool of activeTools.value) {
+      await tool.saveAgentTool(activeTool);
     }
   }
   catch (error) {
@@ -108,6 +101,7 @@ onMounted(async () => {
   
     if (route.params.active_agent_id) {
       await avatar.getActiveAgent(route.params.agent_id, route.params.avatar_id);
+      await agent.getActiveTools(avatar.activeAgent.agent_id);
       if (avatar.activeAgent) {
         activeAgentLLMID.value = avatar.activeAgent.llm_id;
         agentPrimer.value = avatar.activeAgent.primer;

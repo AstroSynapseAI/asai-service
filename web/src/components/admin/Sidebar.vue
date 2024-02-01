@@ -20,6 +20,7 @@ const user = useUserStore();
 			</ul>
 
 			<ul class="sidebar-nav" v-else>
+
 				<li class="sidebar-item">
 					<router-link :to="{name: 'admin', params: { avatar_id: user.avatar?.ID }}" class="sidebar-link">
 						<i class="align-middle" data-feather="message-circle"></i> <span class="align-middle">Chat</span>
@@ -27,6 +28,13 @@ const user = useUserStore();
 				</li>
 
 				<li class="sidebar-header">Configure</li>
+
+				<li class="sidebar-item">
+					<router-link :to="{name: 'personality', params: { avatar_id: user.avatar?.ID }}" class="sidebar-link">
+						<i class="align-middle" data-feather="meh"></i> <span class="align-middle">Personality</span>
+					</router-link>
+				</li>
+				
 				<li class="sidebar-item">
 					<router-link :to="{name: 'models', params: { avatar_id: user.avatar?.ID }}" class="sidebar-link">
 						<i class="align-middle" data-feather="codesandbox"></i> <span class="align-middle">Models</span>
@@ -46,27 +54,21 @@ const user = useUserStore();
 				</li>
 
 				<li class="sidebar-item">
-					<router-link :to="{name: 'personality', params: { avatar_id: user.avatar?.ID }}" class="sidebar-link">
-						<i class="align-middle" data-feather="meh"></i> <span class="align-middle">Personality</span>
-					</router-link>
-				</li>
-
-				<li class="sidebar-item">
 					<router-link :to="{name: 'plugins', params: { avatar_id: user.avatar?.ID }}" class="sidebar-link">
 						<i class="align-middle" data-feather="package"></i> <span class="align-middle">Plugins</span>
 					</router-link>
 				</li>
 
 
-				<li class="sidebar-header">
+				<!-- <li class="sidebar-header">
 					Library
 					<span class="float-end">
 						<i data-feather="upload" class="align-middle ms-2"></i>
 					</span>
-				</li>
+				</li> -->
 
 
-				<li class="sidebar-item p-4">
+				<!-- <li class="sidebar-item p-4">
 					<div class="container p-0">
 						<div class="card">
 							<div class="card-body p-0">
@@ -101,7 +103,7 @@ const user = useUserStore();
 						</div>
 
 					</div>
-				</li>
+				</li> -->
 
 			</ul>
 

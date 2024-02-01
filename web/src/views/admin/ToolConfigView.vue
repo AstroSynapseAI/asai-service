@@ -1,10 +1,11 @@
 <script setup>
 import { onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useToolStore } from '@/stores/tool.store';
 import { useAvatarStore } from '@/stores/avatar.store';
 
 const route = useRoute();
+const router = useRouter();
 const avatar = useAvatarStore();
 const tool = useToolStore();
 
@@ -21,15 +22,21 @@ const togglePublic = () => {
   isPublicTool.value = !isPublicTool.value
 }
 
-const saveTool = () => {
-  tool.saveTool({
-    ID: parseInt(route.params.active_tool_id),
-    avatar_id: parseInt(route.params.avatar_id),
-    tool_id: parseInt(route.params.tool_id),
-    token: toolToken.value,
-    is_active: isActiveTool.value,
-    is_public: isPublicTool.value
-  })
+const saveTool = async () => {
+  try {
+    await tool.saveAvatarTool({
+      ID: parseInt(route.params.active_tool_id),
+      avatar_id: parseInt(route.params.avatar_id),
+      tool_id: parseInt(route.params.tool_id),
+      token: toolToken.value,
+      is_active: isActiveTool.value,
+      is_public: isPublicTool.value
+    })
+    router.push({name: 'tools', params: {avatar_id: route.params.avatar_id}});
+  }
+  catch (error) {
+    console.log(error);
+  }
 }
 
 onMounted( async () => {

@@ -34,6 +34,15 @@ export const usePluginStore = defineStore({
       } catch (error) {
         console.error(error);
       }
+    },
+
+    async toggleActivePlugin(ID, formData) {
+      try {
+        const plugin = await fetchWrapper.post(`${pluginsURL}/${ID}/toggle/active`, formData);
+        this.record = plugin;
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 })

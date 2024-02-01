@@ -10,7 +10,8 @@ export const useUserStore = defineStore({
   state: () => ({
     current: JSON.parse(localStorage.getItem('user')),
     avatar: JSON.parse(localStorage.getItem('avatar')),
-    all: {},
+    record: {},
+    records: [],
   }),
   actions: {
     async getUsers() {

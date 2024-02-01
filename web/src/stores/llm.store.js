@@ -8,6 +8,7 @@ export const useLLMStore = defineStore({
   id: 'llm',
   state: () => ({
     records: {},
+    record: {},
   }),
   actions: {
     async getLLMs() {
@@ -17,6 +18,32 @@ export const useLLMStore = defineStore({
       } catch (error) {
         console.error(error);
       }
+    }, 
+
+    async getLLM(llm_id) {
+      try {
+        const llm = await fetchWrapper.get(`${llmsURL}/${llm_id}`);
+        this.record = llm;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async saveLLM(formData) {
+      try {
+        const llm = await fetchWrapper.post(`${llmsURL}/save/active`, formData);
+        this.record = llm;
+      } catch (error) {
+        console.error(error);
+      }
+    }, 
+    async toggleActiveLLM(ID, formData) {
+      try {
+        await fetchWrapper.post(`${llmsURL}/${ID}/toggle/active`, formData);
+      } catch (error) {
+        console.error(error);
+      }
+      
     }
   }
 })

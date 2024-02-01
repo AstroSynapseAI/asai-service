@@ -19,6 +19,7 @@ type AgentsController struct {
 func NewAgentsController(db *database.Database) *AgentsController {
 	return &AgentsController{
 		Agent: repositories.NewAgentsRepository(db),
+		Tool:  repositories.NewToolsRepository(db),
 	}
 }
 
@@ -77,7 +78,7 @@ func (ctrl *AgentsController) ToggleActiveAgent(ctx *rest.Context) {
 
 	var input struct {
 		AvatarID    uint `json:"avatar_id"`
-		ActiveAgent bool `json:"active_agent"`
+		ActiveAgent bool `json:"is_active"`
 	}
 
 	err := ctx.JsonDecode(&input)

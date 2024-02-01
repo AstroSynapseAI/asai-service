@@ -13,7 +13,33 @@ const avatar = useAvatarStore();
 const activeAgents = toRef(avatar, 'activeAgents');
 
 const agentIsActive = (agentID) => {
-  return activeAgents.value.some(activeAgent => activeAgent.agent.ID === agentID);
+  const activeAgent = activeAgents.value.find(activeAgent => {
+    return activeAgent.agent.ID === agentID;
+  })
+
+  return activeAgent ? activeAgent.is_active : false;
+}
+
+const toggleActive = async (agentID) => {
+  const activeAgent = activeAgents.value.find(activeAgent => {
+    return activeAgent.agent.ID == agentID;
+  });
+
+  if(activeAgent){
+    activeAgent.is_active = !activeAgent.is_active;
+  }
+
+  const formData = {
+    is_active: activeAgent ? activeAgent.is_active : false,
+    avatar_id: user.avatar.ID
+  }
+
+  try {
+    await agent.toggleActiveAgent(agentID, formData);
+  }
+  catch (error) {
+    console.log(error);
+  }
 }
 
 const getActiveAgentID = (agentID) => {
@@ -54,7 +80,7 @@ onMounted(async () => {
                       </div>
                       <div class="col-auto">
                         <div class="form-check form-switch d-flex align-items-center" v-if="getActiveAgentID(agent.ID)">
-                          <input class="form-check-input me-2" type="checkbox" id="flexSwitchCheckDefault" :checked="agentIsActive(agent.ID)">
+                          <input class="form-check-input me-2" type="checkbox" id="flexSwitchCheckDefault" :checked="agentIsActive(agent.ID)" @click="toggleActive(agent.ID)">
                           <label style="margin-bottom: -5px;" for="flexSwitchCheckDefault">Active</label>
                         </div>
                       </div>

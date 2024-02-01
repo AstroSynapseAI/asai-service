@@ -5,13 +5,45 @@ import { useAvatarStore } from '@/stores/avatar.store';
 import { useUserStore } from '@/stores/user.store';
 
 const user = useUserStore();
-const tool = useToolStore();
-const toolsRecords = toRef(tool, 'records');
-
 const avatar = useAvatarStore();
 const activeTools = toRef(avatar, 'activeTools');
 
-const toolIsActive = ref(false);
+const tool = useToolStore();
+const toolsRecords = toRef(tool, 'records');
+
+const isActive = (ID) => {
+  const activeTool = activeTools.value.find(activeTool => {
+    return activeTool.tool.ID == ID;
+  });
+  
+  return activeTool ? activeTool.is_active : false;
+}
+
+const toggleActive = async (ID) => {
+  const activeTool = activeTools.value.find(activeTool => {
+    return activeTool.tool.ID == ID;
+  });
+  
+  if(activeTool){
+    activeTool.is_active = !activeTool.is_active;
+  }
+
+  const formData = {
+    is_active: activeTool ? activeTool.is_active : false,
+    avatar_id: user.avatar.ID
+  }
+  try {    
+    await tool.toggleAvatarTool(ID, formData)
+  }
+  catch (error) {
+    console.log(error);
+  }
+}
+
+const getActiveToolID = (ToolID) => {
+  const activeTool = activeTools.value.find(m => m.tool.ID === ToolID);
+  return activeTool ? activeTool.ID : null;
+}
 
 onMounted( async () => {
   try {
@@ -47,8 +79,8 @@ onMounted( async () => {
                       <h5 class="card-title">{{ tool.name }}</h5>
                     </div>
                     <div class="col-auto">
-                      <div class="form-check form-switch d-flex align-items-center">
-                        <input class="form-check-input me-2" type="checkbox" id="flexSwitchCheckDefault" :checked="toolIsActive">
+                      <div class="form-check form-switch d-flex align-items-center" v-if="getActiveToolID(tool.ID)">
+                        <input class="form-check-input me-2" type="checkbox" id="flexSwitchCheckDefault" :checked="isActive(tool.ID)" @click="toggleActive(tool.ID)">
                         <label style="margin-bottom: -5px;" for="flexSwitchCheckDefault">Active</label>
                       </div>
                     </div>
@@ -59,7 +91,7 @@ onMounted( async () => {
                   <p>{{ tool.description }}</p>
                   <div>
                     <router-link 
-                    :to="{name: 'tool-config', params: {avatar_id: user.avatar.ID, tool_id: tool.ID}}" 
+                    :to="{name: 'tool-config', params: {avatar_id: user.avatar.ID, tool_id: tool.ID, active_tool_id: getActiveToolID(tool.ID)}}" 
                     class="btn 
                     btn-primary">
                       Configure

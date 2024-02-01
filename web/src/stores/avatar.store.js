@@ -92,18 +92,18 @@ export const useAvatarStore = defineStore({
       }
     }, 
 
-    getActiveTools(avatar_id) {
+    async getActiveTools(avatar_id) {
       try {
-        const tools = fetchWrapper.get(`${avatarsURL}/${avatar_id}/tools`);
+        const tools = await fetchWrapper.get(`${avatarsURL}/${avatar_id}/tools`);
         this.activeTools = tools;
       } catch (error) {
         console.error(error);
       }
     },
 
-    getActiveTool(avatar_id, tool_id) {
+    async getActiveTool(avatar_id, tool_id) {
       try {
-        const tool = fetchWrapper.get(`${avatarsURL}/${avatar_id}/tools/${tool_id}`);
+        const tool = await fetchWrapper.get(`${avatarsURL}/${avatar_id}/tools/${tool_id}`);
         this.activeTool = tool;
       } catch (error) {
         console.error(error);

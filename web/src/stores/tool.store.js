@@ -26,6 +26,40 @@ export const useToolStore = defineStore({
       } catch (error) {
         console.error(error);
       }
+    }, 
+
+    async saveAvatarTool(formData) {
+      try {
+        const tool = await fetchWrapper.post(`${toolsURL}/save/avatar`, formData);
+        this.record = tool;
+      } catch (error) {
+        console.error(error);
+      }
+    }, 
+
+    async saveAgentTool(formData) {
+      try {
+        const tool = await fetchWrapper.post(`${toolsURL}/save/agent`, formData);
+        this.record = tool;
+      } catch (error) {
+        console.error(error);
+      }
+    }, 
+
+    async toggleAvatarTool(ID, formData) {
+      try {
+        await fetchWrapper.post(`${toolsURL}/${ID}/toggle/avatar`, formData);
+      } catch (error) {
+        console.error(error);
+      }
+    }, 
+
+    async toggleAgentTool(ID, formData) {
+      try {
+        await fetchWrapper.post(`${toolsURL}/${ID}/toggle/agent`, formData);
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 })
