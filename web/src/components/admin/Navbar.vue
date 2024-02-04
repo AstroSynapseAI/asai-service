@@ -26,7 +26,7 @@ const logout = () => {
           </a>
           
           <div class="dropdown-menu dropdown-menu-end">
-            <router-link to="/account" class="dropdown-item"><i class="align-middle me-1" data-feather="user"></i> Profile</router-link>
+            <router-link :to="{name: 'profile'}" class="dropdown-item"><i class="align-middle me-1" data-feather="user"></i> Profile</router-link>
             
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#" @click="logout"><i class="align-middle me-1" data-feather="log-out"></i>Log out</a>

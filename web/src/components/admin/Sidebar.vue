@@ -1,7 +1,12 @@
 <script setup>
+import { onMounted } from 'vue';
 import { useUserStore } from '@/stores/user.store';
 
 const user = useUserStore();
+
+onMounted(() => {
+	feather.replace()
+})
 </script>
 
 <template>
@@ -59,6 +64,8 @@ const user = useUserStore();
 					</router-link>
 				</li>
 
+				
+
 
 				<!-- <li class="sidebar-header">
 					Library
@@ -105,6 +112,16 @@ const user = useUserStore();
 					</div>
 				</li> -->
 
+			</ul>
+
+			<ul class="sidebar-nav" v-if="user.isAdmin()">
+				<li class="sidebar-header">Administration</li> 
+
+				<li class="sidebar-item">
+					<router-link :to="{name: 'users'}" class="sidebar-link">
+						<i class="align-middle" data-feather="users"></i> <span class="align-middle">Manage Users</span>
+					</router-link>
+				</li>
 			</ul>
 
 		</div>

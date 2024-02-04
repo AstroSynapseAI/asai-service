@@ -34,10 +34,11 @@ func (routes *Routes) LoadRoutes(router *rest.Rest) {
 
 	// CUSTOM CONTROLLERS
 	api := router.API()
-	// Route custom UsersController
-	api.Route("/users").Controller(controllers.NewUsersController(routes.DB))
+
 	// Route custom AvatarsController
 	api.Route("/avatars").Controller(controllers.NewAvatarsController(routes.DB))
+	// Route custom UsersController
+	api.Route("/users").Controller(controllers.NewUsersController(routes.DB))
 	// Route custom AgentsController
 	api.Route("/agents").Controller(controllers.NewAgentsController(routes.DB))
 	// Route custom DocumentsController
@@ -115,6 +116,12 @@ func (routes *Routes) LoadMiddlewares(router *rest.Rest) {
 				if strings.HasPrefix(r.URL.Path, "/api") {
 					log.Printf("%s %s %s\n", r.RemoteAddr, r.Method, r.URL)
 
+					// Logging Request Headers
+					// for name, headers := range r.Header {
+					// 	for _, h := range headers {
+					// 		log.Printf("%v: %v\n", name, h)
+					// 	}
+					// }
 					if r.Method == "POST" || r.Method == "PUT" {
 						bodyBytes, err := io.ReadAll(r.Body)
 						if err != nil {

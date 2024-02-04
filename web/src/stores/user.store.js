@@ -10,16 +10,23 @@ export const useUserStore = defineStore({
   state: () => ({
     current: JSON.parse(localStorage.getItem('user')),
     avatar: JSON.parse(localStorage.getItem('avatar')),
+    account: {},
     record: {},
     records: [],
   }),
   actions: {
-    async getUsers() {
-
+    isAdmin() {
+      // return this.current.roles.some(role => role.permission === 'admin');
+      return true;
     },
 
-    async getUser() {
-
+    async getUsers() {
+      try {
+        const users = await fetchWrapper.get(`${usersURL}`);
+        this.records = users;
+      } catch (error) {
+        console.error(error);
+      }
     },
 
     async getUserAvatar(user_id) {
@@ -34,16 +41,10 @@ export const useUserStore = defineStore({
     async getUserAccounts(user_id) {
       try {
         const accounts = await fetchWrapper.get(`${usersURL}/${user_id}/accounts`);
-        user = this.user;
-        user.accounts = accounts;
-        localStorage.setItem('user', JSON.stringify(user));
+        this.account = accounts[0];
       } catch (error) {
         console.error(error);
       }
-    },
-
-    async getUserRole() {
-
     },
 
     async getSession() {
@@ -67,6 +68,32 @@ export const useUserStore = defineStore({
       if (this.user) {
         console.log("User:", this.user);
         chatStore.loadHistory();
+      }
+    }, 
+
+    async saveProfile(formData) {
+      if (formData.ID) {
+        try {
+          const user = await fetchWrapper.put(`${usersURL}/${formData.ID}/update`, formData);
+          localStorage.setItem('user', JSON.stringify(user));
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      if (formData.account_id) {
+        const accountData = {
+          ID: formData.account_id,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          email: formData.email
+        } 
+        try {
+          const account = await fetchWrapper.put(`${apiUrl}/accounts/${formData.account_id}`, accountData);
+          this.account = account;
+        } catch (error) {
+          console.error(error);
+        }
       }
     }
   }

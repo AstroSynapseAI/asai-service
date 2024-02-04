@@ -27,6 +27,14 @@ func (user *UsersRepository) Login(username string, password string) (models.Use
 		return models.User{}, err
 	}
 
+	query := user.Repo.DB.Preload("Roles").Preload("Roles.Role")
+	query = query.Preload("Roles.Avatar")
+
+	err = query.First(&record, record.ID).Error
+	if err != nil {
+		return models.User{}, err
+	}
+
 	return record, nil
 }
 
@@ -55,7 +63,7 @@ func (user *UsersRepository) Register(username string, password string) (models.
 	return newUser, nil
 }
 
-func (user *UsersRepository) CreateInvite() (models.User, error) {
+func (user *UsersRepository) CreateInvite(username string) (models.User, error) {
 	token, err := user.GenerateToken(64)
 	if err != nil {
 		return models.User{}, err
@@ -63,6 +71,7 @@ func (user *UsersRepository) CreateInvite() (models.User, error) {
 
 	record := models.User{
 		InviteToken: token,
+		Username:    username,
 	}
 
 	userRecord, err := user.Repo.Create(record)
@@ -101,6 +110,21 @@ func (user *UsersRepository) ConfirmInvite(username string, password string, tok
 	return invitedUser, nil
 }
 
+func (user *UsersRepository) GetAll() ([]models.User, error) {
+	var records []models.User
+
+	query := user.Repo.DB
+	query = query.Preload("Roles").Preload("Roles.Role")
+	query = query.Preload("Roles.Avatar")
+
+	err := query.Find(&records).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return records, nil
+}
+
 func (user *UsersRepository) GetByUsername(username string) (models.User, error) {
 	var record models.User
 	err := user.Repo.DB.Where("username = ?", username).First(&record).Error
@@ -129,7 +153,18 @@ func (user *UsersRepository) GetByInviteToken(token string) (models.User, error)
 	return record, nil
 }
 
-func (user *UsersRepository) GetUserAccount(userID uint, accountID uint) (models.Account, error) {
+func (user *UsersRepository) GetAccounts(userID uint) ([]models.Account, error) {
+	var userRecord models.User
+	query := user.Repo.DB.Preload("Accounts")
+
+	err := query.Find(&userRecord, userID).Error
+	if err != nil {
+		return nil, err
+	}
+	return userRecord.Accounts, nil
+}
+
+func (user *UsersRepository) GetAccount(userID uint, accountID uint) (models.Account, error) {
 	var record models.Account
 	err := user.Repo.DB.Where("user_id = ? AND id = ?", userID, accountID).First(&record).Error
 	if err != nil {
@@ -162,4 +197,13 @@ func (user *UsersRepository) GenerateToken(n int) (string, error) {
 		return "", err
 	}
 	return hex.EncodeToString(token), nil
+}
+
+func (user *UsersRepository) Update(userData models.User) (models.User, error) {
+	result := user.Repo.DB.Save(&userData)
+	if result.Error != nil {
+		return models.User{}, result.Error
+	}
+
+	return userData, nil
 }

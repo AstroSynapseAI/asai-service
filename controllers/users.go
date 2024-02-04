@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/AstroSynapseAI/app-service/models"
 	"github.com/AstroSynapseAI/app-service/repositories"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/AstroSynapseAI/app-service/sdk/rest"
@@ -24,7 +25,7 @@ func (ctrl *UsersController) Run() {
 	ctrl.Post("/login", ctrl.Login)
 	ctrl.Post("/register", ctrl.Register)
 	ctrl.Post("/register/invite", ctrl.RegisterInvite)
-	ctrl.Get("/invite", ctrl.CreateInvite)
+	ctrl.Post("/invite", ctrl.CreateInvite)
 	ctrl.Get("/{id}/accounts", ctrl.GetAccounts)
 	ctrl.Get("/{id}/accounts/{account_id}", ctrl.GetAccount)
 	ctrl.Get("/{id}/avatars", ctrl.GetAvatar)
@@ -32,7 +33,8 @@ func (ctrl *UsersController) Run() {
 
 // Default CRUD routes
 func (ctrl *UsersController) ReadAll(ctx *rest.Context) {
-	users, err := ctrl.User.Repo.ReadAll()
+	fmt.Println("UsersController.ReadAll")
+	users, err := ctrl.User.GetAll()
 	if err != nil {
 		ctx.SetStatus(http.StatusInternalServerError)
 		return
@@ -55,7 +57,18 @@ func (ctrl *UsersController) Read(ctx *rest.Context) {
 //
 // create user invite
 func (ctrl *UsersController) CreateInvite(ctx *rest.Context) {
-	record, err := ctrl.User.CreateInvite()
+	fmt.Println("UsersController.CreateInvite")
+	var input struct {
+		Username string `json:"username"`
+	}
+
+	err := ctx.JsonDecode(&input)
+	if err != nil {
+		ctx.SetStatus(http.StatusBadRequest)
+		return
+	}
+
+	record, err := ctrl.User.CreateInvite(input.Username)
 	if err != nil {
 		ctx.SetStatus(http.StatusInternalServerError)
 		return
@@ -95,6 +108,7 @@ func (ctrl *UsersController) RegisterInvite(ctx *rest.Context) {
 }
 
 func (ctrl *UsersController) Register(ctx *rest.Context) {
+	fmt.Println("UsersController.Register")
 	var reqData struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -116,6 +130,7 @@ func (ctrl *UsersController) Register(ctx *rest.Context) {
 }
 
 func (ctrl *UsersController) Login(ctx *rest.Context) {
+	fmt.Println("UsersController.Login")
 	var reqData struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -137,26 +152,23 @@ func (ctrl *UsersController) Login(ctx *rest.Context) {
 }
 
 func (ctrl *UsersController) GetAccounts(ctx *rest.Context) {
-	userID := ctx.GetID("id")
-	user, err := ctrl.User.Repo.Read(userID)
+	fmt.Println("UsersController.GetAccounts")
+	userID := ctx.GetID()
+
+	accounts, err := ctrl.User.GetAccounts(userID)
 	if err != nil {
 		ctx.SetStatus(http.StatusInternalServerError)
 		return
 	}
-	accounts := user.Accounts
 
-	if accounts != nil {
-		ctx.JsonResponse(http.StatusOK, accounts)
-	}
-
-	ctx.SetStatus(http.StatusNotFound)
+	ctx.JsonResponse(http.StatusOK, accounts)
 }
 
 func (ctrl *UsersController) GetAccount(ctx *rest.Context) {
 	accountID := ctx.GetID("account_id")
-	account, err := ctrl.User.GetUserAccount(ctx.GetID(), accountID)
+	account, err := ctrl.User.GetAccount(ctx.GetID(), accountID)
 	if err != nil {
-		ctx.SetStatus(http.StatusNotFound)
+		ctx.SetStatus(http.StatusInternalServerError)
 		return
 	}
 
@@ -164,6 +176,7 @@ func (ctrl *UsersController) GetAccount(ctx *rest.Context) {
 }
 
 func (ctrl *UsersController) GetAvatar(ctx *rest.Context) {
+	fmt.Println("UsersController.GetAvatar")
 	avatar, err := ctrl.User.GetUserAvatar(ctx.GetID())
 	if err != nil {
 		ctx.SetStatus(http.StatusNotFound)
@@ -171,4 +184,26 @@ func (ctrl *UsersController) GetAvatar(ctx *rest.Context) {
 	}
 
 	ctx.JsonResponse(http.StatusOK, avatar)
+}
+
+func (ctrl *UsersController) Update(ctx *rest.Context) {
+	fmt.Println("UsersController.Update")
+	userID := ctx.GetID()
+
+	var record models.User
+	record.ID = userID
+
+	err := ctx.JsonDecode(&record)
+	if err != nil {
+		ctx.SetStatus(http.StatusBadRequest)
+		return
+	}
+
+	user, err := ctrl.User.Update(record)
+	if err != nil {
+		ctx.SetStatus(http.StatusInternalServerError)
+		return
+	}
+
+	ctx.JsonResponse(http.StatusOK, user)
 }

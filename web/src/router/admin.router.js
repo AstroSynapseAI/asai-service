@@ -61,6 +61,16 @@ const adminRoutes = [
     name: 'tool-config',
     component: () => import('@/views/admin/ToolConfigView.vue')
   },
+  {
+    path: 'users',
+    name: 'users',
+    component: () => import('@/views/admin/UsersView.vue')
+  },
+  {
+    path: 'profile',
+    name: 'profile',
+    component: () => import('@/views/admin/ProfileView.vue')
+  },
   { path: '/:pathMatch(.*)*', redirect: '/' }
 ]
 

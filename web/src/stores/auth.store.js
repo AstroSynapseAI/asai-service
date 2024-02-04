@@ -37,6 +37,19 @@ export const useAuthStore = defineStore({
       }
     },
 
+    async inviteUser(username) {
+      const reqBody = {
+        username: username
+      }
+      try {
+        const user = await fetchWrapper.post(`${usersURL}/invite`, reqBody);
+        return user
+      } catch (error) {
+        console.error(error);
+        return false
+      }
+    },
+
     logout() {
       localStorage.removeItem('user');
       this.isLogedIn = false

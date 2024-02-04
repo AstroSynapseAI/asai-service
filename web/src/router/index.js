@@ -6,6 +6,7 @@ import HomeView from '@/views/home/HomeView.vue'
 import AboutView from '@/views/home/AboutView.vue'
 import LoginView from '@/views/LoginView.vue'
 import AdminView from '@/views/admin/AdminView.vue'
+import RegisterView from '@/views/RegisterView.vue'
 
 import adminRoutes from './admin.router'
 
@@ -25,6 +26,12 @@ const router = createRouter({
           component: AboutView
         },
       ]
+    },
+    {
+      path: '/register/:invite_token?',
+      name: 'register',
+      meta: { requiresAuth: false },
+      component: RegisterView
     },
     {
       path: '/login',
