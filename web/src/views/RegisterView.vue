@@ -1,7 +1,44 @@
 <script setup>
 import { ref } from 'vue';
+import { useRoute } from 'vue-router';
 import { onMounted } from 'vue';
+import { useAuthStore } from '@/stores/auth.store';
 
+const auth = useAuthStore();
+const username = ref('');
+const password = ref('');
+const confirmPassword = ref('');
+
+
+const confirmedPassword = () => {
+  if (password.value === confirmPassword.value) {
+    return true
+  }
+  else {
+    return false
+  }
+};
+
+const register = async () => {
+  if (!confirmedPassword()) {
+    alert('Passwords do not match.')
+  }
+
+  try {
+    const loggedIn = await auth.register({
+      username: username.value,
+      password: password.value,
+      invite_token: route.params.token
+    })
+
+    if (loggedIn) {
+      window.location.href = '/admin/avatar/create';
+    }
+  }
+  catch (error) {
+    console.log(error);
+  }
+}
 
 onMounted(() => {
   feather.replace();
@@ -41,7 +78,8 @@ onMounted(() => {
             <Form class="form-control" @submit="submitLogin">
               <Field v-model="username" id="Email" name="Username" type="email" class="email-input d-block" placeholder="Username"></Field>
               <Field v-model="password" id="Password" name="Password" type="password" class="pass-input d-block" placeholder="Password"></Field>
-              <button class="send-button btn btn-light"> Login</button>
+              <Field v-model="confirmPassword" id="confirmPassword" name="confirmPassword" type="password" class="pass-input d-block" placeholder="Confirm Password"></Field>
+              <button class="send-button btn btn-light" @click="register"> REGISTER </button>
           </Form>
             
           </div>

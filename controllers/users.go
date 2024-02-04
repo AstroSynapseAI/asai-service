@@ -8,16 +8,20 @@ import (
 	"github.com/AstroSynapseAI/app-service/repositories"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/AstroSynapseAI/app-service/sdk/rest"
+
+	"github.com/AstroSynapseAI/app-service/sdk/crud/orms/gorm"
 )
 
 type UsersController struct {
 	rest.Controller
-	User *repositories.UsersRepository
+	User    *repositories.UsersRepository
+	Account *gorm.Repository[models.Account]
 }
 
 func NewUsersController(db *database.Database) *UsersController {
 	return &UsersController{
-		User: repositories.NewUsersRepository(db),
+		User:    repositories.NewUsersRepository(db),
+		Account: gorm.NewRepository[models.Account](db, models.Account{}),
 	}
 }
 
@@ -26,9 +30,16 @@ func (ctrl *UsersController) Run() {
 	ctrl.Post("/register", ctrl.Register)
 	ctrl.Post("/register/invite", ctrl.RegisterInvite)
 	ctrl.Post("/invite", ctrl.CreateInvite)
+	ctrl.Post("/{id}/accounts/save", ctrl.SaveAccount)
+	ctrl.Post("/{id}/save/profile", ctrl.SaveProfile)
+
+	ctrl.Put("/{id}/change/password", ctrl.ChangePassword)
+	// ctrl.Put("/{id}/change/email", ctrl.ChangeEmail)
+
 	ctrl.Get("/{id}/accounts", ctrl.GetAccounts)
 	ctrl.Get("/{id}/accounts/{account_id}", ctrl.GetAccount)
 	ctrl.Get("/{id}/avatars", ctrl.GetAvatar)
+
 }
 
 // Default CRUD routes
@@ -207,3 +218,113 @@ func (ctrl *UsersController) Update(ctx *rest.Context) {
 
 	ctx.JsonResponse(http.StatusOK, user)
 }
+
+func (ctrl *UsersController) SaveAccount(ctx *rest.Context) {
+	fmt.Println("UsersController.SaveAccount")
+	userID := ctx.GetID()
+
+	var record models.Account
+	err := ctx.JsonDecode(&record)
+	if err != nil {
+		ctx.SetStatus(http.StatusBadRequest)
+		return
+	}
+
+	record.UserID = userID
+	account, err := ctrl.User.SaveAccount(record)
+	if err != nil {
+		ctx.SetStatus(http.StatusInternalServerError)
+		return
+	}
+
+	ctx.JsonResponse(http.StatusOK, account)
+}
+
+func (ctrl *UsersController) SaveProfile(ctx *rest.Context) {
+	fmt.Println("UsersController.SaveProfile")
+	userID := ctx.GetID()
+
+	var reqData struct {
+		AccountID uint   `json:"account_id,omitempty"`
+		Username  string `json:"username"`
+		FirstName string `json:"first_name,omitempty"`
+		LastName  string `json:"last_name,omitempty"`
+		Email     string `json:"email,omitempty"`
+	}
+
+	err := ctx.JsonDecode(&reqData)
+	if err != nil {
+		ctx.SetStatus(http.StatusBadRequest)
+		return
+	}
+
+	account := models.Account{
+		UserID:    userID,
+		FirstName: reqData.FirstName,
+		LastName:  reqData.LastName,
+		Email:     reqData.Email,
+	}
+
+	account.ID = reqData.AccountID
+
+	_, err = ctrl.User.SaveAccount(account)
+	if err != nil {
+		ctx.SetStatus(http.StatusInternalServerError)
+		return
+	}
+
+	user := models.User{
+		Username: reqData.Username,
+	}
+
+	user.ID = userID
+
+	userRecord, err := ctrl.User.Update(user)
+	if err != nil {
+		ctx.SetStatus(http.StatusInternalServerError)
+		return
+	}
+
+	ctx.JsonResponse(http.StatusOK, userRecord)
+}
+
+func (ctrl *UsersController) ChangePassword(ctx *rest.Context) {
+	fmt.Println("UsersController.ChangePassword")
+	userID := ctx.GetID()
+
+	var reqData struct {
+		Password string `json:"password"`
+	}
+
+	err := ctx.JsonDecode(&reqData)
+	if err != nil {
+		ctx.SetStatus(http.StatusBadRequest)
+		return
+	}
+
+	user, err := ctrl.User.UpdatePassword(userID, reqData.Password)
+	if err != nil {
+		ctx.SetStatus(http.StatusInternalServerError)
+		return
+	}
+
+	ctx.JsonResponse(http.StatusOK, user)
+}
+
+// func (ctrl *UsersController) ChangeEmail(ctx *rest.Context) {
+// 	fmt.Println("UsersController.ChangeEmail")
+// 	userID := ctx.GetID()
+// 	var reqData struct {
+// 		AccountID uint   `json:"account_id"`
+// 		Email     string `json:"email"`
+// 	}
+
+// 	err := ctx.JsonDecode(&reqData)
+// 	if err != nil {
+// 		ctx.SetStatus(http.StatusBadRequest)
+// 		return
+// 	}
+
+// 	var account models.Account
+
+// }

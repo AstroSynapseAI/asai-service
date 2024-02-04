@@ -29,6 +29,7 @@ func (user *UsersRepository) Login(username string, password string) (models.Use
 
 	query := user.Repo.DB.Preload("Roles").Preload("Roles.Role")
 	query = query.Preload("Roles.Avatar")
+	query = query.Preload("Accounts")
 
 	err = query.First(&record, record.ID).Error
 	if err != nil {
@@ -116,6 +117,7 @@ func (user *UsersRepository) GetAll() ([]models.User, error) {
 	query := user.Repo.DB
 	query = query.Preload("Roles").Preload("Roles.Role")
 	query = query.Preload("Roles.Avatar")
+	query = query.Preload("Accounts")
 
 	err := query.Find(&records).Error
 	if err != nil {
@@ -201,9 +203,47 @@ func (user *UsersRepository) GenerateToken(n int) (string, error) {
 
 func (user *UsersRepository) Update(userData models.User) (models.User, error) {
 	result := user.Repo.DB.Save(&userData)
+
 	if result.Error != nil {
 		return models.User{}, result.Error
 	}
 
-	return userData, nil
+	var updatedUser models.User
+	query := user.Repo.DB.Preload("Roles").Preload("Roles.Role")
+	query = query.Preload("Roles.Avatar")
+	query = query.Preload("Accounts")
+	query = query.First(&updatedUser, userData.ID)
+
+	if query.Error != nil {
+		return models.User{}, query.Error
+	}
+
+	return updatedUser, nil
+}
+
+func (user *UsersRepository) SaveAccount(accountData models.Account) (models.Account, error) {
+	result := user.Repo.DB.Save(&accountData)
+	if result.Error != nil {
+		return models.Account{}, result.Error
+	}
+
+	return accountData, nil
+
+}
+
+func (user *UsersRepository) UpdatePassword(userID uint, password string) (models.User, error) {
+	var record models.User
+	err := user.Repo.DB.Where("id = ?", userID).First(&record).Error
+	if err != nil {
+		return models.User{}, err
+	}
+
+	record.Password = password
+
+	_, err = user.Repo.Update(userID, record)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	return record, nil
 }

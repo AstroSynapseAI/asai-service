@@ -27,7 +27,7 @@ export const useAuthStore = defineStore({
           localStorage.setItem('user', JSON.stringify(user));
           return true
         }
-
+        return false
       } catch (error) {
         console.error(error);
         localStorage.removeItem('user');
@@ -44,6 +44,24 @@ export const useAuthStore = defineStore({
       try {
         const user = await fetchWrapper.post(`${usersURL}/invite`, reqBody);
         return user
+      } catch (error) {
+        console.error(error);
+        return false
+      }
+    },
+
+    async registerinvite(formData) {
+      try {
+        const user = await fetchWrapper.post(`${usersURL}/register/invite`, formData);
+        if (user) {
+          if (user.apiToken) {
+            this.apiToken = user.apiToken
+          }
+          this.isLogedIn = true
+          localStorage.setItem('user', JSON.stringify(user));
+          return true
+        }
+        return false
       } catch (error) {
         console.error(error);
         return false

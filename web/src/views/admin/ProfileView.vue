@@ -47,14 +47,18 @@ const confirmedPassword = () => {
 
 const saveUserInfo = async () => {
   try {
-    user.saveProfile({
-      ID: user.current.ID,
-      account_id: user.account.ID,
+    const profileData = {
       username: username.value,
       first_name: firstName.value,
       last_name: lastName.value,
       email: email.value
-    })
+    }
+
+    if (user.account) {
+      profileData.account_id = user.account.ID
+    }
+
+    user.saveProfile(user.current.ID, profileData)
   }
   catch (error) {
     console.error(error)
@@ -67,7 +71,7 @@ const updateEmail = async () => {
   }
 
   try {
-    user.saveProfile({
+    user.changeEmail(user.current.ID, {
       account_id: user.account.ID,
       email: email.value,
     })
@@ -83,8 +87,7 @@ const changePassword = async () => {
   }
 
   try {
-    user.saveProfile({
-      ID: user.current.ID,
+    user.changePassword(user.current.ID,{
       password: newPassword.value
     })
   }
@@ -157,7 +160,7 @@ onMounted(async () => {
 
           <hr>
 
-          <h3>Update Email</h3>
+          <!-- <h3>Update Email</h3>
 
           <div class="row">
             <div class="col-6">
@@ -179,7 +182,7 @@ onMounted(async () => {
             <div class="col-12">
               <button class="btn btn-primary float-end" @click="updateEmail">Update</button>
             </div>
-          </div>
+          </div> -->
           
          
 

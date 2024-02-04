@@ -71,29 +71,28 @@ export const useUserStore = defineStore({
       }
     }, 
 
-    async saveProfile(formData) {
-      if (formData.ID) {
-        try {
-          const user = await fetchWrapper.put(`${usersURL}/${formData.ID}/update`, formData);
-          localStorage.setItem('user', JSON.stringify(user));
-        } catch (error) {
-          console.error(error);
-        }
+    async saveProfile(user_id, formData) {
+      try {
+        const user = await fetchWrapper.post(`${usersURL}/${user_id}/save/profile`, formData);
+        localStorage.setItem('user', JSON.stringify(user));
+      } catch (error) {
+        console.error(error);
       }
+    }, 
 
-      if (formData.account_id) {
-        const accountData = {
-          ID: formData.account_id,
-          first_name: formData.first_name,
-          last_name: formData.last_name,
-          email: formData.email
-        } 
-        try {
-          const account = await fetchWrapper.put(`${apiUrl}/accounts/${formData.account_id}`, accountData);
-          this.account = account;
-        } catch (error) {
-          console.error(error);
-        }
+    async changeEmail(user_id, formData) {
+      try {
+        await fetchWrapper.put(`${usersURL}/${user_id}/change/email`, formData);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async changePassword(user_id, formData) {
+      try {
+        await fetchWrapper.put(`${usersURL}/${user_id}/change/password`, formData);
+      } catch (error) {
+        console.error(error);
       }
     }
   }
