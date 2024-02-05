@@ -1,3 +1,7 @@
 .DS_store
 keys.yaml
 tmp/
+.vscode/
+api-requests.http
+.air.toml
+
