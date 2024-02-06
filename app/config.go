@@ -91,7 +91,22 @@ func (cnf *Config) LoadEnvironment() {
 		return
 	}
 
+	if cnf.ENV == "AWS DEV" {
+		cnf.setupAWS()
+		return
+	}
+
 	fmt.Println("Unknown Environment")
+}
+
+func (cnf *Config) setupAWS() {
+	username := os.Getenv("RDS_USERNAME")
+	password := os.Getenv("RDS_PASSWORD")
+	database := os.Getenv("RDS_DB_NAME")
+	host := os.Getenv("RDS_HOST")
+	port := os.Getenv("RDS_PORT")
+
+	cnf.DSN = fmt.Sprintf("postgres://%s:%s@%s:%s/%s", username, password, host, port, database)
 }
 
 func (cnf *Config) setupHeroku() {
