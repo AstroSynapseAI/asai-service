@@ -3,12 +3,13 @@ import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth.store';
+import { Form, Field } from 'vee-validate';
 
+const route = useRoute();
 const auth = useAuthStore();
 const username = ref('');
 const password = ref('');
 const confirmPassword = ref('');
-
 
 const confirmedPassword = () => {
   if (password.value === confirmPassword.value) {
@@ -25,10 +26,10 @@ const register = async () => {
   }
 
   try {
-    const loggedIn = await auth.register({
+    const loggedIn = await auth.registerInvite({
       username: username.value,
       password: password.value,
-      invite_token: route.params.token
+      invite_token: route.params.invite_token
     })
 
     if (loggedIn) {
@@ -40,7 +41,17 @@ const register = async () => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  if (route.params.invite_token) {
+    try {
+      let user = await auth.getInvitedUser(route.params.invite_token);
+      console.log(user);
+      username.value = user.username;
+    }
+    catch (error) {
+      console.log(error);
+    }
+  }
   feather.replace();
 });
 
@@ -75,11 +86,11 @@ onMounted(() => {
         <div class="card">
           <div class="card-body">
             
-            <Form class="form-control" @submit="submitLogin">
+            <Form class="form-control" @submit="register">
               <Field v-model="username" id="Email" name="Username" type="email" class="email-input d-block" placeholder="Username"></Field>
               <Field v-model="password" id="Password" name="Password" type="password" class="pass-input d-block" placeholder="Password"></Field>
               <Field v-model="confirmPassword" id="confirmPassword" name="confirmPassword" type="password" class="pass-input d-block" placeholder="Confirm Password"></Field>
-              <button class="send-button btn btn-light" @click="register"> REGISTER </button>
+              <button class="send-button btn btn-light"> REGISTER </button>
           </Form>
             
           </div>

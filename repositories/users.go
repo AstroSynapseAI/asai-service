@@ -89,8 +89,8 @@ func (user *UsersRepository) ConfirmInvite(username string, password string, tok
 		return models.User{}, fmt.Errorf("invalid invite token")
 	}
 
-	_, err = user.GetByUsername(username)
-	if err == nil {
+	existingUser, err := user.GetByUsername(username)
+	if err == nil && existingUser.ID != invitedUser.ID {
 		return models.User{}, fmt.Errorf("user already exists")
 	}
 

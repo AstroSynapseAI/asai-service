@@ -39,6 +39,7 @@ func (ctrl *UsersController) Run() {
 	ctrl.Get("/{id}/accounts", ctrl.GetAccounts)
 	ctrl.Get("/{id}/accounts/{account_id}", ctrl.GetAccount)
 	ctrl.Get("/{id}/avatars", ctrl.GetAvatar)
+	ctrl.Get("/invited/{token}", ctrl.GetInvitedUser)
 
 }
 
@@ -61,6 +62,23 @@ func (ctrl *UsersController) Read(ctx *rest.Context) {
 		ctx.SetStatus(http.StatusInternalServerError)
 		return
 	}
+	ctx.JsonResponse(http.StatusOK, user)
+}
+
+func (ctrl *UsersController) GetInvitedUser(ctx *rest.Context) {
+	fmt.Println("Fetching user")
+	inviteToken := ctx.GetParam("token")
+	if inviteToken == "" {
+		ctx.SetStatus(http.StatusBadRequest)
+		return
+	}
+
+	user, err := ctrl.User.GetByInviteToken(inviteToken)
+	if err != nil {
+		ctx.SetStatus(http.StatusInternalServerError)
+		return
+	}
+
 	ctx.JsonResponse(http.StatusOK, user)
 }
 
@@ -90,13 +108,12 @@ func (ctrl *UsersController) CreateInvite(ctx *rest.Context) {
 
 // register invited user
 func (ctrl *UsersController) RegisterInvite(ctx *rest.Context) {
+	fmt.Println("UsersController.RegisterInvite")
 	var reqData struct {
 		Username    string `json:"username"`
 		Password    string `json:"password"`
 		InviteToken string `json:"invite_token"`
 	}
-
-	fmt.Println("Register invite token: ")
 
 	err := ctx.JsonDecode(&reqData)
 	if err != nil {

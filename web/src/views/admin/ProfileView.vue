@@ -182,11 +182,9 @@ onMounted(async () => {
             <div class="col-12">
               <button class="btn btn-primary float-end" @click="updateEmail">Update</button>
             </div>
-          </div> -->
-          
-         
+          </div>
 
-          <hr>
+          <hr> -->
 
           <h3>Change Password</h3>
 
