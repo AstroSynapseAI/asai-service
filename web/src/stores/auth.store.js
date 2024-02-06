@@ -50,7 +50,17 @@ export const useAuthStore = defineStore({
       }
     },
 
-    async registerinvite(formData) {
+    async getInvitedUser(inviteToken) {
+      try {
+        const user = await fetchWrapper.get(`${usersURL}/invited/${inviteToken}`);
+        return user
+      } catch (error) {
+        console.error(error);
+        return false
+      }
+    },
+
+    async registerInvite(formData) {
       try {
         const user = await fetchWrapper.post(`${usersURL}/register/invite`, formData);
         if (user) {
