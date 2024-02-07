@@ -14,7 +14,6 @@ import (
 
 type DiscordController struct {
 	db          *database.Database
-	asaiChain   *chains.AsaiChain
 	WelcomeChID string
 	ClientType  string
 }
@@ -26,31 +25,25 @@ func NewDiscordController(db *database.Database) *DiscordController {
 		ClientType:  "Discord",
 	}
 
-	asaiConfig := engine.NewConfig(db)
-	asaiChain, err := chains.NewAsaiChain(asaiConfig)
-	if err != nil {
-		fmt.Println("Failed to initate socket:", err)
-		return nil
-	}
-
-	ctrl.asaiChain = asaiChain
-	ctrl.asaiChain.SetClientType(ctrl.ClientType)
-
 	return ctrl
 }
 
 func (ctrl *DiscordController) MsgHandler(session *discordgo.Session, msg *discordgo.MessageCreate) {
+	asaiChain, err := chains.NewAsaiChain(engine.NewConfig(ctrl.db))
+	if err != nil {
+		fmt.Println("Failed to initate asai chain:", err)
+		return
+	}
+
 	if msg.Author.ID == session.State.User.ID {
 		return
 	}
 
-	sessionID := msg.Author.ID
-	userPrompt := msg.Content
+	avatarID := uint(1) //tmp hardcoded need to find a way to have a refernce for each plugin to know what avatar is connected to it
+	asaiChain.LoadAvatar(avatarID, msg.Author.ID, ctrl.ClientType)
 
 	if strings.Contains(msg.Content, "@"+session.State.User.ID) {
-		ctrl.asaiChain.SetSessionID(sessionID)
-
-		response, err := ctrl.asaiChain.Prompt(context.Background(), userPrompt)
+		response, err := asaiChain.Prompt(context.Background(), msg.Content)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -61,18 +54,21 @@ func (ctrl *DiscordController) MsgHandler(session *discordgo.Session, msg *disco
 }
 
 func (ctrl *DiscordController) NewMemberHandler(session *discordgo.Session, addEvent *discordgo.GuildMemberAdd) {
-	sessionID := addEvent.User.ID
-	userName := addEvent.User.Username
+	// Stoping this for now, need to implement it properly
 
-	ctrl.asaiChain.SetSessionID(sessionID)
+	// asaiChain, err := chains.NewAsaiChain(engine.NewConfig(ctrl.db))
+	// if err != nil {
+	// 	fmt.Println("Failed to initate asai chain:", err)
+	// 	return
+	// }
 
-	userPrompt := fmt.Sprintf("New user, %s (%s), has joined the server.", userName, sessionID)
+	// userPrompt := fmt.Sprintf("New user, %s (%s), has joined the server.", userName, sessionID)
 
-	response, err := ctrl.asaiChain.Prompt(context.Background(), userPrompt)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	// response, err := ctrl.asaiChain.Prompt(context.Background(), userPrompt)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
 
-	_, _ = session.ChannelMessageSend(ctrl.WelcomeChID, response)
+	// _, _ = session.ChannelMessageSend(ctrl.WelcomeChID, response)
 }

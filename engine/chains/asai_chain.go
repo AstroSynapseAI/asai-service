@@ -7,12 +7,9 @@ import (
 	"time"
 
 	"github.com/AstroSynapseAI/app-service/engine"
-	"github.com/AstroSynapseAI/app-service/engine/agents/browser"
-	"github.com/AstroSynapseAI/app-service/engine/agents/search"
 	"github.com/AstroSynapseAI/app-service/engine/callbacks"
 	"github.com/AstroSynapseAI/app-service/engine/memory"
 	"github.com/AstroSynapseAI/app-service/engine/templates"
-	"github.com/AstroSynapseAI/app-service/engine/tools/documents"
 
 	asaiTools "github.com/AstroSynapseAI/app-service/engine/tools"
 
@@ -25,6 +22,9 @@ import (
 	"github.com/tmc/langchaingo/tools"
 )
 
+// Prompt for intializing conversation
+const InitiativePrompt = "New user, has connected."
+
 type AsaiChain struct {
 	LLM        llms.LanguageModel
 	Memory     *memory.AsaiMemory
@@ -36,42 +36,54 @@ type AsaiChain struct {
 
 func NewAsaiChain(config engine.AvatarConfig) (*AsaiChain, error) {
 	asaiMemory := memory.NewMemory(config)
-
-	// create search agent
-	searchAgent, err := search.NewSearchAgent()
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-
-	// create browser agent
-	scraperAgent, err := browser.New()
-	if err != nil {
-		return nil, err
-	}
-
-	// create library agent
-	// currently using a simple tool for extracting documents
-	libraryAgent, err := documents.NewLoader()
-	if err != nil {
-		return nil, err
-	}
-
-	return &AsaiChain{
-		LLM:    config.GetAvatarLLM(),
+	asaiChain := &AsaiChain{
 		Memory: asaiMemory,
 		config: config,
-		Agents: []tools.Tool{
-			searchAgent,
-			scraperAgent,
-			libraryAgent,
-		},
-	}, nil
+		Agents: []tools.Tool{},
+	}
+	return asaiChain, nil
+
+	// create search agent
+	// searchAgent, err := search.NewSearchAgent()
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return nil, err
+	// }
+
+	// // create browser agent
+	// scraperAgent, err := browser.New()
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// // create library agent
+	// // currently using a simple tool for extracting documents
+	// libraryAgent, err := documents.NewLoader()
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// return &AsaiChain{
+	// 	LLM:    config.GetAvatarLLM(),
+	// 	Memory: asaiMemory,
+	// 	config: config,
+	// 	Agents: []tools.Tool{
+	// 		searchAgent,
+	// 		scraperAgent,
+	// 		libraryAgent,
+	// 	},
+	// }, nil
 }
 
-func (chain *AsaiChain) LoadAvatar(userID uint, sessionID string) {
+func (chain *AsaiChain) LoadAvatar(userID uint, sessionID string, clientType string) {
 	chain.Memory.SetSessionID(sessionID)
 	chain.config.LoadConfig(userID)
+	chain.LLM = chain.config.GetAvatarLLM()
+	chain.ClientType = clientType
+}
+
+func (chain *AsaiChain) SetStream(stream func(context.Context, []byte)) {
+	chain.Stream = stream
 }
 
 func (chain *AsaiChain) SetSessionID(id string) {
@@ -128,6 +140,10 @@ func (chain *AsaiChain) Run(ctx context.Context, input string, options ...chains
 
 	// need to try this might be I initally loaded the prompt option wrong in the Executor
 	// asaiAgent := agents.NewConversationalAgent(llm, chain.Agents, agents.WithPrompt(promptTmplt))
+
+	if input == "new user connected" {
+		input = InitiativePrompt
+	}
 
 	agentCallback := callbacks.NewStreamHandler()
 	agentCallback.ReadFromEgress(ctx, chain.Stream)
