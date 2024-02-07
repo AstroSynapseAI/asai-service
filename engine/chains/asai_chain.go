@@ -69,6 +69,11 @@ func NewAsaiChain(config engine.AvatarConfig) (*AsaiChain, error) {
 	}, nil
 }
 
+func (chain *AsaiChain) LoadAvatar(userID uint, sessionID string) {
+	chain.Memory.SetSessionID(sessionID)
+	chain.config.LoadConfig(userID)
+}
+
 func (chain *AsaiChain) SetSessionID(id string) {
 	chain.Memory.SetSessionID(id)
 }

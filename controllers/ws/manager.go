@@ -41,6 +41,7 @@ func (m *Manager) Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	asaiConfig := engine.NewConfig(m.db)
+
 	asaiChain, err := chains.NewAsaiChain(asaiConfig)
 	if err != nil {
 		fmt.Println("Failed to initate socket:", err)
