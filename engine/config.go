@@ -3,13 +3,16 @@ package engine
 import (
 	"fmt"
 
+	"github.com/AstroSynapseAI/app-service/models"
+	"github.com/AstroSynapseAI/app-service/repositories"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/llms/openai"
 )
 
 type Config struct {
-	DB *database.Database
+	DB     *database.Database
+	Avatar *models.Avatar
 }
 
 var _ AvatarConfig = (*Config)(nil)
@@ -20,25 +23,46 @@ func NewConfig(db *database.Database) *Config {
 	}
 }
 
+func (cnf *Config) LoadConfig(userID uint) {
+	repo := repositories.NewUsersRepository(cnf.DB)
+
+	avatar, err := repo.GetUserAvatar(userID)
+	if err != nil {
+		fmt.Println("Error loading avatar:", err)
+		return
+	}
+
+	cnf.Avatar = &avatar
+
+}
+
 func (cnf *Config) GetDB() *database.Database {
 	return cnf.DB
 }
 
 func (cnf *Config) GetAvatarLLM() llms.LanguageModel {
-	LLM, err := openai.NewChat(openai.WithModel("gpt-4"))
-	if err != nil {
-		fmt.Println("Error creating default LLM:", err)
+	avatarLLM := cnf.Avatar.LLM
+
+	switch avatarLLM.Slug {
+	case "gpt-4":
+		LLM, err := openai.NewChat(openai.WithModel("gpt-4"))
+		if err != nil {
+			fmt.Println("Error setting gpt-4:", err)
+			return nil
+		}
+		return LLM
+	default:
+		fmt.Println("Unknown LLM:", avatarLLM)
 		return nil
 	}
-	return LLM
 }
 
 func (cnf *Config) GetAvatarName() string {
-	return "Asai"
+	return cnf.Avatar.Name
 }
 
 func (cnf *Config) GetAvatarPrimer() string {
-	return ""
+	return cnf.Avatar.Primer
 }
 
 func (cnf *Config) GetAvatarMemorySize() int {
@@ -46,7 +70,7 @@ func (cnf *Config) GetAvatarMemorySize() int {
 }
 
 func (cnf *Config) AvatarIsPublic() bool {
-	return true
+	return cnf.Avatar.IsPublic
 }
 
 func (cnf *Config) GetAgents() []AgentConfig {

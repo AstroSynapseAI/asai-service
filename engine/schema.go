@@ -6,6 +6,7 @@ import (
 )
 
 type AvatarConfig interface {
+	LoadConfig(userID uint)
 	GetDB() *database.Database
 	GetAvatarName() string
 	GetAvatarLLM() llms.LanguageModel
