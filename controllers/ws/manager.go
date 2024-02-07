@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/AstroSynapseAI/app-service/engine"
-	"github.com/AstroSynapseAI/app-service/engine/chains"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/gorilla/websocket"
 )
@@ -40,15 +38,7 @@ func (m *Manager) Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	asaiConfig := engine.NewConfig(m.db)
-
-	asaiChain, err := chains.NewAsaiChain(asaiConfig)
-	if err != nil {
-		fmt.Println("Failed to initate socket:", err)
-		return
-	}
-
-	client := NewClient(conn, m, asaiChain)
+	client := NewClient(conn, m)
 	m.addClient(client)
 
 	ctx := context.Background()
@@ -56,7 +46,6 @@ func (m *Manager) Handler(w http.ResponseWriter, r *http.Request) {
 	go client.MaintainConnection(ctx)
 	go client.ReadMsgs(ctx)
 	go client.SendMsgs(ctx)
-
 }
 
 func (m *Manager) addClient(client *Client) {

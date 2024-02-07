@@ -7,6 +7,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/AstroSynapseAI/app-service/engine"
 	"github.com/AstroSynapseAI/app-service/engine/chains"
 	"github.com/gorilla/websocket"
 )
@@ -19,24 +20,20 @@ var (
 	// The reason why it has to be less than PingRequency is becuase otherwise it will
 	// send a new Ping before getting response
 	pingInterval = (pongWait * 9) / 10
-	// Prompt for intializing conversation
-	InitiativePrompt = "New user, has connected."
 )
 
 type Client struct {
-	sessionID  string
 	egress     chan []byte
 	connection *websocket.Conn
 	manager    *Manager
 	asaiChain  *chains.AsaiChain
 }
 
-func NewClient(conn *websocket.Conn, manager *Manager, chain *chains.AsaiChain) *Client {
+func NewClient(conn *websocket.Conn, manager *Manager) *Client {
 	return &Client{
 		egress:     make(chan []byte),
 		connection: conn,
 		manager:    manager,
-		asaiChain:  chain,
 	}
 }
 
@@ -91,7 +88,8 @@ func (client *Client) ReadMsgs(ctx context.Context) {
 		}
 
 		var request struct {
-			SessionId  string `json:"session_id"`
+			AvatarID   uint   `json:"avatar_id"`
+			SessionID  string `json:"session_id"`
 			UserPrompt string `json:"user_prompt"`
 		}
 
@@ -100,22 +98,23 @@ func (client *Client) ReadMsgs(ctx context.Context) {
 			break
 		}
 
-		client.sessionID = request.SessionId
+		asaiConfig := engine.NewConfig(client.manager.db)
+		asaiChain, err := chains.NewAsaiChain(asaiConfig)
+		if err != nil {
+			fmt.Println("Failed to initate asai chain:", err)
+			return
+		}
 
-		client.asaiChain.SetSessionID(request.SessionId)
-		client.asaiChain.SetClientType("Web Browser")
+		asaiChain.LoadAvatar(request.AvatarID, request.SessionID, "Web Browser")
 
-		client.asaiChain.Stream = func(ctx context.Context, chunk []byte) {
+		asaiChain.SetStream(func(ctx context.Context, chunk []byte) {
 			client.egress <- chunk
-		}
-
-		if request.UserPrompt == "new user connected" {
-			request.UserPrompt = InitiativePrompt
-		}
+		})
 
 		go func() {
 			if err = client.asaiChain.Run(ctx, request.UserPrompt); err != nil {
 				fmt.Println("error Asai running chain: ", err)
+
 				// Send an error message
 				errMessage, _ := json.Marshal(map[string]string{
 					"step": "error",
@@ -140,7 +139,5 @@ func (client *Client) SendMsgs(ctx context.Context) {
 			fmt.Println("Sending message failed:", err)
 			return
 		}
-
-		// fmt.Println("Msg sent...")
 	}
 }

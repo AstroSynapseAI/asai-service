@@ -23,17 +23,16 @@ func NewConfig(db *database.Database) *Config {
 	}
 }
 
-func (cnf *Config) LoadConfig(userID uint) {
-	repo := repositories.NewUsersRepository(cnf.DB)
+func (cnf *Config) LoadConfig(avatarID uint) {
+	avatars := repositories.NewAvatarsRepository(cnf.DB)
 
-	avatar, err := repo.GetUserAvatar(userID)
+	avatar, err := avatars.Repo.Read(avatarID)
 	if err != nil {
 		fmt.Println("Error loading avatar:", err)
 		return
 	}
 
 	cnf.Avatar = &avatar
-
 }
 
 func (cnf *Config) GetDB() *database.Database {
