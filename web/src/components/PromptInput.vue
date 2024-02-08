@@ -41,6 +41,8 @@ function submitPrompt(event, resetForm) {
       prompt: prompt.value,
     }
 
+    console.log("Prompt:", prompt.value);
+
     chatStore.sendPrompt(payload);
     event.target.style.height = 'auto';
     resetForm();

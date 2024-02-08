@@ -128,6 +128,8 @@ export const useChatStore = defineStore({
     },
 
     async sendPrompt(payload) {      
+      console.log("Sending prompt:", payload);
+
       var userMsg = {
         sender: "human",
         content: payload.prompt
