@@ -32,6 +32,7 @@ async function scrollToBottom() {
 }
 
 watch(messages, () => {
+  console.log("Messages updated", messages.value);
   scrollToBottom();
 });
 
