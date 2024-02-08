@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 	"sync"
 
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
@@ -11,7 +12,6 @@ import (
 )
 
 var websocketUpgrader = websocket.Upgrader{
-	// CheckOrigin:     checkOrigin,
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 }
@@ -32,6 +32,12 @@ func NewManager(db *database.Database) *Manager {
 }
 
 func (m *Manager) Handler(w http.ResponseWriter, r *http.Request) {
+	if os.Getenv("ENVIRONMENT") == "LOCAL DEV" {
+		websocketUpgrader.CheckOrigin = func(r *http.Request) bool {
+			return r.Header.Get("Origin") == "http://localhost:5173"
+		}
+	}
+
 	conn, err := websocketUpgrader.Upgrade(w, r, nil)
 	if err != nil {
 		fmt.Println("Failed to initate socket:", err)

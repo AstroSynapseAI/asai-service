@@ -2,6 +2,9 @@
 import { ref, onMounted, nextTick } from 'vue';
 import { Form, Field, useForm } from 'vee-validate';
 import { useChatStore } from '../stores/chat.store.js';
+import { useUserStore } from '../stores/user.store.js';
+
+const user = useUserStore();
 
 const chatStore = useChatStore();
 const prompt = ref("");
@@ -33,7 +36,12 @@ function addNewLines(event) {
 function submitPrompt(event, resetForm) {
   event.preventDefault();
   if (prompt.value.trim() !== '') {
-    chatStore.sendPrompt(prompt.value);
+    const payload = {
+      session_id: user.session_id,
+      prompt: prompt.value,
+    }
+
+    chatStore.sendPrompt(payload);
     event.target.style.height = 'auto';
     resetForm();
   }
