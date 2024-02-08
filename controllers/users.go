@@ -8,6 +8,7 @@ import (
 	"github.com/AstroSynapseAI/app-service/repositories"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/AstroSynapseAI/app-service/sdk/rest"
+	"github.com/thanhpk/randstr"
 
 	"github.com/AstroSynapseAI/app-service/sdk/crud/orms/gorm"
 )
@@ -40,6 +41,7 @@ func (ctrl *UsersController) Run() {
 	ctrl.Get("/{id}/accounts/{account_id}", ctrl.GetAccount)
 	ctrl.Get("/{id}/avatars", ctrl.GetAvatar)
 	ctrl.Get("/invited/{token}", ctrl.GetInvitedUser)
+	ctrl.Get("/token", ctrl.GetToken)
 
 }
 
@@ -63,6 +65,19 @@ func (ctrl *UsersController) Read(ctx *rest.Context) {
 		return
 	}
 	ctx.JsonResponse(http.StatusOK, user)
+}
+
+func (ctrl *UsersController) GetToken(ctx *rest.Context) {
+	fmt.Println("UsersController.GetToken")
+	sessionToken := randstr.String(16)
+
+	var reponseJson struct {
+		Token string `json:"token"`
+	}
+
+	reponseJson.Token = sessionToken
+
+	ctx.JsonResponse(http.StatusOK, reponseJson)
 }
 
 func (ctrl *UsersController) GetInvitedUser(ctx *rest.Context) {

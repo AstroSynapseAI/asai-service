@@ -10,6 +10,7 @@ export const useUserStore = defineStore({
   state: () => ({
     current: JSON.parse(localStorage.getItem('user')),
     avatar: JSON.parse(localStorage.getItem('avatar')),
+    session_id: localStorage.getItem('session_id'),
     account: {},
     record: {},
     records: [],
@@ -18,6 +19,15 @@ export const useUserStore = defineStore({
     isAdmin() {
       // return this.current.roles.some(role => role.permission === 'admin');
       return true;
+    },
+
+    async getSessionToken() {
+      try {
+        const session = await fetchWrapper.get(`${apiUrl}/users/token`);
+        localStorage.setItem('session_id', session.token);
+      } catch (error) {
+        console.error(error);
+      }
     },
 
     async getUsers() {
@@ -47,6 +57,7 @@ export const useUserStore = defineStore({
       }
     },
 
+    // legacy function
     async getSession() {
       console.log("Creating session...")
       const chatStore = useChatStore();

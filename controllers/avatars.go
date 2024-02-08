@@ -14,6 +14,7 @@ import (
 
 type AvatarsController struct {
 	rest.Controller
+	DB     *database.Database
 	Avatar *repositories.AvatarsRepository
 	Agent  *repositories.AgentsRepository
 	Plugin *repositories.PluginsRepository
@@ -24,6 +25,7 @@ type AvatarsController struct {
 
 func NewAvatarsController(db *database.Database) *AvatarsController {
 	return &AvatarsController{
+		DB:     db,
 		Avatar: repositories.NewAvatarsRepository(db),
 		Agent:  repositories.NewAgentsRepository(db),
 		Plugin: repositories.NewPluginsRepository(db),
@@ -50,6 +52,8 @@ func (ctrl *AvatarsController) Run() {
 
 	ctrl.Get("/{id}/documents", ctrl.GetDocuments)
 	ctrl.Get("/{id}/documents/{document_id}", ctrl.GetDocument)
+
+	ctrl.Get("/{id}/session/{session_id}", ctrl.GetSession)
 }
 
 // AVATARS
@@ -109,6 +113,21 @@ func (ctrl *AvatarsController) SaveAvatar(ctx *rest.Context) {
 	}
 
 	ctx.JsonResponse(http.StatusOK, record)
+}
+
+func (ctrl *AvatarsController) GetSession(ctx *rest.Context) {
+	fmt.Println("AvatarsController.GetSession")
+	sessionID := ctx.GetParam("session_id")
+
+	var history *models.ChatHistory
+
+	err := ctrl.DB.Adapter.Gorm().Where(models.ChatHistory{SessionID: sessionID}).Find(&history).Error
+	if err != nil {
+		ctx.SetStatus(http.StatusInternalServerError)
+		return
+	}
+
+	ctx.JsonResponse(http.StatusOK, history)
 }
 
 // ACTIVE AGENTS

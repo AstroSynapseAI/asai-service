@@ -4,6 +4,7 @@ import { useUserStore } from './user.store.js';
 
 const chatURL = `${import.meta.env.VITE_API_URL}/chat`;
 const wsURL = `${import.meta.env.VITE_WS_URL}/ws/chat`;
+const apiUrl = import.meta.env.VITE_API_URL;
 
 export const useChatStore = defineStore({
   id: 'chat',
@@ -126,19 +127,17 @@ export const useChatStore = defineStore({
       }
     },
 
-    async sendPrompt(content) {      
-      const userStore = useUserStore();
-
+    async sendPrompt(payload) {      
       var userMsg = {
         sender: "human",
-        content: content
+        content: payload.prompt
       }
 
       this.messages = [...this.messages, userMsg];
       
       const reqData = {
-        session_id: userStore.user.session_id,
-        user_prompt: content
+        session_id: payload.session_id,
+        user_prompt: payload.prompt
       }
 
       try {
@@ -148,6 +147,26 @@ export const useChatStore = defineStore({
         console.error("Failed to send prompt:", error);
       }
     },
+
+    async getPrivateSession(avatar_id, session_id) {
+      var responseMsgs = []
+      try {
+        console.log("Loading session...");
+        const session = await fetchWrapper.get(`${apiUrl}/avatars/${avatar_id}/session/${session_id}`);
+
+        for (var i = 0; i < session.length; i++) {
+          var msg = {
+            sender: session[i].type,
+            content: session[i].text
+          }
+          responseMsgs.push(msg)
+        }
+        this.messages = responseMsgs;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
     async loadHistory() {
       const userStore = useUserStore();
       const session_id = userStore.user.session_id;
