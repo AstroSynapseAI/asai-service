@@ -29,9 +29,6 @@ func NewRoutes(db *database.Database) *Routes {
 }
 
 func (routes *Routes) LoadRoutes(router *rest.Rest) {
-	//TMP API Controller
-	// routes.rest.Route("/api").MapController(controllers.NewApiController(routes.DB)).Init()
-
 	// CUSTOM CONTROLLERS
 	api := router.API()
 

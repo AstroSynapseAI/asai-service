@@ -100,7 +100,7 @@ onMounted(() => {
 <style scoped>
 .textarea-container {
   position: relative;
-  background-color: black;
+  background-color: transparent;
 }
 
 .loading {

@@ -75,14 +75,14 @@ onMounted(async () => {
                   <div class="conversation-item row" v-for="(message, index) in messages" :key="index">
                   
                     <div class="col-1">
-                      <img :src="require('../assets/asai-icon.png')" class="logo" alt="Avatar Icon" width="35" v-if="message.type === 'ai'"/>
-                      <img :src="require('../assets/user-icon.png')" class="logo" alt="User Icon" width="35" height="50" v-if="message.type === 'human'"/>
+                      <img src="../../assets/asai-icon.png" class="logo" alt="Avatar Icon" width="35" v-if="message.type === 'ai'"/>
+                      <img src="../../assets/user-icon.png" class="logo" alt="User Icon" width="35" height="50" v-if="message.type === 'human'"/>
                     </div>
                   
                     <div class="col-11">
                       <div v-if="message.isLoading">
-                        <p><span class="me-3">I'm thinking...  </span><span class="spinner mb-2 me-2"><img v-if="!message.isAgentRunnig" :src="require('../assets/loader.png')" alt=""></span></p>
-                        <p v-if="message.isAgentRunnig"><span class="me-3 fst-italic">Activating agent: {{ message.agentName }}...  </span><span class="spinner mb-2 me-2"><img :src="require('../assets/loader.png')" alt=""></span></p>
+                        <p><span class="me-3">I'm thinking...  </span><span class="spinner mb-2 me-2"><img v-if="!message.isAgentRunnig" src="../../assets/loader.png" alt=""></span></p>
+                        <p v-if="message.isAgentRunnig"><span class="me-3 fst-italic">Activating agent: {{ message.agentName }}...  </span><span class="spinner mb-2 me-2"><img src="../../assets/loader.png" alt=""></span></p>
                       </div>
                       
                       <div v-else class="message-content pe-3" v-html="md.render(message.content.trim())"></div>

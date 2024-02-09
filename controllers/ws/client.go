@@ -7,7 +7,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/AstroSynapseAI/app-service/engine"
 	"github.com/AstroSynapseAI/app-service/engine/chains"
 	"github.com/gorilla/websocket"
 )
@@ -34,6 +33,7 @@ func NewClient(conn *websocket.Conn, manager *Manager) *Client {
 		egress:     make(chan []byte),
 		connection: conn,
 		manager:    manager,
+		asaiChain:  chains.NewAsaiChain(manager.db),
 	}
 }
 
@@ -98,24 +98,9 @@ func (client *Client) ReadMsgs(ctx context.Context) {
 			break
 		}
 
-		asaiConfig := engine.NewConfig(client.manager.db)
-		asaiChain, err := chains.NewAsaiChain(asaiConfig)
-		if err != nil {
-			fmt.Println("Failed to initate asai chain:", err)
-			return
-		}
+		client.asaiChain.LoadAvatar(request.AvatarID, request.SessionID, "Web Browser")
 
-		printOut, err := json.MarshalIndent(request, "", "   ")
-		if err != nil {
-			fmt.Println("error marshalling the request object:", err)
-			break
-		}
-
-		fmt.Println("Formatted Request Payload: ", string(printOut))
-
-		asaiChain.LoadAvatar(request.AvatarID, request.SessionID, "Web Browser")
-
-		asaiChain.SetStream(func(ctx context.Context, chunk []byte) {
+		client.asaiChain.SetStream(func(ctx context.Context, chunk []byte) {
 			client.egress <- chunk
 		})
 
