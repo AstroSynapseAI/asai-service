@@ -42,7 +42,6 @@ func (cnf *Config) GetDB() *database.Database {
 func (cnf *Config) GetAvatarLLM() llms.LanguageModel {
 	avatarLLM := cnf.Avatar.LLM
 
-	fmt.Println("Avatar Name: ", avatarLLM.Name)
 	switch avatarLLM.Slug {
 	case "gpt-4":
 		LLM, err := openai.NewChat(openai.WithModel("gpt-4"))
@@ -58,10 +57,12 @@ func (cnf *Config) GetAvatarLLM() llms.LanguageModel {
 }
 
 func (cnf *Config) GetAvatarName() string {
+	fmt.Println("Avatar Name: ", cnf.Avatar.Name)
 	return cnf.Avatar.Name
 }
 
 func (cnf *Config) GetAvatarPrimer() string {
+	fmt.Println("Avatar Primer: ", cnf.Avatar.Primer)
 	return cnf.Avatar.Primer
 }
 

@@ -3,13 +3,13 @@ package chains
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/AstroSynapseAI/app-service/engine"
 	"github.com/AstroSynapseAI/app-service/engine/callbacks"
 	"github.com/AstroSynapseAI/app-service/engine/memory"
 	"github.com/AstroSynapseAI/app-service/engine/templates"
+	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 
 	asaiTools "github.com/AstroSynapseAI/app-service/engine/tools"
 
@@ -34,14 +34,14 @@ type AsaiChain struct {
 	config     engine.AvatarConfig
 }
 
-func NewAsaiChain(config engine.AvatarConfig) (*AsaiChain, error) {
+func NewAsaiChain(db *database.Database) *AsaiChain {
 	asaiChain := &AsaiChain{
-		config: config,
-		LLM:    llms.LanguageModel{},
+		config: engine.NewConfig(db),
 		Memory: &memory.AsaiMemory{},
 		Agents: []tools.Tool{},
 	}
-	return asaiChain, nil
+
+	return asaiChain
 
 	// create search agent
 	// searchAgent, err := search.NewSearchAgent()
@@ -141,19 +141,8 @@ func (chain *AsaiChain) Run(ctx context.Context, input string, options ...chains
 
 	// need to try this might be I initally loaded the prompt option wrong in the Executor
 	// asaiAgent := agents.NewConversationalAgent(llm, chain.Agents, agents.WithPrompt(promptTmplt))
-	if chain != nil {
-		fmt.Println("Chain is set!")
-	}
-	if chain.Stream != nil {
-		fmt.Println("Stream is set!")
-	}
-
-	if input == "new user connected" {
-		input = InitiativePrompt
-	}
 
 	agentCallback := callbacks.NewStreamHandler()
-
 	agentCallback.ReadFromEgress(ctx, chain.Stream)
 
 	asaiAgent := agents.NewConversationalAgent(
@@ -162,19 +151,7 @@ func (chain *AsaiChain) Run(ctx context.Context, input string, options ...chains
 		agents.WithCallbacksHandler(agentCallback),
 	)
 
-	obChain, err := NewOnboardingChain(chain.config, chain.Memory)
-	if err != nil {
-		return err
-	}
-
-	response, err := obChain.Call(ctx, input)
-	if err != nil {
-		return err
-	}
-
-	tmplt := chain.loadTemplate(map[string]interface{}{
-		"onboarding": response,
-	})
+	tmplt := chain.loadTemplate(map[string]interface{}{})
 
 	asaiAgent.Chain = chains.NewLLMChain(chain.LLM, tmplt)
 
@@ -186,7 +163,7 @@ func (chain *AsaiChain) Run(ctx context.Context, input string, options ...chains
 	)
 
 	// run the agent
-	_, err = chains.Run(ctx, executor, input, options...)
+	_, err := chains.Run(ctx, executor, input, options...)
 	if err != nil {
 		return err
 	}
@@ -196,19 +173,12 @@ func (chain *AsaiChain) Run(ctx context.Context, input string, options ...chains
 
 func (chain *AsaiChain) loadTemplate(values map[string]any) prompts.PromptTemplate {
 	// load Asai persona prompt template
-	template, err := templates.Load("persona.txt")
+	template, err := templates.Load("default_primer.txt")
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	script := ""
-	if values["onboarding"] == "Yes" {
-		tmplContent, err := os.ReadFile("./engine/documents/onboarding_script.txt")
-		if err != nil {
-			fmt.Println("Error reading onboarding script:", err)
-		}
-		script = string(tmplContent)
-	}
+	fmt.Println("Default Primer: ", template)
 
 	// create agent prompt template
 	return prompts.PromptTemplate{
@@ -216,12 +186,12 @@ func (chain *AsaiChain) loadTemplate(values map[string]any) prompts.PromptTempla
 		TemplateFormat: prompts.TemplateFormatGoTemplate,
 		InputVariables: []string{"input", "agent_scratchpad"},
 		PartialVariables: map[string]interface{}{
+			"avatar_name":        chain.config.GetAvatarName(),
+			"primer":             chain.config.GetAvatarPrimer(),
 			"agent_names":        asaiTools.Names(chain.Agents),
 			"agent_descriptions": asaiTools.Descriptions(chain.Agents),
 			"date":               time.Now().Format("January 02, 2006"),
 			"client_type":        chain.ClientType,
-			"onboarding":         values["onboarding"],
-			"script":             script,
 			"history":            "",
 		},
 	}

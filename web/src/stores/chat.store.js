@@ -105,6 +105,7 @@ export const useChatStore = defineStore({
       this.aiMsg.agentName = payload.agent;
     },
     onMessage(payload) {
+      console.log("Received message:", payload);
       if (this.aiMsg.isLoading) {
         this.aiMsg.isLoading = false;
       }
@@ -132,7 +133,7 @@ export const useChatStore = defineStore({
 
       var userMsg = {
         sender: "human",
-        content: payload.prompt
+        content: payload.msg
       }
 
       this.messages = [...this.messages, userMsg];

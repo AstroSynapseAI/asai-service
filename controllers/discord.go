@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/AstroSynapseAI/app-service/engine"
 	"github.com/AstroSynapseAI/app-service/engine/chains"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/bwmarrin/discordgo"
@@ -29,11 +28,7 @@ func NewDiscordController(db *database.Database) *DiscordController {
 }
 
 func (ctrl *DiscordController) MsgHandler(session *discordgo.Session, msg *discordgo.MessageCreate) {
-	asaiChain, err := chains.NewAsaiChain(engine.NewConfig(ctrl.db))
-	if err != nil {
-		fmt.Println("Failed to initate asai chain:", err)
-		return
-	}
+	asaiChain := chains.NewAsaiChain(ctrl.db)
 
 	if msg.Author.ID == session.State.User.ID {
 		return

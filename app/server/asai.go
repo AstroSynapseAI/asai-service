@@ -34,16 +34,16 @@ func NewAsaiServer() *AsaiServer {
 
 func (server *AsaiServer) Run(db *database.Database) error {
 	// Initialize the Discord client
-	discordCtrl := controllers.NewDiscordController(db)
-	server.discordClient.AddHandler(discordCtrl.MsgHandler)
-	server.discordClient.AddHandler(discordCtrl.NewMemberHandler)
-	server.discordClient.Identify.Intents = discordgo.IntentsGuildMessages
+	// discordCtrl := controllers.NewDiscordController(db)
+	// server.discordClient.AddHandler(discordCtrl.MsgHandler)
+	// server.discordClient.AddHandler(discordCtrl.NewMemberHandler)
+	// server.discordClient.Identify.Intents = discordgo.IntentsGuildMessages
 
-	err := server.discordClient.Open()
-	if err != nil {
-		fmt.Println("Failed to open Discord connection:", err)
-		return err
-	}
+	// err := server.discordClient.Open()
+	// if err != nil {
+	// 	fmt.Println("Failed to open Discord connection:", err)
+	// 	return err
+	// }
 
 	router := rest.NewRouter()
 	router.Mux.StrictSlash(true)
