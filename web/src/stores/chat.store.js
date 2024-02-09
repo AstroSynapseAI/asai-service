@@ -139,7 +139,8 @@ export const useChatStore = defineStore({
       
       const reqData = {
         session_id: payload.session_id,
-        user_prompt: payload.prompt
+        avatar_id: payload.avatar_id,
+        user_prompt: payload.msg
       }
 
       try {

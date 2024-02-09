@@ -105,6 +105,14 @@ func (client *Client) ReadMsgs(ctx context.Context) {
 			return
 		}
 
+		printOut, err := json.MarshalIndent(request, "", "   ")
+		if err != nil {
+			fmt.Println("error marshalling the request object:", err)
+			break
+		}
+
+		fmt.Println("Formatted Request Payload: ", string(printOut))
+
 		asaiChain.LoadAvatar(request.AvatarID, request.SessionID, "Web Browser")
 
 		asaiChain.SetStream(func(ctx context.Context, chunk []byte) {

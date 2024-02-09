@@ -38,10 +38,11 @@ function submitPrompt(event, resetForm) {
   if (prompt.value.trim() !== '') {
     const payload = {
       session_id: user.session_id,
-      prompt: prompt.value,
+      avatar_id: user.avatar.ID,
+      msg: prompt.value,
     }
 
-    console.log("Prompt:", prompt.value);
+    console.log("Prompt:", payload);
 
     chatStore.sendPrompt(payload);
     event.target.style.height = 'auto';
