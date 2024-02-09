@@ -50,6 +50,7 @@ func (m *AsaiMemory) GetSessionID() string {
 //
 //	None.
 func (m *AsaiMemory) SetSessionID(id string) {
+	fmt.Println("Session Id:", id)
 	m.chatHistory.SetSessionID(id)
 }
 

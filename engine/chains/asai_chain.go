@@ -35,10 +35,10 @@ type AsaiChain struct {
 }
 
 func NewAsaiChain(config engine.AvatarConfig) (*AsaiChain, error) {
-	asaiMemory := memory.NewMemory(config)
 	asaiChain := &AsaiChain{
-		Memory: asaiMemory,
 		config: config,
+		LLM:    llms.LanguageModel{},
+		Memory: &memory.AsaiMemory{},
 		Agents: []tools.Tool{},
 	}
 	return asaiChain, nil
@@ -76,10 +76,11 @@ func NewAsaiChain(config engine.AvatarConfig) (*AsaiChain, error) {
 }
 
 func (chain *AsaiChain) LoadAvatar(userID uint, sessionID string, clientType string) {
-	chain.Memory.SetSessionID(sessionID)
 	chain.config.LoadConfig(userID)
 	chain.LLM = chain.config.GetAvatarLLM()
 	chain.ClientType = clientType
+	chain.Memory = memory.NewMemory(chain.config)
+	chain.Memory.SetSessionID(sessionID)
 }
 
 func (chain *AsaiChain) SetStream(stream func(context.Context, []byte)) {
@@ -140,12 +141,19 @@ func (chain *AsaiChain) Run(ctx context.Context, input string, options ...chains
 
 	// need to try this might be I initally loaded the prompt option wrong in the Executor
 	// asaiAgent := agents.NewConversationalAgent(llm, chain.Agents, agents.WithPrompt(promptTmplt))
+	if chain != nil {
+		fmt.Println("Chain is set!")
+	}
+	if chain.Stream != nil {
+		fmt.Println("Stream is set!")
+	}
 
 	if input == "new user connected" {
 		input = InitiativePrompt
 	}
 
 	agentCallback := callbacks.NewStreamHandler()
+
 	agentCallback.ReadFromEgress(ctx, chain.Stream)
 
 	asaiAgent := agents.NewConversationalAgent(

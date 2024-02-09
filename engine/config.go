@@ -26,7 +26,7 @@ func NewConfig(db *database.Database) *Config {
 func (cnf *Config) LoadConfig(avatarID uint) {
 	avatars := repositories.NewAvatarsRepository(cnf.DB)
 
-	avatar, err := avatars.Repo.Read(avatarID)
+	avatar, err := avatars.Fetch(avatarID)
 	if err != nil {
 		fmt.Println("Error loading avatar:", err)
 		return
@@ -42,6 +42,7 @@ func (cnf *Config) GetDB() *database.Database {
 func (cnf *Config) GetAvatarLLM() llms.LanguageModel {
 	avatarLLM := cnf.Avatar.LLM
 
+	fmt.Println("Avatar Name: ", avatarLLM.Name)
 	switch avatarLLM.Slug {
 	case "gpt-4":
 		LLM, err := openai.NewChat(openai.WithModel("gpt-4"))
@@ -51,7 +52,7 @@ func (cnf *Config) GetAvatarLLM() llms.LanguageModel {
 		}
 		return LLM
 	default:
-		fmt.Println("Unknown LLM:", avatarLLM)
+		fmt.Println("Unknown LLM:", avatarLLM.Slug)
 		return nil
 	}
 }
