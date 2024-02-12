@@ -4,7 +4,7 @@ const adminRoutes = [
   {
     path: 'avatar/create',
     name: 'crete-avatar',
-    component: () => import('@/views/admin/HomeView.vue')
+    component: () => import('@/views/admin/CreateAvatarView.vue')
   },
   {
     path: 'avatar/:avatar_id',

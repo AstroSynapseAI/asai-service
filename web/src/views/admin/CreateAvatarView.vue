@@ -2,7 +2,38 @@
 import { ref, onMounted, toRef } from 'vue';
 import { Form, Field } from 'vee-validate';
 import { useLLMStore } from '@/stores/llm.store.js';
-import { useUserStore } from '@/stores/user.store.js';
+import { useAvatarStore } from '@/stores/avatar.store.js';
+
+// Initiate stores
+const llm = useLLMStore();
+const avatar = useAvatarStore();
+
+// Form data
+const avatarName = ref('');
+const avatarLLMID = ref('');
+const avatarPrimer = ref('');
+
+const llms = toRef(llm, 'records')
+
+const submitForm = () => {
+  const formData = {
+    name: avatarName.value,
+    llm: avatarLLMID.value,
+    primer: avatarPrimer.value,
+  }
+
+  avatar.saveAvatar(formData);
+}
+
+onMounted(async () => {
+  try {
+    await llm.getLLMs();
+  } catch (error) {
+    console.log(error);
+  }
+
+  feather.replace();
+});
 
 
 </script>
@@ -11,7 +42,7 @@ import { useUserStore } from '@/stores/user.store.js';
 
   <div class="container-fluid p-0">
 
-    <h1 class="h3 mb-3">Personality</h1>
+    <h1 class="h3 mb-3">Create your AI Avatar</h1>
 
     <div class="row">
       <div class="col-12">
@@ -45,6 +76,7 @@ import { useUserStore } from '@/stores/user.store.js';
                 <div class="col-12">
                   <h3>Primer</h3>
                   <Field
+                    v-model="avatarPrimer"
                     name="avatar-primer"
                     type="text"
                     as="textarea"
