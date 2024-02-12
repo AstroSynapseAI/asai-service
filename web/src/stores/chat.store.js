@@ -153,19 +153,23 @@ export const useChatStore = defineStore({
     },
 
     async getPrivateSession(avatar_id, session_id) {
+      console.log("Loading session...");
       var responseMsgs = []
       try {
         console.log("Loading session...");
-        const session = await fetchWrapper.get(`${apiUrl}/avatars/${avatar_id}/session/${session_id}`);
+        const histroy = await fetchWrapper.get(`${apiUrl}/avatars/${avatar_id}/session/${session_id}`);
 
-        for (var i = 0; i < session.length; i++) {
-          var msg = {
-            sender: session[i].type,
-            content: session[i].text
+        console.log("Session msgs:", histroy);
+        if (histroy) {
+          for (var i = 0; i < histroy.length; i++) {
+            var msg = {
+              sender: histroy[i].type,
+              content: histroy[i].text
+            }
+            responseMsgs.push(msg)
           }
-          responseMsgs.push(msg)
+          this.messages = responseMsgs;
         }
-        this.messages = responseMsgs;
       } catch (error) {
         console.error(error);
       }

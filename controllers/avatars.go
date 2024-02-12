@@ -127,7 +127,7 @@ func (ctrl *AvatarsController) GetSession(ctx *rest.Context) {
 		return
 	}
 
-	ctx.JsonResponse(http.StatusOK, history)
+	ctx.JsonResponse(http.StatusOK, history.ChatHistory)
 }
 
 // ACTIVE AGENTS

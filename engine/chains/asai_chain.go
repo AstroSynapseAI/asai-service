@@ -178,15 +178,12 @@ func (chain *AsaiChain) loadTemplate(values map[string]any) prompts.PromptTempla
 		fmt.Println(err)
 	}
 
-	fmt.Println("Default Primer: ", template)
-
 	// create agent prompt template
 	return prompts.PromptTemplate{
 		Template:       template,
 		TemplateFormat: prompts.TemplateFormatGoTemplate,
 		InputVariables: []string{"input", "agent_scratchpad"},
-		PartialVariables: map[string]interface{}{
-			"avatar_name":        chain.config.GetAvatarName(),
+		PartialVariables: map[string]interface{}{"avatar_name": chain.config.GetAvatarName(),
 			"primer":             chain.config.GetAvatarPrimer(),
 			"agent_names":        asaiTools.Names(chain.Agents),
 			"agent_descriptions": asaiTools.Descriptions(chain.Agents),
