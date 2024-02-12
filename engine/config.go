@@ -57,12 +57,10 @@ func (cnf *Config) GetAvatarLLM() llms.LanguageModel {
 }
 
 func (cnf *Config) GetAvatarName() string {
-	fmt.Println("Avatar Name: ", cnf.Avatar.Name)
 	return cnf.Avatar.Name
 }
 
 func (cnf *Config) GetAvatarPrimer() string {
-	fmt.Println("Avatar Primer: ", cnf.Avatar.Primer)
 	return cnf.Avatar.Primer
 }
 
