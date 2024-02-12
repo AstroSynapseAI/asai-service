@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, toRef } from 'vue';
+import { useRouter } from 'vue-router';
 import { Form, Field } from 'vee-validate';
 import { useLLMStore } from '@/stores/llm.store.js';
 import { useAvatarStore } from '@/stores/avatar.store.js';
@@ -7,6 +8,7 @@ import { useAvatarStore } from '@/stores/avatar.store.js';
 // Initiate stores
 const llm = useLLMStore();
 const avatar = useAvatarStore();
+const router = useRouter();
 
 // Form data
 const avatarName = ref('');
@@ -16,13 +18,19 @@ const avatarPrimer = ref('');
 const llms = toRef(llm, 'records')
 
 const submitForm = () => {
-  const formData = {
-    name: avatarName.value,
-    llm: avatarLLMID.value,
-    primer: avatarPrimer.value,
-  }
+  try {
+    const formData = {
+      name: avatarName.value,
+      llm: avatarLLMID.value,
+      primer: avatarPrimer.value,
+    }
 
-  avatar.saveAvatar(formData);
+    avatar.saveAvatar(formData);
+    router.push({name: 'personality', params: {avatar_id: avatar.userAvatar.ID}});
+  }
+  catch (error) {
+    console.log(error)
+  }
 }
 
 onMounted(async () => {
