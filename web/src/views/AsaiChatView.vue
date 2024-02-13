@@ -1,6 +1,4 @@
 <script setup>
-
-import PromptInput from '../components/PromptInput.vue';
 import { ref, onMounted, watch, nextTick, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import  MarkdownIt  from 'markdown-it';

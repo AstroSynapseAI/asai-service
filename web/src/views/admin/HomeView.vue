@@ -32,7 +32,6 @@ async function scrollToBottom() {
 }
 
 watch(messages, () => {
-  console.log("Messages updated", messages.value);
   scrollToBottom();
 });
 
@@ -59,16 +58,18 @@ onMounted(async () => {
 
 </script>
 
-<template>  
-  <div class="container-fluid p-0">
+``<template>
+  <div class="container-fluid">
     <h1 class="h3 mb-3">Avatar</h1>
     <div class="row">
       <div class="col-12">
         <div class="card">
           <div class="card-body">
-            <div class="container p-4 d-flex flex-column">
+            <div class="container d-flex flex-column">
+
               
-              <div ref="conversationContainer" class="conversation-container container-fluid flex-grow-1 overflow-auto">
+              
+              <div ref="conversationContainer" class="conversation-container flex-grow-1 overflow-auto">
                 
                 <template v-if="messages.length > 0">
                 
@@ -79,7 +80,7 @@ onMounted(async () => {
                       <img src="../../assets/user-icon.png" class="logo" alt="User Icon" width="35" height="50" v-if="message.type === 'human'"/>
                     </div>
                   
-                    <div class="col-11">
+                    <div class="col-10">
                       <div v-if="message.isLoading">
                         <p><span class="me-3">I'm thinking...  </span><span class="spinner mb-2 me-2"><img v-if="!message.isAgentRunnig" src="../../assets/loader.png" alt=""></span></p>
                         <p v-if="message.isAgentRunnig"><span class="me-3 fst-italic">Activating agent: {{ message.agentName }}...  </span><span class="spinner mb-2 me-2"><img src="../../assets/loader.png" alt=""></span></p>
@@ -119,6 +120,17 @@ main {
 }
 .container-fluid {
   color: white;
+}
+
+.conversation-container {
+  max-height: calc(90vh - 30px);
+  padding: 1.25rem;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+.conversation-container ::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+  padding: 1.5rem;
 }
 
 .card-body .container {
