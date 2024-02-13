@@ -156,10 +156,7 @@ export const useChatStore = defineStore({
       console.log("Loading session...");
       var responseMsgs = []
       try {
-        console.log("Loading session...");
         const histroy = await fetchWrapper.get(`${apiUrl}/avatars/${avatar_id}/session/${session_id}`);
-
-        console.log("Session msgs:", histroy);
         if (histroy) {
           for (var i = 0; i < histroy.length; i++) {
             var msg = {
