@@ -8,15 +8,13 @@ const usersURL = `${apiUrl}/users`;
 export const useUserStore = defineStore({
   id: 'users',
   state: () => ({
-    // current: JSON.parse(localStorage.getItem('user')),
-    avatar: JSON.parse(localStorage.getItem('avatar')),
-    // session_id: localStorage.getItem('session_id'),
     account: {},
     record: {},
     records: [],
   }),
   getters: {
     current: () => JSON.parse(localStorage.getItem('user')),
+    avatar: () => JSON.parse(localStorage.getItem('avatar')),
     session_id: () => localStorage.getItem('session_id'),
   },
   actions: {
@@ -42,7 +40,6 @@ export const useUserStore = defineStore({
       try {
         const avatar = await fetchWrapper.get(`${usersURL}/${user_id}/avatars`);
         localStorage.setItem('avatar', JSON.stringify(avatar));
-        this.avatar = avatar;
       } catch (error) {
         console.error(error);
       }
