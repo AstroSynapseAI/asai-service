@@ -2,11 +2,12 @@
 import { onMounted, computed } from 'vue';
 import { useUserStore } from '@/stores/user.store';
 
-let user = computed(() => useUserStore().current);
+let user = useUserStore();
 
-onMounted(() => {
+onMounted(() => {	
 	feather.replace()
-})
+});
+
 </script>
 
 <template>
@@ -16,15 +17,7 @@ onMounted(() => {
 				<span class="align-middle">AI Avatar</span>
 			</div>
 
-			<ul class="sidebar-nav" v-if="!user.avatar">
-				<li class="sidebar-item">
-					<router-link :to="{name: 'create-avatar'}" class="sidebar-link">
-						<i class="align-middle" data-feather="message-circle"></i> <span class="align-middle">Create Avatar</span>
-					</router-link>
-				</li>
-			</ul>
-
-			<ul class="sidebar-nav" v-else>
+			<ul class="sidebar-nav" v-if="user.avatar">
 
 				<li class="sidebar-item">
 					<router-link :to="{name: 'admin', params: { avatar_id: user.avatar?.ID }}" class="sidebar-link">
@@ -66,7 +59,15 @@ onMounted(() => {
 
 			</ul>
 
-			<ul class="sidebar-nav" v-if="user.is_admin">
+			<ul class="sidebar-nav" v-else>
+				<li class="sidebar-item">
+					<router-link :to="{name: 'create-avatar'}" class="sidebar-link">
+						<i class="align-middle" data-feather="message-circle"></i> <span class="align-middle">Create Avatar</span>
+					</router-link>
+				</li>
+			</ul>
+
+			<ul class="sidebar-nav" v-if="user.current.is_admin">
 				<li class="sidebar-header">Administration</li> 
 
 				<li class="sidebar-item">

@@ -7,10 +7,12 @@ const usersURL = `${import.meta.env.VITE_API_URL}/users`;
 export const useAuthStore = defineStore({
   id: 'auth',
   state: () => ({
-    currentUser: JSON.parse(localStorage.getItem('user')),
     isLogedIn: false,
     apiToken: null
   }),
+  getters: {
+    currentUser: () => JSON.parse(localStorage.getItem('user')),
+  },
   actions: {
    async login(username, password) {
       const reqBody = {
@@ -25,7 +27,6 @@ export const useAuthStore = defineStore({
           }
           this.isLogedIn = true
           localStorage.setItem('user', JSON.stringify(user));
-          this.currentUser = user
           return true
         }
         return false
@@ -81,6 +82,8 @@ export const useAuthStore = defineStore({
 
     logout() {
       localStorage.removeItem('user');
+      localStorage.removeItem('session_id');
+      localStorage.removeItem('avatar');
       this.isLogedIn = false
       this.apiToken = null
       router.push('/login');
