@@ -16,11 +16,6 @@ export const useUserStore = defineStore({
     records: [],
   }),
   actions: {
-    isAdmin() {
-      // return this.current.roles.some(role => role.permission === 'admin');
-      return true;
-    },
-
     async getSessionToken() {
       try {
         const session = await fetchWrapper.get(`${apiUrl}/users/token`);
