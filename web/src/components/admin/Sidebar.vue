@@ -1,8 +1,8 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, computed } from 'vue';
 import { useUserStore } from '@/stores/user.store';
 
-const user = useUserStore();
+let user = computed(() => useUserStore().current);
 
 onMounted(() => {
 	feather.replace()
@@ -12,9 +12,9 @@ onMounted(() => {
 <template>
   <nav id="sidebar" class="sidebar js-sidebar">
 		<div class="sidebar-content js-simplebar" data-simplebar="init">
-			<router-link :to="{name: 'admin', params: { avatar_id: user.avatar?.ID }}" class="sidebar-brand">
+			<div class="sidebar-brand">
 				<span class="align-middle">AI Avatar</span>
-			</router-link>
+			</div>
 
 			<ul class="sidebar-nav" v-if="!user.avatar">
 				<li class="sidebar-item">
