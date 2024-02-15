@@ -30,6 +30,8 @@ export const useAvatarStore = defineStore({
         }
 
         const userAvatar = await fetchWrapper.post(`${avatarsURL}/save`, avatar);
+        console.log("userAvatar", userAvatar);
+        localStorage.setItem('user', JSON.stringify(userAvatar));
         this.userAvatar = userAvatar;
 
       } catch (error) {

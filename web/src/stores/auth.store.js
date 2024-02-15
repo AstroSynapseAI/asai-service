@@ -25,6 +25,7 @@ export const useAuthStore = defineStore({
           }
           this.isLogedIn = true
           localStorage.setItem('user', JSON.stringify(user));
+          this.currentUser = user
           return true
         }
         return false
