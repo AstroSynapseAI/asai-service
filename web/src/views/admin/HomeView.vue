@@ -44,9 +44,10 @@ onMounted(async () => {
     if (!user.session_id) {
       // generate new token and session
       await user.getSessionToken();
+    } else {
+      // fetch the session messages
+      await chatStore.getPrivateSession(route.params.avatar_id, user.session_id);
     }
-    // fetch the session messages
-    await chatStore.getPrivateSession(route.params.avatar_id, user.session_id);
   }
   catch (error) {
     console.log(error);
@@ -140,4 +141,22 @@ main {
   background-color: #19232E !important;
   color: white !important;
 }
+
+@keyframes rotate {
+  0%    { transform: rotate(0deg); }
+  25%   { transform: rotate(90deg); }
+  50%   { transform: rotate(180deg); }
+  75%   { transform: rotate(270deg); }
+  100%  { transform: rotate(360deg); }
+}
+
+.spinner img {
+  display: inline-block;
+  vertical-align: middle;
+  transform-origin: 50% 50%;
+  animation: rotate 0.5s linear infinite;
+  height: 18px;
+  margin-bottom: 5px;
+}
+
 </style>
