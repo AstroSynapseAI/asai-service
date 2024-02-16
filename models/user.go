@@ -1,8 +1,6 @@
 package models
 
 import (
-	"database/sql"
-
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"gorm.io/gorm"
 )
@@ -13,18 +11,19 @@ type User struct {
 	Password    string       `json:"password,omitempty"`
 	ApiToken    string       `json:"api_token,omitempty"`
 	InviteToken string       `json:"invite_token,omitempty"`
+	IsAdmin     bool         `json:"is_admin,omitempty"`
 	Accounts    []Account    `json:"accounts,omitempty"`
 	Roles       []AvatarRole `gorm:"foreignKey:UserID;" json:"roles,omitempty"`
 }
 
 type AvatarRole struct {
 	gorm.Model
-	RoleID   sql.NullInt64 `json:"role_id,omitempty"`
-	UserID   sql.NullInt64 `json:"user_id,omitempty"`
-	AvatarID sql.NullInt64 `json:"avatar_id,omitempty"`
-	Role     Role          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"role,omitempty"`
-	User     User          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"user,omitempty"`
-	Avatar   Avatar        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"avatar,omitempty"`
+	RoleID   uint   `json:"role_id,omitempty"`
+	UserID   uint   `json:"user_id,omitempty"`
+	AvatarID uint   `json:"avatar_id,omitempty"`
+	Role     Role   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"role,omitempty"`
+	User     User   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"user,omitempty"`
+	Avatar   Avatar `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"avatar,omitempty"`
 }
 
 func (*User) SeedModel(db *database.Database) error {
@@ -38,6 +37,7 @@ func (*User) SeedModel(db *database.Database) error {
 				Password:    "admin_admin",
 				ApiToken:    "tmp_token_superadmin_123",
 				InviteToken: "",
+				IsAdmin:     true,
 			},
 		}
 

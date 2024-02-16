@@ -143,6 +143,7 @@ func (ctrl *UsersController) RegisterInvite(ctx *rest.Context) {
 	)
 
 	if err != nil {
+		fmt.Println(err)
 		ctx.SetStatus(http.StatusInternalServerError)
 		return
 	}

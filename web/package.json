@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "docker": "env-cmd -f .env.local vite build"
+    "docker": "env-cmd -f .env.docker vite build",
+    "heroku-dev": "env-cmd -f .env.dev vite build"
   },
   "dependencies": {
     "chart.js": "^4.4.0",

@@ -26,12 +26,6 @@ func (*Role) SeedModel(db *database.Database) error {
 				Description: "Owner Role for Avatar",
 				Permission:  "owner",
 			},
-			{
-				Name:        "Admin",
-				Slug:        "admin",
-				Description: "Platform Admin Role",
-				Permission:  "admin",
-			},
 		}
 
 		if result := db.Adapter.Gorm().Create(&roles); result.Error != nil {
