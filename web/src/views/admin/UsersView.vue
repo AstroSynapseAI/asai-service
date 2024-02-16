@@ -66,7 +66,7 @@ onMounted( async () => {
                   <label for="floatingInput">Username</label>
                 </div>
                 <p>Invite Link: </p>
-                <p><pre>https://asai.astrosynapse.ai/register/token/{{ inviteToken }}</pre></p>
+                <p><pre>https://asai.astrosynapse.ai/register/{{ inviteToken }}</pre></p>
               </div>
             </div>
           </div>
@@ -101,7 +101,7 @@ onMounted( async () => {
             <td>{{ avatarName(user.roles) }}</td>
             <td>{{ new Date().toLocaleDateString() }}</td>
             <td>{{ new Date().toLocaleDateString() }}</td>
-            <td><pre>https://asai.astrosynapse.ai/register/token/{{ user.invite_token }}</pre></td>
+            <td><pre>https://asai.astrosynapse.ai/register/{{ user.invite_token }}</pre></td>
             <td>Delete</td>
           </tr>
         </tbody>
