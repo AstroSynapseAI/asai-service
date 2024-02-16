@@ -94,6 +94,8 @@ func (user *UsersRepository) ConfirmInvite(username string, password string, tok
 		return models.User{}, fmt.Errorf("user already exists")
 	}
 
+	fmt.Println("username is not taken")
+
 	apiToken, err := user.GenerateToken(64)
 	if err != nil {
 		return models.User{}, err
@@ -103,7 +105,7 @@ func (user *UsersRepository) ConfirmInvite(username string, password string, tok
 	invitedUser.Password = password
 	invitedUser.ApiToken = apiToken
 
-	_, err = user.Repo.Update(invitedUser.ID, invitedUser)
+	err = user.Repo.DB.Save(invitedUser).Error
 	if err != nil {
 		return models.User{}, err
 	}

@@ -45,7 +45,6 @@ onMounted(async () => {
   if (route.params.invite_token) {
     try {
       let user = await auth.getInvitedUser(route.params.invite_token);
-      console.log(user);
       username.value = user.username;
     }
     catch (error) {
