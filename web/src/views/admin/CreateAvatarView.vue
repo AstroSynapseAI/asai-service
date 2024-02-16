@@ -17,16 +17,16 @@ const avatarPrimer = ref('');
 
 const llms = toRef(llm, 'records')
 
-const submitForm = () => {
+const submitForm =  async () => {
   try {
     const formData = {
       name: avatarName.value,
       llm: avatarLLMID.value,
       primer: avatarPrimer.value,
     }
-
-    avatar.saveAvatar(formData);
-    router.push({name: 'personality', params: {avatar_id: avatar.userAvatar.ID}});
+    await avatar.saveAvatar(formData);
+    await router.replace({name: 'personality', params: {avatar_id: avatar.userAvatar.ID}});
+    window.location.reload();
   }
   catch (error) {
     console.log(error)

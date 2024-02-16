@@ -1,30 +1,23 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, computed } from 'vue';
 import { useUserStore } from '@/stores/user.store';
 
-const user = useUserStore();
+let user = useUserStore();
 
-onMounted(() => {
+onMounted(() => {	
 	feather.replace()
-})
+});
+
 </script>
 
 <template>
   <nav id="sidebar" class="sidebar js-sidebar">
 		<div class="sidebar-content js-simplebar" data-simplebar="init">
-			<router-link :to="{name: 'admin', params: { avatar_id: user.avatar?.ID }}" class="sidebar-brand">
+			<div class="sidebar-brand">
 				<span class="align-middle">AI Avatar</span>
-			</router-link>
+			</div>
 
-			<ul class="sidebar-nav" v-if="!user.avatar">
-				<li class="sidebar-item">
-					<router-link :to="{name: 'create-avatar'}" class="sidebar-link">
-						<i class="align-middle" data-feather="message-circle"></i> <span class="align-middle">Create Avatar</span>
-					</router-link>
-				</li>
-			</ul>
-
-			<ul class="sidebar-nav" v-else>
+			<ul class="sidebar-nav" v-if="user.avatar">
 
 				<li class="sidebar-item">
 					<router-link :to="{name: 'admin', params: { avatar_id: user.avatar?.ID }}" class="sidebar-link">
@@ -64,57 +57,17 @@ onMounted(() => {
 					</router-link>
 				</li>
 
-				
-
-
-				<!-- <li class="sidebar-header">
-					Library
-					<span class="float-end">
-						<i data-feather="upload" class="align-middle ms-2"></i>
-					</span>
-				</li> -->
-
-
-				<!-- <li class="sidebar-item p-4">
-					<div class="container p-0">
-						<div class="card">
-							<div class="card-body p-0">
-								<ul class="list-group list-group-flush">
-									<li class="list-group-item px-0">
-										<i class="align-middle me-2" data-feather="file-text"></i>
-										welcome_script.txt
-										<i class="align-middle float-end text-danger" data-feather="trash-2"></i>
-									</li>
-									<li class="list-group-item px-0">
-										<i class="align-middle me-2" data-feather="file-text"></i>
-										impressum.txt
-										<i class="align-middle float-end text-danger" data-feather="trash-2"></i>
-									</li>
-									<li class="list-group-item px-0">
-										<i class="align-middle me-2" data-feather="file-text"></i>
-										Essay.pdf
-										<i class="align-middle float-end text-danger" data-feather="trash-2"></i>
-									</li>
-									<li class="list-group-item px-0">
-										<i class="align-middle me-2" data-feather="file-text"></i>
-										Finance.xls
-										<i class="align-middle float-end text-danger" data-feather="trash-2"></i>
-									</li>
-									<li class="list-group-item px-0">
-										<i class="align-middle me-2" data-feather="file-text"></i>
-										My Diary.pages
-										<i class="align-middle float-end text-danger" data-feather="trash-2"></i>
-									</li>
-								</ul>
-							</div>
-						</div>
-
-					</div>
-				</li> -->
-
 			</ul>
 
-			<ul class="sidebar-nav" v-if="user.isAdmin()">
+			<ul class="sidebar-nav" v-else>
+				<li class="sidebar-item">
+					<router-link :to="{name: 'create-avatar'}" class="sidebar-link">
+						<i class="align-middle" data-feather="message-circle"></i> <span class="align-middle">Create Avatar</span>
+					</router-link>
+				</li>
+			</ul>
+
+			<ul class="sidebar-nav" v-if="user.current.is_admin">
 				<li class="sidebar-header">Administration</li> 
 
 				<li class="sidebar-item">

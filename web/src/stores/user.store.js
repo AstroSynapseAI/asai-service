@@ -8,19 +8,16 @@ const usersURL = `${apiUrl}/users`;
 export const useUserStore = defineStore({
   id: 'users',
   state: () => ({
-    current: JSON.parse(localStorage.getItem('user')),
-    avatar: JSON.parse(localStorage.getItem('avatar')),
-    session_id: localStorage.getItem('session_id'),
     account: {},
     record: {},
     records: [],
   }),
+  getters: {
+    current: () => JSON.parse(localStorage.getItem('user')),
+    avatar: () => JSON.parse(localStorage.getItem('avatar')),
+    session_id: () => localStorage.getItem('session_id'),
+  },
   actions: {
-    isAdmin() {
-      // return this.current.roles.some(role => role.permission === 'admin');
-      return true;
-    },
-
     async getSessionToken() {
       try {
         const session = await fetchWrapper.get(`${apiUrl}/users/token`);

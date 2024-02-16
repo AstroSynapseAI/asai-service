@@ -1,11 +1,13 @@
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { onMounted } from 'vue';
 import { Form, Field, useForm } from 'vee-validate';
 import { useAuthStore } from '@/stores/auth.store.js'; 
 import { useUserStore } from '@/stores/user.store.js';
 const { handleSubmit } = useForm();
 
+const router = useRouter();
 const auth = useAuthStore();
 const user = useUserStore();
 
@@ -16,12 +18,12 @@ const submitLogin = handleSubmit(async values => {
   try {
     const loggedIn = await auth.login(username.value, password.value)
     if (loggedIn) {
-      await user.getUserAvatar(user.current.ID);
+      await user.getUserAvatar(auth.currentUser.ID);
       if (user.avatar) {
-        window.location.href = '/admin/avatar/' + user.avatar.ID;
+        router.push({name: 'admin', params: { avatar_id: user.avatar.ID }});
         return
       }
-      window.location.href = '/admin/avatar/create';
+      router.push({name: 'create-avatar'});
     }
     else {
       alert('Invalid username or password');

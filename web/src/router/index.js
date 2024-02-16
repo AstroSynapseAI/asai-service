@@ -39,12 +39,12 @@ const router = createRouter({
       meta: { requiresAuth: false },
       component: LoginView
     },
-    {
-      path: '/chat',
-      name: 'asai',
-      meta: { requiresAuth: false },
-      component: AsaiChatView
-    },
+    // {
+    //   path: '/chat',
+    //   name: 'asai',
+    //   meta: { requiresAuth: false },
+    //   component: AsaiChatView
+    // },
     { path: '/admin',
       component: AdminView,
       children: adminRoutes

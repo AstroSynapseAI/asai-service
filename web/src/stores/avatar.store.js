@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
-import { fetchWrapper } from '../helpers/fetch-wrapper.js';
+import { fetchWrapper } from '@/helpers/fetch-wrapper.js';
+import { useUserStore } from './user.store.js';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 const avatarsURL = `${apiUrl}/avatars`;
@@ -7,7 +8,6 @@ const avatarsURL = `${apiUrl}/avatars`;
 export const useAvatarStore = defineStore({
   id: 'avatar',
   state: () => ({
-    currentUser: JSON.parse(localStorage.getItem('user')),
     userAvatar: {},
     activeAgents: [],
     activeAgent: {},
@@ -20,16 +20,21 @@ export const useAvatarStore = defineStore({
   }),
   actions: {
     async saveAvatar(formData) {
+      let user = useUserStore();
       try {
         const avatar = {
-          user_id: this.currentUser.ID,
+          user_id: user.current.ID,
           avatar_name: formData.name,
           avatar_primer: formData.primer,
           avatar_llm_id: formData.llm,
-          avatar_id: formData.ID
+        }
+
+        if (formData.ID) {
+          avatar.avatar_id = formData.ID;
         }
 
         const userAvatar = await fetchWrapper.post(`${avatarsURL}/save`, avatar);
+        localStorage.setItem('avatar', JSON.stringify(userAvatar));
         this.userAvatar = userAvatar;
 
       } catch (error) {

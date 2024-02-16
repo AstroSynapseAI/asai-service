@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 const adminRoutes = [
   {
     path: 'avatar/create',
-    name: 'crete-avatar',
+    name: 'create-avatar',
     component: () => import('@/views/admin/CreateAvatarView.vue')
   },
   {
