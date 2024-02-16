@@ -82,7 +82,6 @@ export const useAuthStore = defineStore({
 
     logout() {
       localStorage.removeItem('user');
-      localStorage.removeItem('session_id');
       localStorage.removeItem('avatar');
       this.isLogedIn = false
       this.apiToken = null
