@@ -7,9 +7,11 @@ const auth = useAuthStore();
 
 const user = useUserStore();
 const usersRecords = toRef(user, 'records')
+
 const showModal = ref(false);
 const inviteUsername = ref("");
 const inviteToken = ref("");
+const hostname = ref(import.meta.env.VITE_API_URL)
 
 const avatarName = (roles) => {
   if (roles) {
@@ -66,7 +68,7 @@ onMounted( async () => {
                   <label for="floatingInput">Username</label>
                 </div>
                 <p>Invite Link: </p>
-                <p><pre>https://asai.astrosynapse.ai/register/{{ inviteToken }}</pre></p>
+                <p><pre>{{ hostname }}/register/{{ inviteToken }}</pre></p>
               </div>
             </div>
           </div>
@@ -101,7 +103,7 @@ onMounted( async () => {
             <td>{{ avatarName(user.roles) }}</td>
             <td>{{ new Date().toLocaleDateString() }}</td>
             <td>{{ new Date().toLocaleDateString() }}</td>
-            <td><pre>https://asai.astrosynapse.ai/register/{{ user.invite_token }}</pre></td>
+            <td><pre>{{ hostname }}/register/{{ user.invite_token }}</pre></td>
             <td>Delete</td>
           </tr>
         </tbody>
