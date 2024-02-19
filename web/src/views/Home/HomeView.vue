@@ -23,8 +23,8 @@ onMounted(() => {
 
               <div class="row">
                 <div class="col-auto">
-                  <router-link :to="{name: 'asai'}" target="_blank" class="btn text-white px-md-4 px-lg-5 px-sm-2">
-                    <!-- <img src="@/assets/ASAILogomark.svg" height="24" alt=""> -->
+                  <!-- <router-link :to="{name: 'asai'}" target="_blank" class="btn text-white px-md-4 px-lg-5 px-sm-2">
+                    <img src="@/assets/ASAILogomark.svg" height="24" alt="">
 
                     <svg class="asai-icon" height="24" viewBox="0 0 165 247" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <g clip-path="url(#clip0_1100_3274)">
@@ -41,7 +41,7 @@ onMounted(() => {
                     </svg>
 
                     <span class="ms-3">Talk to Asai</span>
-                  </router-link>
+                  </router-link> -->
                 </div>
                 <div class="col-auto">
                   <router-link :to="{name: 'about', hash: '#content'}" class="btn text-white px-md-5 px-sm-0">
