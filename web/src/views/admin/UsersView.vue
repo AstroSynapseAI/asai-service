@@ -11,7 +11,7 @@ const usersRecords = toRef(user, 'records')
 const showModal = ref(false);
 const inviteUsername = ref("");
 const inviteToken = ref("");
-const hostname = ref(import.meta.env.VITE_API_URL)
+const hostname = ref(import.meta.env.VITE_HOSTNAME);
 
 const avatarName = (roles) => {
   if (roles) {
