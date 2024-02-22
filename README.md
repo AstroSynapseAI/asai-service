@@ -28,7 +28,7 @@ To setup the environment make sure you have docker and docker-compose installed 
 docker compose run --rm app air init`
 ```
 
-After the first run you or if you don't want hot reloading, use:
+After the first run or if you don't want hot reloading, use:
 
 ```bash
 docker compose up
