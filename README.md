@@ -42,7 +42,7 @@ cd web
 yarn install
 ```
 
-Web client had CORS allowed to run alongised with the dockerised server. Run `yarn run dev` to run the web clinet on port 5173. If you need the front end to be serverd at the same port as the dockerised app service, you can run `yarn run docker` to build the front ned for runing in docker, now the forned is avaliable on por 8082.
+Web client has CORS allowed to run alongised with the dockerised server. Run `yarn run dev` to run the web clinet on port 5173 as usaul. If you need the front end to be serverd at the same port as the dockerised app service, you can run `yarn run docker` to build the front ned for runing in docker, now the frontend is avaliable on port 8082.
 
 ### API keys
 
