@@ -72,10 +72,6 @@ func (cnf *Config) AvatarIsPublic() bool {
 	return cnf.Avatar.IsPublic
 }
 
-func (cnf *Config) GetLLM() LLMConfig {
-	return nil
-}
-
 func (cnf *Config) GetAgents() []AgentConfig {
 	return nil
 }
