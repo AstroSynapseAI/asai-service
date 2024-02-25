@@ -73,7 +73,7 @@ func (cnf *Config) AvatarIsPublic() bool {
 }
 
 func (cnf *Config) GetLLM() LLMConfig {
-	return nil
+	return NewActiveLLM(cnf.DB)
 }
 
 func (cnf *Config) GetAgents() []AgentConfig {
@@ -86,4 +86,96 @@ func (cnf *Config) GetTools() []ToolConfig {
 
 func (cnf *Config) GetPlugins() []PluginConfig {
 	return nil
+}
+
+type ActiveLLM struct {
+	DB  *database.Database
+	LLM llms.LanguageModel
+}
+
+var _ LLMConfig = (*ActiveLLM)(nil)
+
+func NewActiveLLM(db *database.Database) *ActiveLLM {
+	return &ActiveLLM{
+		DB: db,
+	}
+}
+
+func (cnf *ActiveLLM) GetAPI() string {
+	return ""
+}
+
+func (cnf *ActiveLLM) GetToken() string {
+	return ""
+}
+
+type ActiveAgent struct {
+	DB          *database.Database
+	ActiveAgent *models.ActiveAgent
+}
+
+var _ AgentConfig = (*ActiveAgent)(nil)
+
+func NewActiveAgent(db *database.Database) *ActiveAgent {
+	return &ActiveAgent{
+		DB: db,
+	}
+}
+
+func (cnf *ActiveAgent) GetAgentName(agentID string) string {
+	return cnf.ActiveAgent.Agent.Name
+}
+
+func (cnf *ActiveAgent) GetAgentModel(agentID string) *llms.LLM {
+	return nil
+}
+
+func (cnf *ActiveAgent) GetAgentPrimer(agentID string) string {
+	return cnf.ActiveAgent.Primer
+}
+
+func (cnf *ActiveAgent) IsAgentPublic(agentID string) bool {
+	return cnf.ActiveAgent.IsPublic
+}
+
+func (cnf *ActiveAgent) IsAgentActive(agentID string) bool {
+	return cnf.ActiveAgent.IsActive
+}
+
+func (cnf *ActiveAgent) GetAgentTools(agentID string) []any {
+	return nil
+}
+
+type ActiveTool struct {
+}
+
+var _ ToolConfig = (*ActiveTool)(nil)
+
+func NewActiveTool() *ActiveTool {
+	return &ActiveTool{}
+}
+
+func (cnf *ActiveTool) GetName() string {
+	return ""
+}
+
+func (cnf *ActiveTool) GetToken() string {
+	return ""
+}
+
+type ActivePlugin struct {
+}
+
+var _ PluginConfig = (*ActivePlugin)(nil)
+
+func NewActivePlugin() *ActivePlugin {
+	return &ActivePlugin{}
+}
+
+func (cnf *ActivePlugin) GetName() string {
+	return ""
+}
+
+func (cnf *ActivePlugin) GetToken() string {
+	return ""
 }
