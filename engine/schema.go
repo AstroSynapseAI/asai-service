@@ -13,7 +13,6 @@ type AvatarConfig interface {
 	GetAvatarPrimer() string
 	GetAvatarMemorySize() int
 	AvatarIsPublic() bool
-	GetLLM() LLMConfig
 	GetAgents() []AgentConfig
 	GetTools() []ToolConfig
 	GetPlugins() []PluginConfig

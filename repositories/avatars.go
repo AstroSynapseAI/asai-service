@@ -75,6 +75,7 @@ func (avatar *AvatarsRepository) Fetch(ID uint) (models.Avatar, error) {
 	query = query.Preload("ActiveAgents").Preload("ActiveAgents.Agent")
 	query = query.Preload("ActiveTools").Preload("ActiveTools.Tool")
 	query = query.Preload("ActivePlugins").Preload("ActivePlugins.Plugin")
+	query = query.Preload("ActiveLLMs").Preload("ActiveLLMs.LLM")
 
 	var record models.Avatar
 	result := query.First(&record, ID)
