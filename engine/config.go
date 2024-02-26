@@ -41,10 +41,25 @@ func (cnf *Config) GetDB() *database.Database {
 
 func (cnf *Config) GetAvatarLLM() llms.LanguageModel {
 	avatarLLM := cnf.Avatar.LLM
+	activeLLMs := cnf.Avatar.ActiveLLMs
+	if len(activeLLMs) == 0 {
+		fmt.Println("No active LLMs")
+		return nil
+	}
 
 	switch avatarLLM.Slug {
 	case "gpt-4":
-		LLM, err := openai.NewChat(openai.WithModel("gpt-4"))
+		var activeLLM models.ActiveLLM
+		// extract active llm where activeLLM.llmID == avatarLLM.ID
+		for _, active := range activeLLMs {
+			if active.LLM.ID == avatarLLM.ID {
+				activeLLM = active
+			}
+		}
+
+		LLM, err := openai.NewChat(
+			openai.WithToken(activeLLM.Token),
+			openai.WithModel("gpt-4"))
 		if err != nil {
 			fmt.Println("Error setting gpt-4:", err)
 			return nil
@@ -72,10 +87,6 @@ func (cnf *Config) AvatarIsPublic() bool {
 	return cnf.Avatar.IsPublic
 }
 
-func (cnf *Config) GetLLM() LLMConfig {
-	return NewActiveLLM(cnf.DB)
-}
-
 func (cnf *Config) GetAgents() []AgentConfig {
 	return nil
 }
@@ -88,6 +99,7 @@ func (cnf *Config) GetPlugins() []PluginConfig {
 	return nil
 }
 
+// Active LLM Config
 type ActiveLLM struct {
 	DB  *database.Database
 	LLM llms.LanguageModel
@@ -109,6 +121,7 @@ func (cnf *ActiveLLM) GetToken() string {
 	return ""
 }
 
+// Active Agent Config
 type ActiveAgent struct {
 	DB          *database.Database
 	ActiveAgent *models.ActiveAgent
@@ -146,6 +159,7 @@ func (cnf *ActiveAgent) GetAgentTools(agentID string) []any {
 	return nil
 }
 
+// Active Tool Config
 type ActiveTool struct {
 }
 
@@ -163,6 +177,7 @@ func (cnf *ActiveTool) GetToken() string {
 	return ""
 }
 
+// Active Plugin Config
 type ActivePlugin struct {
 }
 

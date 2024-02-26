@@ -136,11 +136,11 @@ func (cnf *Config) setupLocalDev() {
 	}
 
 	// Set the Openai API key as env variable
-	err = os.Setenv("OPENAI_API_KEY", Config.OpenAPIKey)
-	if err != nil {
-		fmt.Println("Error setting environment variable:", err)
-		return
-	}
+	// err = os.Setenv("OPENAI_API_KEY", Config.OpenAPIKey)
+	// if err != nil {
+	//		fmt.Println("Error setting environment variable:", err)
+	//		return
+	// }
 
 	// Set the SerpAPI API key as env variable
 	err = os.Setenv("SERPAPI_API_KEY", Config.SerpAPIKey)
