@@ -2,8 +2,8 @@
 import Sidebar from '@/components/admin/Sidebar.vue';
 import Navbar  from '@/components/admin/Navbar.vue';
 
-import '@/assets/adminkit/dist/css/dark.css';
-import '@/assets/adminkit/dist/js/app.js';
+import '@/assets/adminkit/static/css/dark.css';
+import '@/assets/adminkit/static/js/app.js';
 
 </script>
 <template>
