@@ -92,33 +92,21 @@ func (cnf *Config) GetAgents() []AgentConfig {
 }
 
 func (cnf *Config) GetTools() []ToolConfig {
-	return nil
+	activeTools := cnf.Avatar.ActiveTools
+	var configs []ToolConfig
+	for _, activeTool := range activeTools {
+		configs = append(configs, NewActiveTool(activeTool))
+	}
+	return configs
 }
 
 func (cnf *Config) GetPlugins() []PluginConfig {
-	return nil
-}
-
-// Active LLM Config
-type ActiveLLM struct {
-	DB  *database.Database
-	LLM llms.LanguageModel
-}
-
-var _ LLMConfig = (*ActiveLLM)(nil)
-
-func NewActiveLLM(db *database.Database) *ActiveLLM {
-	return &ActiveLLM{
-		DB: db,
+	activePlugins := cnf.Avatar.ActivePlugins
+	var configs []PluginConfig
+	for _, activePlugin := range activePlugins {
+		configs = append(configs, NewActivePlugin(activePlugin))
 	}
-}
-
-func (cnf *ActiveLLM) GetAPI() string {
-	return ""
-}
-
-func (cnf *ActiveLLM) GetToken() string {
-	return ""
+	return configs
 }
 
 // Active Agent Config
@@ -161,36 +149,58 @@ func (cnf *ActiveAgent) GetAgentTools(agentID string) []any {
 
 // Active Tool Config
 type ActiveTool struct {
+	activeTool models.ActiveTool
 }
 
 var _ ToolConfig = (*ActiveTool)(nil)
 
-func NewActiveTool() *ActiveTool {
-	return &ActiveTool{}
+func NewActiveTool(tool models.ActiveTool) *ActiveTool {
+	return &ActiveTool{
+		activeTool: tool,
+	}
 }
 
 func (cnf *ActiveTool) GetName() string {
-	return ""
+	return cnf.activeTool.Tool.Name
 }
 
 func (cnf *ActiveTool) GetToken() string {
-	return ""
+	return cnf.activeTool.Token
+}
+
+func (cnf *ActiveTool) IsPublic() bool {
+	return cnf.activeTool.IsPublic
+}
+
+func (cnf *ActiveTool) IsActive() bool {
+	return cnf.activeTool.IsActive
 }
 
 // Active Plugin Config
 type ActivePlugin struct {
+	activePlugin models.ActivePlugin
 }
 
 var _ PluginConfig = (*ActivePlugin)(nil)
 
-func NewActivePlugin() *ActivePlugin {
-	return &ActivePlugin{}
+func NewActivePlugin(plugin models.ActivePlugin) *ActivePlugin {
+	return &ActivePlugin{
+		activePlugin: plugin,
+	}
 }
 
 func (cnf *ActivePlugin) GetName() string {
-	return ""
+	return cnf.activePlugin.Plugin.Name
 }
 
 func (cnf *ActivePlugin) GetToken() string {
-	return ""
+	return cnf.activePlugin.Token
+}
+
+func (cnf *ActivePlugin) IsActive() bool {
+	return cnf.activePlugin.IsActive
+}
+
+func (cnf *ActivePlugin) IsPublic() bool {
+	return cnf.activePlugin.IsPublic
 }

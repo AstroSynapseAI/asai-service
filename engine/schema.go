@@ -18,11 +18,6 @@ type AvatarConfig interface {
 	GetPlugins() []PluginConfig
 }
 
-type LLMConfig interface {
-	GetAPI() string
-	GetToken() string
-}
-
 type AgentConfig interface {
 	GetAgentName(agentID string) string
 	GetAgentModel(agentID string) *llms.LLM
@@ -35,9 +30,13 @@ type AgentConfig interface {
 type ToolConfig interface {
 	GetName() string
 	GetToken() string
+	IsPublic() bool
+	IsActive() bool
 }
 
 type PluginConfig interface {
 	GetName() string
 	GetToken() string
+	IsActive() bool
+	IsPublic() bool
 }
