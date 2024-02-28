@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/AstroSynapseAI/app-service/engine"
+	"github.com/AstroSynapseAI/app-service/engine/agents/search"
 	"github.com/AstroSynapseAI/app-service/engine/callbacks"
 	"github.com/AstroSynapseAI/app-service/engine/memory"
 	"github.com/AstroSynapseAI/app-service/engine/templates"
@@ -81,6 +82,28 @@ func (chain *AsaiChain) LoadAvatar(userID uint, sessionID string, clientType str
 	chain.ClientType = clientType
 	chain.Memory = memory.NewMemory(chain.config)
 	chain.Memory.SetSessionID(sessionID)
+}
+
+func (chain *AsaiChain) LoadAgents() {
+	for _, agent := range chain.config.GetAgents() {
+		var activeAgent tools.Tool
+		var err error
+
+		if agent.GetAgentSlug() == "search-agent" && agent.IsAgentActive() {
+			activeAgent, err = search.NewSearchAgent(
+				search.WithPrimer(agent.GetAgentPrimer()),
+				search.WithLLM(agent.GetAgentLLM()),
+			)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
+
+		if activeAgent != nil {
+			chain.Agents = append(chain.Agents, activeAgent)
+		}
+
+	}
 }
 
 func (chain *AsaiChain) SetStream(stream func(context.Context, []byte)) {
