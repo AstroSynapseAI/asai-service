@@ -197,6 +197,7 @@ func (ctrl *UsersController) Login(ctx *rest.Context) {
 
 func (ctrl *UsersController) GetAccounts(ctx *rest.Context) {
 	fmt.Println("UsersController.GetAccounts")
+
 	userID := ctx.GetID()
 
 	accounts, err := ctrl.User.GetAccounts(userID)
@@ -282,7 +283,6 @@ func (ctrl *UsersController) SaveProfile(ctx *rest.Context) {
 		Username  string `json:"username"`
 		FirstName string `json:"first_name,omitempty"`
 		LastName  string `json:"last_name,omitempty"`
-		Email     string `json:"email,omitempty"`
 	}
 
 	err := ctx.JsonDecode(&reqData)
@@ -291,14 +291,23 @@ func (ctrl *UsersController) SaveProfile(ctx *rest.Context) {
 		return
 	}
 
+	if reqData.Username == "" {
+		ctx.SetStatus(http.StatusBadRequest)
+		return
+	}
+
 	account := models.Account{
 		UserID:    userID,
 		FirstName: reqData.FirstName,
 		LastName:  reqData.LastName,
-		Email:     reqData.Email,
 	}
 
 	account.ID = reqData.AccountID
+
+	if account.UserID == 0 || account.FirstName == "" || account.LastName == "" {
+		ctx.SetStatus(http.StatusBadRequest)
+		return
+	}
 
 	_, err = ctrl.User.SaveAccount(account)
 	if err != nil {
@@ -311,6 +320,11 @@ func (ctrl *UsersController) SaveProfile(ctx *rest.Context) {
 	}
 
 	user.ID = userID
+
+	if user.Username == "" {
+		ctx.SetStatus(http.StatusBadRequest)
+		return
+	}
 
 	userRecord, err := ctrl.User.Update(user)
 	if err != nil {
@@ -331,6 +345,11 @@ func (ctrl *UsersController) ChangePassword(ctx *rest.Context) {
 
 	err := ctx.JsonDecode(&reqData)
 	if err != nil {
+		ctx.SetStatus(http.StatusBadRequest)
+		return
+	}
+
+	if len(reqData.Password) < 8 || reqData.Password == "" {
 		ctx.SetStatus(http.StatusBadRequest)
 		return
 	}
