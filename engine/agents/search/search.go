@@ -2,17 +2,17 @@ package search
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 
-	"github.com/AstroSynapseAI/app-service/engine/templates"
 	"github.com/AstroSynapseAI/app-service/engine/tools/google"
 
 	asaiTools "github.com/AstroSynapseAI/app-service/engine/tools"
 
 	"github.com/tmc/langchaingo/agents"
 	"github.com/tmc/langchaingo/chains"
-	"github.com/tmc/langchaingo/llms/openai"
+	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/memory"
 	"github.com/tmc/langchaingo/prompts"
 	"github.com/tmc/langchaingo/schema"
@@ -24,6 +24,9 @@ var _ tools.Tool = &SearchAgent{}
 
 type SearchAgent struct {
 	Memory   schema.Memory
+	Primer   string
+	LLM      llms.LanguageModel
+	Tools    []tools.Tool
 	Executor agents.Executor
 }
 
@@ -38,13 +41,8 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 		option(searchAgent)
 	}
 
-	// create new llm handle
-	llm, err := openai.NewChat(
-		openai.WithModel("gpt-4"),
-	)
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
+	if searchAgent.LLM == nil {
+		return nil, errors.New("llm is required")
 	}
 
 	// create google search API Tool
@@ -65,16 +63,9 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 	// create search agent tools
 	searchTools := []tools.Tool{google, ddg}
 
-	// load custom search agent template
-	searchTmplt, err := templates.Load("search.txt")
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-
 	// create search prompt template
 	promptTmplt := prompts.PromptTemplate{
-		Template:       searchTmplt,
+		Template:       searchAgent.Primer,
 		TemplateFormat: prompts.TemplateFormatGoTemplate,
 		InputVariables: []string{"input", "agent_scratchpad", "today"},
 		PartialVariables: map[string]interface{}{
@@ -86,7 +77,7 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 
 	// create the search prompt
 	agent := agents.NewOneShotAgent(
-		llm,
+		searchAgent.LLM,
 		searchTools,
 		agents.WithMemory(searchAgent.Memory),
 		agents.WithPrompt(promptTmplt),
@@ -100,7 +91,6 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 }
 
 func (agent *SearchAgent) Call(ctx context.Context, input string) (string, error) {
-	fmt.Println("Search Agent called...")
 	reponse, err := chains.Run(ctx, agent.Executor, input)
 	if err != nil {
 		return "Search Agent encountered an error: " + err.Error(), nil

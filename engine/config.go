@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/AstroSynapseAI/app-service/models"
@@ -47,23 +48,27 @@ func (cnf *Config) GetAvatarLLM() llms.LanguageModel {
 		return nil
 	}
 
-	switch avatarLLM.Slug {
-	case "gpt-4":
-		var activeLLM models.ActiveLLM
-		// extract active llm where activeLLM.llmID == avatarLLM.ID
-		for _, active := range activeLLMs {
-			if active.LLM.ID == avatarLLM.ID {
-				activeLLM = active
-			}
+	var activeLLM models.ActiveLLM
+	// extract active llm where activeLLM.llmID == avatarLLM.ID
+	for _, active := range activeLLMs {
+		if active.LLM.ID == avatarLLM.ID {
+			activeLLM = active
 		}
+	}
+
+	switch activeLLM.LLM.Slug {
+	case "gpt-4":
 
 		LLM, err := openai.NewChat(
 			openai.WithToken(activeLLM.Token),
-			openai.WithModel("gpt-4"))
+			openai.WithModel("gpt-4"),
+		)
+
 		if err != nil {
 			fmt.Println("Error setting gpt-4:", err)
 			return nil
 		}
+
 		return LLM
 	default:
 		fmt.Println("Unknown LLM:", avatarLLM.Slug)
@@ -111,39 +116,60 @@ func (cnf *Config) GetPlugins() []PluginConfig {
 
 // Active Agent Config
 type ActiveAgent struct {
-	DB          *database.Database
-	ActiveAgent *models.ActiveAgent
+	Avatar      models.Avatar
+	ActiveAgent models.ActiveAgent
 }
 
 var _ AgentConfig = (*ActiveAgent)(nil)
 
-func NewActiveAgent(db *database.Database) *ActiveAgent {
+func NewActiveAgent(avatar models.Avatar, activeAgent models.ActiveAgent) *ActiveAgent {
 	return &ActiveAgent{
-		DB: db,
+		Avatar:      avatar,
+		ActiveAgent: activeAgent,
 	}
 }
 
-func (cnf *ActiveAgent) GetAgentName(agentID string) string {
+func (cnf *ActiveAgent) GetAgentName() string {
 	return cnf.ActiveAgent.Agent.Name
 }
 
-func (cnf *ActiveAgent) GetAgentModel(agentID string) *llms.LLM {
-	return nil
+func (cnf *ActiveAgent) GetAgentSlug() string {
+	return cnf.ActiveAgent.Agent.Slug
 }
 
-func (cnf *ActiveAgent) GetAgentPrimer(agentID string) string {
+func (cnf *ActiveAgent) GetAgentLLM() llms.LanguageModel {
+	agentLLM := cnf.ActiveAgent.LLM
+	activeLLMs := cnf.Avatar.ActiveLLMs
+
+	var activeLLM models.ActiveLLM
+
+	for _, active := range activeLLMs {
+		if active.LLM.ID == agentLLM.ID {
+			activeLLM = active
+		}
+	}
+
+	llm, err := loadActiveLLM(activeLLM)
+	if err != nil {
+		fmt.Println("Error loading LLM:", err)
+		return nil
+	}
+	return llm
+}
+
+func (cnf *ActiveAgent) GetAgentPrimer() string {
 	return cnf.ActiveAgent.Primer
 }
 
-func (cnf *ActiveAgent) IsAgentPublic(agentID string) bool {
+func (cnf *ActiveAgent) IsAgentPublic() bool {
 	return cnf.ActiveAgent.IsPublic
 }
 
-func (cnf *ActiveAgent) IsAgentActive(agentID string) bool {
+func (cnf *ActiveAgent) IsAgentActive() bool {
 	return cnf.ActiveAgent.IsActive
 }
 
-func (cnf *ActiveAgent) GetAgentTools(agentID string) []any {
+func (cnf *ActiveAgent) GetAgentTools() []ToolConfig {
 	return nil
 }
 
@@ -203,4 +229,25 @@ func (cnf *ActivePlugin) IsActive() bool {
 
 func (cnf *ActivePlugin) IsPublic() bool {
 	return cnf.activePlugin.IsPublic
+}
+
+func loadActiveLLM(activeLLM models.ActiveLLM) (llms.LanguageModel, error) {
+	switch activeLLM.LLM.Slug {
+	case "gpt-4":
+
+		LLM, err := openai.NewChat(
+			openai.WithToken(activeLLM.Token),
+			openai.WithModel("gpt-4"),
+		)
+
+		if err != nil {
+			fmt.Println("Error setting gpt-4:", err)
+			return nil, err
+		}
+
+		return LLM, nil
+	default:
+		fmt.Println("Unknown LLM:", activeLLM.LLM.Slug)
+		return nil, errors.New("unknown LLM")
+	}
 }
