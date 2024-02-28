@@ -1,9 +1,9 @@
 package search
 
 import (
+	"github.com/AstroSynapseAI/app-service/engine"
 	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/schema"
-	"github.com/tmc/langchaingo/tools"
 )
 
 type SearchAgentOptions func(agent *SearchAgent)
@@ -26,9 +26,8 @@ func WithLLM(llm llms.LanguageModel) SearchAgentOptions {
 	}
 }
 
-func WithTools(tools []tools.Tool) SearchAgentOptions {
+func WithToolsConfig(tools []engine.AgentToolConfig) SearchAgentOptions {
 	return func(agent *SearchAgent) {
-		agent.Tools = tools
+
 	}
 }
-

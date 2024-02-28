@@ -169,8 +169,13 @@ func (cnf *ActiveAgent) IsAgentActive() bool {
 	return cnf.ActiveAgent.IsActive
 }
 
-func (cnf *ActiveAgent) GetAgentTools() []ToolConfig {
-	return nil
+func (cnf *ActiveAgent) GetAgentTools() []AgentToolConfig {
+	activeTools := cnf.ActiveAgent.ActiveAgentTools
+	var configs []AgentToolConfig
+	for _, activeTool := range activeTools {
+		configs = append(configs, NewActiveAgentTool(activeTool))
+	}
+	return configs
 }
 
 // Active Tool Config
@@ -190,6 +195,10 @@ func (cnf *ActiveTool) GetName() string {
 	return cnf.activeTool.Tool.Name
 }
 
+func (cnf *ActiveTool) GetSlug() string {
+	return cnf.activeTool.Tool.Slug
+}
+
 func (cnf *ActiveTool) GetToken() string {
 	return cnf.activeTool.Token
 }
@@ -200,6 +209,38 @@ func (cnf *ActiveTool) IsPublic() bool {
 
 func (cnf *ActiveTool) IsActive() bool {
 	return cnf.activeTool.IsActive
+}
+
+type ActiveAgentTool struct {
+	activeAgentTool models.ActiveAgentTool
+}
+
+var _ AgentToolConfig = (*ActiveAgentTool)(nil)
+
+func NewActiveAgentTool(agentTool models.ActiveAgentTool) *ActiveAgentTool {
+	return &ActiveAgentTool{
+		activeAgentTool: agentTool,
+	}
+}
+
+func (cnf *ActiveAgentTool) GetName() string {
+	return cnf.activeAgentTool.Tool.Name
+}
+
+func (cnf *ActiveAgentTool) GetSlug() string {
+	return cnf.activeAgentTool.Tool.Slug
+}
+
+func (cnf *ActiveAgentTool) GetToken() string {
+	return cnf.activeAgentTool.Token
+}
+
+func (cnf *ActiveAgentTool) IsPublic() bool {
+	return cnf.activeAgentTool.IsPublic
+}
+
+func (cnf *ActiveAgentTool) IsActive() bool {
+	return cnf.activeAgentTool.IsActive
 }
 
 // Active Plugin Config

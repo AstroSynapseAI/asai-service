@@ -25,11 +25,20 @@ type AgentConfig interface {
 	GetAgentPrimer() string
 	IsAgentPublic() bool
 	IsAgentActive() bool
-	GetAgentTools() []ToolConfig
+	GetAgentTools() []AgentToolConfig
 }
 
 type ToolConfig interface {
 	GetName() string
+	GetSlug() string
+	GetToken() string
+	IsPublic() bool
+	IsActive() bool
+}
+
+type AgentToolConfig interface {
+	GetName() string
+	GetSlug() string
 	GetToken() string
 	IsPublic() bool
 	IsActive() bool
