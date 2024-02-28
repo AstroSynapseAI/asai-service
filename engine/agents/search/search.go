@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 
+	"github.com/AstroSynapseAI/app-service/engine"
 	"github.com/AstroSynapseAI/app-service/engine/tools/google"
 
 	asaiTools "github.com/AstroSynapseAI/app-service/engine/tools"
@@ -23,11 +23,11 @@ import (
 var _ tools.Tool = &SearchAgent{}
 
 type SearchAgent struct {
-	Memory   schema.Memory
-	Primer   string
-	LLM      llms.LanguageModel
-	Tools    []tools.Tool
-	Executor agents.Executor
+	Memory     schema.Memory
+	Primer     string
+	LLM        llms.LanguageModel
+	ToolsConfg []engine.AgentToolConfig
+	Executor   agents.Executor
 }
 
 func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
@@ -45,23 +45,29 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 		return nil, errors.New("llm is required")
 	}
 
-	// create google search API Tool
-	apiKey := os.Getenv("SERPAPI_API_KEY")
-	google, err := google.New(apiKey, 10)
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-
-	// create DuckDuckGo search API Tool
-	ddg, err := duckduckgo.New(10, duckduckgo.DefaultUserAgent)
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-
 	// create search agent tools
-	searchTools := []tools.Tool{google, ddg}
+	searchTools := []tools.Tool{}
+
+	for _, tool := range searchAgent.ToolsConfg {
+		if tool.GetSlug() == "google-search" && tool.IsActive() {
+			google, err := google.New(tool.GetToken(), 10)
+			if err != nil {
+				fmt.Println(err)
+				return nil, err
+			}
+
+			searchTools = append(searchTools, google)
+		}
+
+		if tool.GetSlug() == "duckduckgo-search" && tool.IsActive() {
+			ddg, err := duckduckgo.New(10, duckduckgo.DefaultUserAgent)
+			if err != nil {
+				fmt.Println(err)
+				return nil, err
+			}
+			searchTools = append(searchTools, ddg)
+		}
+	}
 
 	// create search prompt template
 	promptTmplt := prompts.PromptTemplate{
