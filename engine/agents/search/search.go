@@ -59,7 +59,7 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 			searchTools = append(searchTools, google)
 		}
 
-		if tool.GetSlug() == "duckduckgo-search" && tool.IsActive() {
+		if tool.GetSlug() == "ddg-search" && tool.IsActive() {
 			ddg, err := duckduckgo.New(10, duckduckgo.DefaultUserAgent)
 			if err != nil {
 				fmt.Println(err)
