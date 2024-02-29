@@ -22,7 +22,7 @@ func NewAvatarHandler(avatarID uint, chain *chains.AsaiChain) *AvatarHandler {
 	}
 }
 
-func (handler *AvatarHandler) MsgHandler(session *discordgo.Session, msg *discordgo.MessageCreate) {
+func (handler *AvatarHandler) Messages(session *discordgo.Session, msg *discordgo.MessageCreate) {
 	if msg.Author.ID == session.State.User.ID {
 		return
 	}

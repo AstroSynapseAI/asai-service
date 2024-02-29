@@ -12,10 +12,3 @@ type Plugins interface {
 type Plugin interface {
 	OpenConnection(db *database.Database)
 }
-
-type PluginConfig interface {
-	GetName() string
-	GetToken() string
-	IsActive() bool
-	IsPublic() bool
-}
