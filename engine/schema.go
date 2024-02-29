@@ -15,7 +15,6 @@ type AvatarConfig interface {
 	AvatarIsPublic() bool
 	GetAgents() []AgentConfig
 	GetTools() []ToolConfig
-	GetPlugins() []PluginConfig
 }
 
 type AgentConfig interface {
@@ -42,11 +41,4 @@ type AgentToolConfig interface {
 	GetToken() string
 	IsPublic() bool
 	IsActive() bool
-}
-
-type PluginConfig interface {
-	GetName() string
-	GetToken() string
-	IsActive() bool
-	IsPublic() bool
 }

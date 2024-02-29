@@ -43,7 +43,6 @@ func NewAsaiChain(db *database.Database) *AsaiChain {
 	}
 
 	return asaiChain
-
 }
 
 func (chain *AsaiChain) LoadAvatar(userID uint, sessionID string, clientType string) {

@@ -105,15 +105,6 @@ func (cnf *Config) GetTools() []ToolConfig {
 	return configs
 }
 
-func (cnf *Config) GetPlugins() []PluginConfig {
-	activePlugins := cnf.Avatar.ActivePlugins
-	var configs []PluginConfig
-	for _, activePlugin := range activePlugins {
-		configs = append(configs, NewActivePlugin(activePlugin))
-	}
-	return configs
-}
-
 // Active Agent Config
 type ActiveAgent struct {
 	Avatar      models.Avatar
@@ -241,35 +232,6 @@ func (cnf *ActiveAgentTool) IsPublic() bool {
 
 func (cnf *ActiveAgentTool) IsActive() bool {
 	return cnf.activeAgentTool.IsActive
-}
-
-// Active Plugin Config
-type ActivePlugin struct {
-	activePlugin models.ActivePlugin
-}
-
-var _ PluginConfig = (*ActivePlugin)(nil)
-
-func NewActivePlugin(plugin models.ActivePlugin) *ActivePlugin {
-	return &ActivePlugin{
-		activePlugin: plugin,
-	}
-}
-
-func (cnf *ActivePlugin) GetName() string {
-	return cnf.activePlugin.Plugin.Name
-}
-
-func (cnf *ActivePlugin) GetToken() string {
-	return cnf.activePlugin.Token
-}
-
-func (cnf *ActivePlugin) IsActive() bool {
-	return cnf.activePlugin.IsActive
-}
-
-func (cnf *ActivePlugin) IsPublic() bool {
-	return cnf.activePlugin.IsPublic
 }
 
 func loadActiveLLM(activeLLM models.ActiveLLM) (llms.LanguageModel, error) {
