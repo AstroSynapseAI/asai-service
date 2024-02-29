@@ -197,6 +197,7 @@ func (ctrl *UsersController) Login(ctx *rest.Context) {
 
 func (ctrl *UsersController) GetAccounts(ctx *rest.Context) {
 	fmt.Println("UsersController.GetAccounts")
+
 	userID := ctx.GetID()
 
 	accounts, err := ctrl.User.GetAccounts(userID)
@@ -282,12 +283,16 @@ func (ctrl *UsersController) SaveProfile(ctx *rest.Context) {
 		Username  string `json:"username"`
 		FirstName string `json:"first_name,omitempty"`
 		LastName  string `json:"last_name,omitempty"`
-		Email     string `json:"email,omitempty"`
 	}
 
 	err := ctx.JsonDecode(&reqData)
 	if err != nil {
-		ctx.SetStatus(http.StatusBadRequest)
+		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Invalid request body"})
+		return
+	}
+
+	if reqData.Username == "" {
+		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Username is required"})
 		return
 	}
 
@@ -295,14 +300,18 @@ func (ctrl *UsersController) SaveProfile(ctx *rest.Context) {
 		UserID:    userID,
 		FirstName: reqData.FirstName,
 		LastName:  reqData.LastName,
-		Email:     reqData.Email,
 	}
 
 	account.ID = reqData.AccountID
 
+	if account.UserID == 0 || account.FirstName == "" || account.LastName == "" {
+		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Account data is invalid"})
+		return
+	}
+
 	_, err = ctrl.User.SaveAccount(account)
 	if err != nil {
-		ctx.SetStatus(http.StatusInternalServerError)
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Failed to save account"})
 		return
 	}
 
@@ -312,9 +321,14 @@ func (ctrl *UsersController) SaveProfile(ctx *rest.Context) {
 
 	user.ID = userID
 
+	if user.Username == "" {
+		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Username is required"})
+		return
+	}
+
 	userRecord, err := ctrl.User.Update(user)
 	if err != nil {
-		ctx.SetStatus(http.StatusInternalServerError)
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Failed to update user"})
 		return
 	}
 
@@ -331,13 +345,17 @@ func (ctrl *UsersController) ChangePassword(ctx *rest.Context) {
 
 	err := ctx.JsonDecode(&reqData)
 	if err != nil {
-		ctx.SetStatus(http.StatusBadRequest)
+		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Invalid request body"})
+		return
+	}
+	if len(reqData.Password) < 8 || reqData.Password == "" {
+		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Password is not long enough"})
 		return
 	}
 
 	user, err := ctrl.User.UpdatePassword(userID, reqData.Password)
 	if err != nil {
-		ctx.SetStatus(http.StatusInternalServerError)
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Failed to update password"})
 		return
 	}
 
