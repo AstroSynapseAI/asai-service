@@ -75,7 +75,7 @@ func (server *AsaiServer) Run(db *database.Database) error {
 	}
 
 	// Open all plugins connections
-	server.Plugins.OpenConnection()
+	server.Plugins.OpenConnection(db)
 
 	return nil
 }

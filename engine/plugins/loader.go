@@ -8,12 +8,6 @@ import (
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 )
 
-// I need to get all the plugins platform supports and go through them.
-
-// Then we need to get all the active plugins for each of the plugins and load thir api tokens.
-
-// Finally we need to add plugin sepcific hadlers for all the stuff plugin supports, and open the connection for each plugin.
-
 type PluginLoader struct {
 	Plugins []Plugin
 }
@@ -26,11 +20,7 @@ func NewLoader() *PluginLoader {
 
 func (loader *PluginLoader) LoadConfig(db *database.Database) error {
 	pluginsRepo := repositories.NewPluginsRepository(db)
-	pluginsRecords, err := pluginsRepo.Repo.ReadAll()
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
+	pluginsRecords := pluginsRepo.FetchAll()
 
 	for _, pluginRecord := range pluginsRecords {
 		if pluginRecord.Slug == "discord" {

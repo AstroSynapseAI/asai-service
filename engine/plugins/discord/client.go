@@ -48,6 +48,10 @@ func (plugin *DiscordPlugin) OpenConnection(db *database.Database) {
 	stops := make([]chan os.Signal, len(plugin.clients))
 
 	for i, client := range plugin.clients {
+		if !client.activePlugin.IsActive {
+			return
+		}
+
 		avatarID := client.activePlugin.AvatarID
 		handler := NewAvatarHandler(avatarID, chain)
 		client.session.AddHandler(handler.Messages)
@@ -72,33 +76,4 @@ func (plugin *DiscordPlugin) OpenConnection(db *database.Database) {
 
 		}(stops[i], &client)
 	}
-
-	// chain := chains.NewAsaiChain(db)
-	// for _, client := range plugin.clients {
-	// 	avatarID := client.activePlugin.AvatarID
-	// 	handler := NewAvatarHandler(avatarID, chain)
-	// 	client.session.AddHandler(handler.Messages)
-	// }
-	// Initialize the Discord client
-
-	// server.discordClient.AddHandler(MsgHandler)
-	// server.discordClient.AddHandler(NewMemberHandler)
-
-	// server.discordClient.Identify.Intents = discordgo.IntentsGuildMessages
-
-	// err := server.discordClient.Open()
-	// if err != nil {
-	// 	fmt.Println("Failed to open Discord connection:", err)
-	// 	return err
-	// }
-
-	// stop := make(chan os.Signal, 1)
-	// signal.Notify(stop, syscall.SIGTERM)
-
-	// Wait for SIGTERM signal
-	// <-stop
-
-	// Cleanly close down the Discord session.
-	// server.discordClient.Close()
-
 }
