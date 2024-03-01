@@ -60,6 +60,7 @@ func (chain *AsaiChain) LoadAgents() {
 		var err error
 
 		if agent.GetAgentSlug() == "search-agent" && agent.IsAgentActive() {
+
 			activeAgent, err = search.NewSearchAgent(
 				search.WithPrimer(agent.GetAgentPrimer()),
 				search.WithLLM(agent.GetAgentLLM()),
@@ -121,6 +122,10 @@ func (chain *AsaiChain) Run(ctx context.Context, input string, options ...chains
 	agentCallback.ReadFromEgress(ctx, chain.Stream)
 
 	tmplt := chain.loadTemplate(map[string]interface{}{})
+
+	for _, agent := range chain.Agents {
+		fmt.Println(agent.Name())
+	}
 
 	asaiAgent := agents.NewConversationalAgent(
 		chain.LLM,

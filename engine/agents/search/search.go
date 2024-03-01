@@ -97,6 +97,7 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 }
 
 func (agent *SearchAgent) Call(ctx context.Context, input string) (string, error) {
+	fmt.Println("Search Agent Running...")
 	reponse, err := chains.Run(ctx, agent.Executor, input)
 	if err != nil {
 		return "Search Agent encountered an error: " + err.Error(), nil

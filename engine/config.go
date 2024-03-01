@@ -8,12 +8,13 @@ import (
 	"github.com/AstroSynapseAI/app-service/repositories"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/tmc/langchaingo/llms"
+	"github.com/tmc/langchaingo/llms/ollama"
 	"github.com/tmc/langchaingo/llms/openai"
 )
 
 type Config struct {
 	DB     *database.Database
-	Avatar *models.Avatar
+	Avatar models.Avatar
 }
 
 var _ AvatarConfig = (*Config)(nil)
@@ -33,7 +34,7 @@ func (cnf *Config) LoadConfig(avatarID uint) {
 		return
 	}
 
-	cnf.Avatar = &avatar
+	cnf.Avatar = avatar
 }
 
 func (cnf *Config) GetDB() *database.Database {
@@ -56,24 +57,12 @@ func (cnf *Config) GetAvatarLLM() llms.LanguageModel {
 		}
 	}
 
-	switch activeLLM.LLM.Slug {
-	case "gpt-4":
-
-		LLM, err := openai.NewChat(
-			openai.WithToken(activeLLM.Token),
-			openai.WithModel("gpt-4"),
-		)
-
-		if err != nil {
-			fmt.Println("Error setting gpt-4:", err)
-			return nil
-		}
-
-		return LLM
-	default:
-		fmt.Println("Unknown LLM:", avatarLLM.Slug)
+	llm, err := loadActiveLLM(activeLLM)
+	if err != nil {
+		fmt.Println("Error loading LLM:", err)
 		return nil
 	}
+	return llm
 }
 
 func (cnf *Config) GetAvatarName() string {
@@ -93,7 +82,13 @@ func (cnf *Config) AvatarIsPublic() bool {
 }
 
 func (cnf *Config) GetAgents() []AgentConfig {
-	return nil
+	activeAgents := cnf.Avatar.ActiveAgents
+	var configs []AgentConfig
+
+	for _, activeAgent := range activeAgents {
+		configs = append(configs, NewActiveAgent(cnf.Avatar, activeAgent))
+	}
+	return configs
 }
 
 func (cnf *Config) GetTools() []ToolConfig {
@@ -235,9 +230,21 @@ func (cnf *ActiveAgentTool) IsActive() bool {
 }
 
 func loadActiveLLM(activeLLM models.ActiveLLM) (llms.LanguageModel, error) {
-	switch activeLLM.LLM.Slug {
-	case "gpt-4":
 
+	switch activeLLM.LLM.Slug {
+	case "mistral":
+		LLM, err := ollama.New(
+			ollama.WithModel("mistral"),
+			ollama.WithServerURL("http://host.docker.internal:11434/"),
+		)
+
+		if err != nil {
+			fmt.Println("Error setting mistral:", err)
+			return nil, err
+		}
+
+		return LLM, nil
+	case "gpt-4":
 		LLM, err := openai.NewChat(
 			openai.WithToken(activeLLM.Token),
 			openai.WithModel("gpt-4"),
