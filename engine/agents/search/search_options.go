@@ -28,6 +28,6 @@ func WithLLM(llm llms.LanguageModel) SearchAgentOptions {
 
 func WithToolsConfig(tools []engine.AgentToolConfig) SearchAgentOptions {
 	return func(agent *SearchAgent) {
-
+		agent.ToolsConfg = tools
 	}
 }
