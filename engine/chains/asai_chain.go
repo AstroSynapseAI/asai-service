@@ -123,10 +123,6 @@ func (chain *AsaiChain) Run(ctx context.Context, input string, options ...chains
 
 	tmplt := chain.loadTemplate(map[string]interface{}{})
 
-	for _, agent := range chain.Agents {
-		fmt.Println(agent.Name())
-	}
-
 	asaiAgent := agents.NewConversationalAgent(
 		chain.LLM,
 		chain.Agents,
