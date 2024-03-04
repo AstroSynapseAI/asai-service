@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/AstroSynapseAI/app-service/engine"
 	"github.com/AstroSynapseAI/app-service/engine/tools/google"
@@ -69,12 +70,24 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 		}
 	}
 
+	fmt.Println("Search Agent Tools:")
+	for _, tool := range searchTools {
+		fmt.Println(tool.Name())
+	}
+
+	// searchTmplt, err := templates.Load("search.txt")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return nil, err
+	// }
+
 	// create search prompt template
 	promptTmplt := prompts.PromptTemplate{
 		Template:       searchAgent.Primer,
 		TemplateFormat: prompts.TemplateFormatGoTemplate,
 		InputVariables: []string{"input", "agent_scratchpad", "today"},
 		PartialVariables: map[string]interface{}{
+			"today":             time.Now().Format("January 02, 2006"),
 			"tool_names":        asaiTools.Names(searchTools),
 			"tool_descriptions": asaiTools.Descriptions(searchTools),
 			"history":           "",
