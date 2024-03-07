@@ -1,11 +1,12 @@
 <script setup>
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted } from 'vue';
 import { Form, Field, useForm } from 'vee-validate';
 import { useChatStore } from '@/stores/chat.store.js';
 import { useUserStore } from '@/stores/user.store.js';
 
 const user = useUserStore();
 const chatStore = useChatStore();
+const MAX_ROWS = 10;
 
 let { resetForm, handleSubmit, defineField } = useForm({
   initialValues: {
@@ -15,15 +16,21 @@ let { resetForm, handleSubmit, defineField } = useForm({
 
 const [prompt, promptAttrs] = defineField('prompt');
 const promptElement = ref(null);
+let inputRowNum = ref(0);
+
+function getInputRowNumber() {
+  const lineHeight = parseInt(window.getComputedStyle(promptElement.value.$el).getPropertyValue("line-height"));
+  return [Math.floor(promptElement.value.$el.scrollHeight / lineHeight), lineHeight];
+}
 
 function resizeTextArea() {
-  promptElement.value.$el.style.height = 'auto';
-  const lineHeight = parseInt(window.getComputedStyle(promptElement.value.$el).getPropertyValue("line-height"));
-  let currentRows = Math.floor(promptElement.value.$el.scrollHeight / lineHeight);
-  const maxRows = 10;
-
+  let [currentRows, lineHeight] = getInputRowNumber();
+  const maxRows = MAX_ROWS;
   currentRows = currentRows > maxRows ? maxRows : currentRows;
-  promptElement.value.$el.style.height = `${currentRows * lineHeight}px`;
+  if (currentRows != inputRowNum.value) {
+    inputRowNum.value = currentRows;
+    promptElement.value.$el.style.height = `${currentRows * lineHeight}px`;
+  }
 }
 
 const onSubmit = handleSubmit((values, ctx) => {
@@ -45,6 +52,7 @@ const onSubmit = handleSubmit((values, ctx) => {
 
 onMounted(() => {
   feather.replace();
+  inputRowNum.value = getInputRowNumber();
 });
 
 </script>
