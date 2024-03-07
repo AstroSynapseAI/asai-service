@@ -102,7 +102,7 @@ export const useUserStore = defineStore({
       } catch (error) {
         throw error.Error
       }
-    }
+  },
   }
-
+  
 })
