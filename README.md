@@ -59,16 +59,6 @@ cd web
 yarn install
 ```
 
-#### Admin kit
-
-Vue needs to access the adminkit, for that we have to build it as a package. 
-
-```bash
-cd web/src/adminkit
-yarn install
-yarn build
-```
-
 Web client has CORS allowed to run alongised with the dockerised server. Run `yarn run dev` to run the web clinet on port 5173 as usaul. If you need the front end to be serverd at the same port as the dockerised app service, you can run `yarn run docker` to build the front ned for runing in docker, now the frontend is avaliable on port 8082.
 
 ### API keys
