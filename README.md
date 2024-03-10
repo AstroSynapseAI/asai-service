@@ -64,7 +64,7 @@ yarn install
 Vue needs to access the adminkit, for that we have to build it as a package. 
 
 ```bash
-cd web/arc/adminkit
+cd web/src/adminkit
 yarn install
 yarn build
 ```
