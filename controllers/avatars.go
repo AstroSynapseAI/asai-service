@@ -23,9 +23,9 @@ type AvatarsController struct {
 	Doc    *repositories.DocumentsRepository
 }
 
-func respondWithError(ctx *Context, errorMessage string) {
-    ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: errorMessage})
-    return
+func respondWithError(ctx *rest.Context, errorMessage string) {
+	ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: errorMessage})
+	return
 }
 
 func NewAvatarsController(db *database.Database) *AvatarsController {
@@ -92,12 +92,12 @@ func (ctrl *AvatarsController) SaveAvatar(ctx *rest.Context) {
 	}
 	if input.AvatarName == "" {
 		respondWithError(ctx, "Avatar Name is required")
-        return
-    }
-	if input.AvatarLLMID == "" {
+		return
+	}
+	if input.AvatarLLMID == 0 {
 		respondWithError(ctx, "Avatar Name is required")
-        return
-    }
+		return
+	}
 	avatar := models.Avatar{
 		Name:     input.AvatarName,
 		Slug:     createSlug(input.AvatarName),
