@@ -1,9 +1,22 @@
 <script setup>
-import { ref, onMounted, toRef } from 'vue';
+import { ref, onMounted, toRef, reactive } from 'vue';
 import { useRouter } from 'vue-router';
-import { Form, Field } from 'vee-validate';
+import { Form, Field, ErrorMessage } from 'vee-validate';
 import { useLLMStore } from '@/stores/llm.store.js';
 import { useAvatarStore } from '@/stores/avatar.store.js';
+import { useToast } from 'vue-toastification';
+import * as yup from 'yup';
+
+const toast = useToast();
+const schema = yup.object({
+  AvatarName: yup.string().required("The Avatar Name is required"),
+  AvatarLLMID: yup.string().required("The LLM is required"),
+  AvatarPrimer: yup.string()
+});
+
+const formState = reactive({
+  isSubmitting: false, 
+});
 
 // Initiate stores
 const llm = useLLMStore();
@@ -18,6 +31,7 @@ const avatarPrimer = ref('');
 const llms = toRef(llm, 'records')
 
 const submitForm =  async () => {
+  formState.isSubmitting = true; 
   try {
     const formData = {
       name: avatarName.value,
@@ -26,10 +40,13 @@ const submitForm =  async () => {
     }
     await avatar.saveAvatar(formData);
     await router.replace({name: 'personality', params: {avatar_id: avatar.userAvatar.ID}});
+    toast.success('Avatar saved successfully');
+    formState.isSubmitting = false;
     window.location.reload();
   }
   catch (error) {
-    console.log(error)
+    toast.error(error)
+    formState.isSubmitting = false; 
   }
 }
 
@@ -58,24 +75,26 @@ onMounted(async () => {
         <div class="card">
 
           <div class="card-body">
-            <div class="container p-4">
+            <Form class="container p-4" @submit="submitForm" :validation-schema="schema">
 
               <div class="row mb-5">
 
                 <div class="col-6">
-                  <div class="form-floating mb-3">
-                    <input v-model="avatarName" type="text" class="form-control" id="floatingInput" placeholder="Name your Avatar...">
+                  <div class="form-floating mb-1">
+                    <Field v-model="avatarName" name="AvatarName" type="text" class="form-control" id="floatingInput" placeholder="Name your Avatar..."/>
                     <label for="floatingInput">Avatar name</label>
                   </div>
+                  <ErrorMessage name="AvatarName" />
                 </div>
 
                 <div class="col-6">
-                  <select v-model="avatarLLMID" class="form-select model-select" aria-label="Select Model">
+                  <Field name="AvatarLLMID" as="select" v-model="avatarLLMID"  class="form-select model-select mb-1" aria-label="Select Model">
                     <option value="" disabled selected>Select a LLM</option>
                     <option v-for="(llm, index) in llms" :value="llm.ID" :key="index">
                       {{ llm.name }}
                     </option>
-                  </select>
+                  </Field>
+                  <ErrorMessage name="AvatarLLMID" />
                 </div>
 
               </div>
@@ -83,21 +102,27 @@ onMounted(async () => {
               <div class="row mb-5">
                 <div class="col-12">
                   <h3>Primer</h3>
+           
                   <Field
                     v-model="avatarPrimer"
-                    name="avatar-primer"
+                    name="AvatarPrimer"
                     type="text"
                     as="textarea"
-                    class="form-control"
+                    class="form-control mb-4"
                     rows="8"
                     placeholder=""
-                  ></Field>
+                  />
+                  <ErrorMessage name="AvatarPrimer"/>
                 </div>
               </div>
 
-              <button type="button" class="btn btn-secondary" @click="submitForm">Save</button>
-
-            </div>
+              <button type="submit" class="btn btn-secondary" :disabled="formState.isSubmitting">
+                <span v-if="formState.isSubmitting">
+                  <span class="loader"></span>
+                </span>
+                <span v-else>Save</span>
+              </button>
+            </Form>
           </div>
 
         </div>
@@ -107,3 +132,29 @@ onMounted(async () => {
   </div>
 
 </template>
+
+<style scoped>
+.model-select {
+  height: 58px;
+}
+
+.loader {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #FFF;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+    }
+
+    @keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+} 
+</style>
