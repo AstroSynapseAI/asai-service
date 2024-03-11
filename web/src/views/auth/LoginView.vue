@@ -42,11 +42,12 @@ const submitLogin = handleSubmit(async values => {
   }
   catch (err) {
     toast.error(err);
+    formState.isSubmitting = false; 
   }
 });
 
 onMounted(() => {
-  
+  feather.replace(); 
 });
 
 </script>
