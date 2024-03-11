@@ -40,6 +40,8 @@ const submitForm =  async () => {
     }
     await avatar.saveAvatar(formData);
     await router.replace({name: 'personality', params: {avatar_id: avatar.userAvatar.ID}});
+    toast.success('Avatar saved successfully');
+    formState.isSubmitting = false;
     window.location.reload();
   }
   catch (error) {
@@ -135,4 +137,24 @@ onMounted(async () => {
 .model-select {
   height: 58px;
 }
+
+.loader {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #FFF;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+    }
+
+    @keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+} 
 </style>
