@@ -2,10 +2,18 @@ package email
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"regexp"
 
 	"github.com/tmc/langchaingo/tools"
 	"github.com/xhit/go-simple-mail/v2"
+)
+
+const (
+	ErrInvalidInput  = "Invalid input"
+	ErrCreatingEmail = "Error while creating email"
+	ErrSendingEmail  = "Error while sending email"
 )
 
 type Client struct {
@@ -30,20 +38,49 @@ func NewClient(options ...ClientOptions) *Client {
 
 func (client Client) Call(ctx context.Context, input string) (string, error) {
 	fmt.Println("Email Tool Running...")
-	return "", nil
+	fmt.Println(input)
+
+	var toolInput struct {
+		sendTo  string
+		subject string
+		body    string
+	}
+
+	re := regexp.MustCompile(`(?s)\{.*\}`)
+	jsonString := re.FindString(input)
+
+	err := json.Unmarshal([]byte(jsonString), &toolInput)
+	if err != nil {
+		fmt.Println(err)
+		return fmt.Sprintf("%v: %s", ErrInvalidInput, err), nil
+	}
+
+	err = client.newEmail("", toolInput.sendTo, toolInput.subject, toolInput.body)
+	if err != nil {
+		fmt.Println(err)
+		return fmt.Sprintf("%v: %s", ErrCreatingEmail, err), nil
+	}
+
+	err = client.sendEmail()
+	if err != nil {
+		fmt.Println(err)
+		return fmt.Sprintf("%v: %s", ErrSendingEmail, err), nil
+	}
+
+	return "Email sent...", nil
 }
 
 func (client Client) Name() string {
-	return "Email Tool"
+	return "Email Agent"
 }
 
 func (client Client) Description() string {
 	return `
-		Email tool enabaes sending emails. The tool expects
+		Email agent enables sending emails. The agent expects
 		string json in the following format:
 		
 		{
-			"sentTo": "string",
+			"sendTo": "string",
 			"subject": "string",
 			"body": "stringHTML"
 		}
@@ -62,6 +99,7 @@ func (client Client) newEmail(sentFrom string, sentTo string, subject string, bo
 
 	return nil
 }
+
 func (client Client) sendEmail() error {
 	smtpClient, err := client.server.Connect()
 	if err != nil {
