@@ -10,6 +10,7 @@ import (
 	"github.com/AstroSynapseAI/app-service/engine/callbacks"
 	"github.com/AstroSynapseAI/app-service/engine/memory"
 	"github.com/AstroSynapseAI/app-service/engine/templates"
+	"github.com/AstroSynapseAI/app-service/engine/tools/email"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 
 	asaiTools "github.com/AstroSynapseAI/app-service/engine/tools"
@@ -55,6 +56,15 @@ func (chain *AsaiChain) LoadAvatar(userID uint, sessionID string, clientType str
 }
 
 func (chain *AsaiChain) LoadAgents() {
+
+	emailtool := email.NewClient(
+		email.WithHost("mail.gandi.net"),
+		email.WithPassword("asai1234"),
+		email.WithUsername("dispatch@astrosynapse.com"),
+	)
+
+	chain.Agents = append(chain.Agents, emailtool)
+
 	for _, agent := range chain.config.GetAgents() {
 		var activeAgent tools.Tool
 		var err error
