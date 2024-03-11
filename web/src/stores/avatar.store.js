@@ -38,7 +38,8 @@ export const useAvatarStore = defineStore({
         this.userAvatar = userAvatar;
 
       } catch (error) {
-        console.error(error);
+        console.log(error)
+        throw error.Error
       }
     },
 
