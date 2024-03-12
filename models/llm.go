@@ -27,6 +27,24 @@ func (*LLM) SeedModel(db *database.Database) error {
 				Description: "OpenAI is a large-scale, open-source AI research project.",
 				Provider:    "OpenAI",
 			},
+			{
+				Name:        "GPT-4-0613",
+				Slug:        "gpt-4-0613",
+				Description: "OpenAI is a large-scale, open-source AI research project.",
+				Provider:    "OpenAI",
+			},
+			{
+				Name:        "GPT-3.5",
+				Slug:        "gpt-3.5",
+				Description: "OpenAI is a large-scale, open-source AI research project.",
+				Provider:    "OpenAI",
+			},
+			{
+				Name:        "GPT-4-turbo Preview",
+				Slug:        "gpt-4-turbo-preview",
+				Description: "OpenAI is a large-scale, open-source AI research project.",
+				Provider:    "OpenAI",
+			},
 		}
 
 		if result := db.Adapter.Gorm().Create(&llms); result.Error != nil {

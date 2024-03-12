@@ -1,5 +1,7 @@
 package email
 
+import "github.com/xhit/go-simple-mail/v2"
+
 type ClientOptions func(*Client)
 
 func WithHost(hostname string) ClientOptions {
@@ -26,8 +28,9 @@ func WithPort(port int) ClientOptions {
 	}
 }
 
-func WithEncryption(encryption string) ClientOptions {
+func WithEncryption(encryption mail.Encryption) ClientOptions {
 	return func(c *Client) {
+		c.server.Encryption = encryption
 	}
 }
 

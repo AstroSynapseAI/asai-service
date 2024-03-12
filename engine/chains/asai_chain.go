@@ -6,11 +6,11 @@ import (
 	"time"
 
 	"github.com/AstroSynapseAI/app-service/engine"
+	"github.com/AstroSynapseAI/app-service/engine/agents/email"
 	"github.com/AstroSynapseAI/app-service/engine/agents/search"
 	"github.com/AstroSynapseAI/app-service/engine/callbacks"
 	"github.com/AstroSynapseAI/app-service/engine/memory"
 	"github.com/AstroSynapseAI/app-service/engine/templates"
-	"github.com/AstroSynapseAI/app-service/engine/tools/email"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 
 	asaiTools "github.com/AstroSynapseAI/app-service/engine/tools"
@@ -19,6 +19,7 @@ import (
 	"github.com/tmc/langchaingo/llms"
 
 	"github.com/tmc/langchaingo/chains"
+	"github.com/tmc/langchaingo/llms/openai"
 	"github.com/tmc/langchaingo/prompts"
 	"github.com/tmc/langchaingo/schema"
 	"github.com/tmc/langchaingo/tools"
@@ -56,15 +57,21 @@ func (chain *AsaiChain) LoadAvatar(userID uint, sessionID string, clientType str
 }
 
 func (chain *AsaiChain) LoadAgents() {
+	llm, err := openai.NewChat(
+		openai.WithModel("gpt-3.5-turbo-0125"),
+		openai.WithToken(""),
+	)
 
-	testTool := email.NewTestEmail()
-	// emailtool := email.NewClient(
-	// 	email.WithHost("mail.gandi.net"),
-	// 	email.WithPassword("asai1234"),
-	// 	email.WithUsername("dispatch@astrosynapse.com"),
-	// )
+	agentEmail, err := email.NewEmailAgent(
+		email.WithDefaultPrimer(),
+		email.WithLLM(llm),
+	)
 
-	chain.Agents = append(chain.Agents, testTool)
+	chain.Agents = append(chain.Agents, agentEmail)
+
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	for _, agent := range chain.config.GetAgents() {
 		var activeAgent tools.Tool

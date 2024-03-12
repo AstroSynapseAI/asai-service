@@ -76,14 +76,24 @@ func (client Client) Name() string {
 
 func (client Client) Description() string {
 	return `
-		Email agent enables sending emails. The agent expects
-		string json in the following format:
+		Email tool enables sending emails. The tool expects
+		json in the following format:
 		
 		{
 			"sendTo": "string",
 			"subject": "string",
 			"body": "stringHTML"
 		}
+
+		Example: 
+		{
+			"sendTo": "john.doe@gmail.com",
+			"subject": "Hello John",
+			"body": "Hello John, this is a test email"
+			
+		}
+
+		Note: All fields are required, make sure the input is a valid json.
 	`
 }
 

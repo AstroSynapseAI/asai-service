@@ -70,11 +70,6 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 		}
 	}
 
-	fmt.Println("Search Agent Tools:")
-	for _, tool := range searchTools {
-		fmt.Println(tool.Name())
-	}
-
 	// searchTmplt, err := templates.Load("search.txt")
 	// if err != nil {
 	// 	fmt.Println(err)
