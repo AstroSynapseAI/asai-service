@@ -39,6 +39,7 @@ watch(messages, () => {
 
 watch(lastMessageText, () => {
   scrollToBottom();
+  feather.replace();
 });
 
 onMounted(async () => {
@@ -57,13 +58,22 @@ onMounted(async () => {
   scrollToBottom();
   feather.replace();
   chatStore.connectWebSocket();
-  console.info('ICONS');
-  console.log(iconASAI);
 });
+
+const regeneratePrompt = function regeneratePrompt() {
+  console.info('Regenerate');
+  const lastHumanMessage = messages.value[messages.value.length - 2] || {};
+
+    chatStore.sendPrompt({
+      session_id: user.session_id,
+      avatar_id: user.avatar.ID,
+      msg: lastHumanMessage.content,
+    });
+}
 
 </script>
 
-``<template>
+<template>
   <div class="container-fluid">
     <h1 class="h3 mb-3">Avatar</h1>
     <div class="row">
@@ -72,17 +82,18 @@ onMounted(async () => {
           <div class="card-body">
             <div class="container d-flex flex-column">
 
-              
-              
               <div ref="conversationContainer" class="conversation-container flex-grow-1 overflow-auto">
                 
                 <template v-if="messages.length > 0">
                 
                   <div class="conversation-item row" v-for="(message, index) in messages" :key="index">
                   
-                    <div class="col-1">
+                    <div class="col-1 d-flex flex-column">
                       <img :src="iconASAI" class="logo" alt="Avatar Icon" width="35" v-if="message.sender === 'ai'" />
                       <img :src="iconUser" class="logo" alt="User Icon" width="35" height="50" v-if="message.sender === 'human'" />
+                        <button v-if="message.sender === 'ai'" @click="regeneratePrompt" class="retry-button btn my-2 p-0" :disabled="chatStore.isLoading" title="Regenerate prompt">
+                          <i class="align-middle" data-feather="refresh-cw"></i>
+                        </button>
                     </div>
                   
                     <div class="col-10">
@@ -144,6 +155,21 @@ main {
 .card-body {
   background-color: #19232E !important;
   color: white !important;
+}
+.retry-button {
+  vertical-align: middle;
+  border-color: transparent !important;
+  width: 35px;
+}
+
+.retry-button:disabled {
+  opacity: .7;
+}
+
+.retry-button .feather {
+  /* width: 20px;
+  height: 20px; */
+  margin: 0 auto;
 }
 
 @keyframes rotate {
