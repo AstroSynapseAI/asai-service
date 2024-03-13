@@ -63,7 +63,6 @@ func (chain *AsaiChain) LoadAgents() {
 	)
 
 	agentEmail, err := email.NewEmailAgent(
-		email.WithDefaultPrimer(),
 		email.WithLLM(llm),
 	)
 

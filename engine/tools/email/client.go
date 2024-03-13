@@ -41,9 +41,9 @@ func (client Client) Call(ctx context.Context, input string) (string, error) {
 	fmt.Println(input)
 
 	var toolInput struct {
-		sendTo  string
-		subject string
-		body    string
+		SendTo  string `json:"sendTo"`
+		Subject string `json:"subject"`
+		Message string `json:"message"`
 	}
 
 	re := regexp.MustCompile(`(?s)\{.*\}`)
@@ -55,7 +55,10 @@ func (client Client) Call(ctx context.Context, input string) (string, error) {
 		return fmt.Sprintf("%v: %s", ErrInvalidInput, err), nil
 	}
 
-	err = client.newEmail("", toolInput.sendTo, toolInput.subject, toolInput.body)
+	log := fmt.Sprintf("SendTo: %s\nSubject: %s\nMessage: %s\n", toolInput.SendTo, toolInput.Subject, toolInput.Message)
+	fmt.Println(log)
+
+	err = client.newEmail(toolInput.SendTo, toolInput.Subject, toolInput.Message)
 	if err != nil {
 		fmt.Println(err)
 		return fmt.Sprintf("%v: %s", ErrCreatingEmail, err), nil
@@ -67,6 +70,7 @@ func (client Client) Call(ctx context.Context, input string) (string, error) {
 		return fmt.Sprintf("%v: %s", ErrSendingEmail, err), nil
 	}
 
+	fmt.Println("Email sent...")
 	return "Email sent...", nil
 }
 
@@ -97,11 +101,11 @@ func (client Client) Description() string {
 	`
 }
 
-func (client Client) newEmail(sentFrom string, sentTo string, subject string, body string) error {
+func (client Client) newEmail(sendTo string, subject string, body string) error {
 
-	client.email.AddTo(sentTo)
+	client.email.AddTo(sendTo)
 	client.email.SetSubject(subject)
-	client.email.SetBody(mail.TextHTML, body)
+	client.email.SetBody(mail.TextPlain, body)
 
 	if client.email.Error != nil {
 		return client.email.Error
@@ -111,6 +115,7 @@ func (client Client) newEmail(sentFrom string, sentTo string, subject string, bo
 }
 
 func (client Client) sendEmail() error {
+	fmt.Println("Sending Email...")
 	smtpClient, err := client.server.Connect()
 	if err != nil {
 		return err

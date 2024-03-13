@@ -1,6 +1,8 @@
 package email
 
-import "github.com/tmc/langchaingo/llms"
+import (
+	"github.com/tmc/langchaingo/llms/openai"
+)
 
 type EmailAgentOptions func(*EmailAgent)
 
@@ -10,7 +12,7 @@ func WithDefaultPrimer() EmailAgentOptions {
 	}
 }
 
-func WithLLM(llm llms.LanguageModel) EmailAgentOptions {
+func WithLLM(llm *openai.Chat) EmailAgentOptions {
 	return func(emailAgent *EmailAgent) {
 		emailAgent.LLM = llm
 	}
@@ -22,13 +24,8 @@ func defaulPrimer() string {
 
   {{.tool_descriptions}}
   
-  The agent should ONLY provide the correct json input for the Email tool.
-
-  The New Input must contain The following:
-  - send to: 
-  - subject:
-  - message:
-
+  The agent MUST provide the correct json input for the Email tool.
+ 
   To use the tool, you MUST the following format:
 
   Thought: Do I need to use the Email tool? Yes
@@ -43,7 +40,7 @@ func defaulPrimer() string {
   Final Answer: Please provide all the required information to use the Email tool
 
 
-  Your final answer MUST have the prefix "Final Answer:"!
+  Your final answer MUST have the prefix "Final Answer:"
 
   Begin!
 
