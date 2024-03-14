@@ -1,14 +1,15 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth.store";
 
-import AsaiChatView from "@/views/AsaiChatView.vue";
-import HomeView from "@/views/home/HomeView.vue";
-import AboutView from "@/views/home/AboutView.vue";
-import LoginView from "@/views/LoginView.vue";
-import AdminView from "@/views/admin/AdminView.vue";
-import RegisterView from "@/views/RegisterView.vue";
-
+import AsaiChatView from '@/views/AsaiChatView.vue'
+import HomeView from '@/views/home/HomeView.vue'
+import AboutView from '@/views/home/AboutView.vue'
+import LoginView from '@/views/auth/LoginView.vue'
+import AdminView from '@/views/admin/AdminView.vue'
+import RegisterView from '@/views/auth/RegisterView.vue'
+import ForgotPasswordView from '@/views/auth/ForgotPasswordView.vue'
 import adminRoutes from "./admin.router";
+import PasswordResetView from "../views/auth/PasswordResetView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -38,6 +39,19 @@ const router = createRouter({
       name: "login",
       meta: { requiresAuth: false },
       component: LoginView,
+    },
+    {
+      path: '/forgot_password',
+      name: 'forgot_password',
+      meta: { requiresAuth: false },
+      component: ForgotPasswordView
+    },
+
+    {
+      path: "/password_reset/:reset_token?",
+      name: "password_reset",
+      meta: { requiresAuth: false },
+      component: PasswordResetView,
     },
     // {
     //   path: '/chat',

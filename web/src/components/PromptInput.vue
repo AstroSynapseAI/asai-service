@@ -1,84 +1,67 @@
 <script setup>
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted } from 'vue';
 import { Form, Field, useForm } from 'vee-validate';
 import { useChatStore } from '../stores/chat.store.js';
 import { useUserStore } from '../stores/user.store.js';
 
 const user = useUserStore();
-
 const chatStore = useChatStore();
-const prompt = ref("");
+const MAX_ROWS = 10;
 
-let { resetForm } = useForm();
+let { resetForm, handleSubmit, defineField } = useForm({
+  initialValues: {
+    prompt: ''
+  }
+});
 
-function resizeTextArea(event) {
-  event.target.style.height = 'auto';
+const [prompt, promptAttrs] = defineField('prompt');
+const promptElement = ref(null);
+let inputRowNum = ref(0);
 
-  const lineHeight = parseInt(window.getComputedStyle(event.target).getPropertyValue("line-height"));
-  let currentRows = Math.floor(event.target.scrollHeight / lineHeight);
-  const maxRows = 10;
-
-  currentRows = currentRows > maxRows ? maxRows : currentRows;
-  event.target.style.height = `${currentRows * lineHeight}px`;
+function getInputRowNumber() {
+  const lineHeight = parseInt(window.getComputedStyle(promptElement.value.$el).getPropertyValue("line-height"));
+  return [Math.floor(promptElement.value.$el.scrollHeight / lineHeight), lineHeight];
 }
 
-function addNewLines(event) {
-  event.preventDefault();
-  let cursorPos = event.target.selectionStart;
-  let textBeforeCursor = prompt.value.substring(0, cursorPos);
-  let textAfterCursor = prompt.value.substring(cursorPos);
-  prompt.value = textBeforeCursor + '\n' + textAfterCursor;
-  nextTick(() => {
-    resizeTextArea(event);
-  });
+function resizeTextArea() {
+  let [currentRows, lineHeight] = getInputRowNumber();
+  currentRows = currentRows > MAX_ROWS ? MAX_ROWS : currentRows;
+  if (currentRows != inputRowNum.value) {
+    inputRowNum.value = currentRows;
+    promptElement.value.$el.style.height = `${currentRows * lineHeight}px`;
+  }
 }
 
-function submitPrompt(event, resetForm) {
-  event.preventDefault();
-  if (prompt.value.trim() !== '') {
+const onSubmit = handleSubmit((values, ctx) => {
+  
+  if (values.prompt.trim() !== '') {
     const payload = {
       session_id: user.session_id,
-      prompt: prompt.value,
+      avatar_id: user.avatar.ID,
+      msg: values.prompt,
     }
-
-    console.log("Prompt:", prompt.value);
-
-    chatStore.sendPrompt(payload);
-    event.target.style.height = 'auto';
     resetForm();
+
+    setTimeout(() => {
+      resizeTextArea();
+      chatStore.sendPrompt(payload);
+    }, 0);
   }
-}
-
-function handleEnterPress(event, resetForm) {
-  const isDesktop = !(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
-
-  if (isDesktop) {
-    if (event.shiftKey && event.key == 'Enter') {
-      addNewLines(event);
-    }
-    else if (event.key == 'Enter') {
-      submitPrompt(event, resetForm);
-    }
-  } else {
-    if (event.key == 'Enter') {
-      addNewLines(event);
-    }
-  }
-
-}
+});
 
 onMounted(() => {
   feather.replace();
+  inputRowNum.value = getInputRowNumber();
 });
 
 </script>
 
 <template>
-  <Form v-slot="{ resetForm }">
+  <Form @submit="onSubmit">
     <div :class="{ 'textarea-container': true, 'loading': chatStore.isLoading, 'form-control': true}" class="form-control">
       <Field
         v-on:input="resizeTextArea"
-        @keydown.enter="handleEnterPress($event, resetForm)"
+        @keydown.enter.exact.prevent="onSubmit"
         name="prompt"
         v-model="prompt"
         type="text"
@@ -87,8 +70,9 @@ onMounted(() => {
         rows="2"
         placeholder="Send a message..."
         :disabled="chatStore.isLoading"
+        ref="promptElement"
       ></Field>
-      <button class="send-button btn btn-light" :disabled="chatStore.isLoading" @click="submitPrompt($event, resetForm)">
+      <button class="send-button btn btn-light" :disabled="chatStore.isLoading">
         <i class="align-middle" data-feather="send"></i>
       </button>
     </div>
@@ -108,8 +92,8 @@ onMounted(() => {
 
 .send-button {
   position: absolute;
-  right: 0.5rem;
-  bottom: 0.7rem;
+  right: 0.9rem;
+  bottom: 0.9rem;
   background-color: black;
   color: white;
   border: 1px solid white;
@@ -121,7 +105,7 @@ onMounted(() => {
 }
 
 textarea {
-  width: calc(100% - 50px);
+  width: calc(100% - 60px);
   background-color: transparent;
   color: white !important;
   z-index: 999;

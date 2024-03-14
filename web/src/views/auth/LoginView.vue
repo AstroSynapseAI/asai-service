@@ -42,11 +42,12 @@ const submitLogin = handleSubmit(async values => {
   }
   catch (err) {
     toast.error(err);
+    formState.isSubmitting = false; 
   }
 });
 
 onMounted(() => {
-  
+  feather.replace(); 
 });
 
 </script>
@@ -91,6 +92,11 @@ onMounted(() => {
                 </span>
                 <span v-else>LOGIN</span>
               </button>
+              <div class="col-auto">
+                <router-link :to="{name: 'forgot_password'}" class="btn btn-light" style="margin-top: 10px;">
+                    <span>Forgot password?</span>
+                </router-link>  
+              </div>
           </Form>
             
           </div>
@@ -143,7 +149,7 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 0;
   width: 100%;
 }
-.card-body {
+.card-body { 
   color: white; /* To make text visible in dark background */
 }
 

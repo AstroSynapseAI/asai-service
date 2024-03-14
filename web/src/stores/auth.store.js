@@ -48,6 +48,28 @@ export const useAuthStore = defineStore({
       }
     },
 
+    async sendRecoverPasswordLink(email) {
+      const reqBody = {
+        email: email,
+      };
+      try {
+        await fetchWrapper.post(`${usersURL}/password_recovery`, reqBody);
+      } catch (error) {
+        throw error.Error 
+      }
+    },
+
+    async validateRecoveryToken(token) {
+      try {
+        const user = await fetchWrapper.get(
+          `${usersURL}/password_recovery/${token}`
+        );
+        return user
+      } catch (error) {
+        throw error.Error 
+      }
+    },
+
     async getInvitedUser(inviteToken) {
       try {
         const user = await fetchWrapper.get(
