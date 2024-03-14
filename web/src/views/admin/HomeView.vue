@@ -6,6 +6,8 @@ import { storeToRefs } from 'pinia';
 import { useChatStore } from '@/stores/chat.store';
 import { useUserStore } from '@/stores/user.store';
 import MarkdownIt from 'markdown-it';
+import iconASAI from '../../assets/asai-icon.png';
+import iconUser from '../../assets/user-icon.png';
 
 const route = useRoute();
 
@@ -55,6 +57,8 @@ onMounted(async () => {
   scrollToBottom();
   feather.replace();
   chatStore.connectWebSocket();
+  console.info('ICONS');
+  console.log(iconASAI);
 });
 
 </script>
@@ -77,8 +81,8 @@ onMounted(async () => {
                   <div class="conversation-item row" v-for="(message, index) in messages" :key="index">
                   
                     <div class="col-1">
-                      <img src="../../assets/asai-icon.png" class="logo" alt="Avatar Icon" width="35" v-if="message.type === 'ai'"/>
-                      <img src="../../assets/user-icon.png" class="logo" alt="User Icon" width="35" height="50" v-if="message.type === 'human'"/>
+                      <img :src="iconASAI" class="logo" alt="Avatar Icon" width="35" v-if="message.sender === 'ai'" />
+                      <img :src="iconUser" class="logo" alt="User Icon" width="35" height="50" v-if="message.sender === 'human'" />
                     </div>
                   
                     <div class="col-10">
