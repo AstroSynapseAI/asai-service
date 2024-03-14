@@ -11,13 +11,13 @@ import (
 type EmailAgentOptions func(*EmailAgent)
 
 type config struct {
-	IMAPServer string
-	SMTPServer string
-	IMAPPort   int
-	SMTPPort   int
-	Username   string
-	Password   string
-	Encryption mail.Encryption
+	IMAPServer string `json:"imap_server"`
+	SMTPServer string `json:"smtp_server"`
+	IMAPPort   int    `json:"imap_port"`
+	SMTPPort   int    `json:"smtp_port"`
+	Username   string `json:"username"`
+	Password   string `json:"password"`
+	Encryption string `json:"encryption"`
 }
 
 func WithLLM(llm *openai.Chat) EmailAgentOptions {
@@ -42,7 +42,18 @@ func WithConfig(data string) EmailAgentOptions {
 		emailAgent.IMAPPort = configData.IMAPPort
 		emailAgent.Username = configData.Username
 		emailAgent.Password = configData.Password
-		emailAgent.Encryption = configData.Encryption
+
+		switch configData.Encryption {
+		case "ssl":
+			emailAgent.Encryption = mail.EncryptionSSL
+		case "tls":
+			emailAgent.Encryption = mail.EncryptionTLS
+		case "starttls":
+			emailAgent.Encryption = mail.EncryptionSTARTTLS
+		default:
+			emailAgent.Encryption = mail.EncryptionNone
+		}
+
 	}
 }
 
