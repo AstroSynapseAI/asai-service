@@ -25,8 +25,7 @@ function getInputRowNumber() {
 
 function resizeTextArea() {
   let [currentRows, lineHeight] = getInputRowNumber();
-  const maxRows = MAX_ROWS;
-  currentRows = currentRows > maxRows ? maxRows : currentRows;
+  currentRows = currentRows > MAX_ROWS ? MAX_ROWS : currentRows;
   if (currentRows != inputRowNum.value) {
     inputRowNum.value = currentRows;
     promptElement.value.$el.style.height = `${currentRows * lineHeight}px`;
@@ -93,8 +92,8 @@ onMounted(() => {
 
 .send-button {
   position: absolute;
-  right: 0.5rem;
-  bottom: 0.7rem;
+  right: 0.9rem;
+  bottom: 0.9rem;
   background-color: black;
   color: white;
   border: 1px solid white;
@@ -106,7 +105,7 @@ onMounted(() => {
 }
 
 textarea {
-  width: calc(100% - 50px);
+  width: calc(100% - 60px);
   background-color: transparent;
   color: white !important;
   z-index: 999;
