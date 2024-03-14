@@ -11,12 +11,18 @@ import (
 
 func main() {
 
-	cnf := app.NewConfig().DSN
-	db, err := gorm.Open(postgres.Open(cnf), &gorm.Config{})
+	app := app.NewConfig()
+	app.LoadEnvironment()
+	if app.DSN == "" {
+		app.DSN = "host=localhost user=asai-admin password=asai-password dbname=asai-db port=5432 sslmode=disable"
+	}
+
+	db, err := gorm.Open(postgres.Open(app.DSN), &gorm.Config{})
 	if err != nil {
 		fmt.Println("failed to connect database:", err)
 		panic(err)
 	}
 
 	db.AutoMigrate(&models.User{})
+
 }
