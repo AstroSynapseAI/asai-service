@@ -1,15 +1,23 @@
 package email
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/tmc/langchaingo/llms/openai"
+	"github.com/xhit/go-simple-mail/v2"
 )
 
 type EmailAgentOptions func(*EmailAgent)
 
-func WithDefaultPrimer() EmailAgentOptions {
-	return func(emailAgent *EmailAgent) {
-		emailAgent.Primer = defaulPrimer()
-	}
+type config struct {
+	IMAPServer string
+	SMTPServer string
+	IMAPPort   int
+	SMTPPort   int
+	Username   string
+	Password   string
+	Encryption mail.Encryption
 }
 
 func WithLLM(llm *openai.Chat) EmailAgentOptions {
@@ -18,35 +26,64 @@ func WithLLM(llm *openai.Chat) EmailAgentOptions {
 	}
 }
 
-func defaulPrimer() string {
-	return `
-  Email agent is trained to write and send emails using the following tool:
+func WithConfig(data string) EmailAgentOptions {
+	return func(emailAgent *EmailAgent) {
+		var configData config
 
-  {{.tool_descriptions}}
-  
-  The agent MUST provide the correct json input for the Email tool.
- 
-  To use the tool, you MUST the following format:
+		err := json.Unmarshal([]byte(data), &configData)
+		if err != nil {
+			fmt.Println("Error decoding config data:", err)
+			return
+		}
 
-  Thought: Do I need to use the Email tool? Yes
-  Action: the action to take, should be {{.tool_names}}
-  Action Input: the input to the action
-  Observation: the result of the action
-  Final Answer: report the result of the action 
+		emailAgent.SMTPServer = configData.SMTPServer
+		emailAgent.SMTPPort = configData.SMTPPort
+		emailAgent.IMAPServer = configData.IMAPServer
+		emailAgent.IMAPPort = configData.IMAPPort
+		emailAgent.Username = configData.Username
+		emailAgent.Password = configData.Password
+		emailAgent.Encryption = configData.Encryption
+	}
+}
 
-  If you you do not receive all 3 input fields, you MUST respond with the following format:
+func WithIMAPServer(hostname string) EmailAgentOptions {
+	return func(agent *EmailAgent) {
+		agent.IMAPServer = hostname
+	}
+}
 
-  Thought: Do I have all the required information to use the Email tool? No
-  Final Answer: Please provide all the required information to use the Email tool
+func WithSMTPServer(hostname string) EmailAgentOptions {
+	return func(agent *EmailAgent) {
+		agent.SMTPServer = hostname
+	}
+}
 
+func WithIMAPPort(port int) EmailAgentOptions {
+	return func(agent *EmailAgent) {
+		agent.IMAPPort = port
+	}
+}
 
-  Your final answer MUST have the prefix "Final Answer:"
+func WithSMTPPort(port int) EmailAgentOptions {
+	return func(agent *EmailAgent) {
+		agent.SMTPPort = port
+	}
+}
 
-  Begin!
+func WithUsername(username string) EmailAgentOptions {
+	return func(agent *EmailAgent) {
+		agent.Username = username
+	}
+}
 
-  New Input: {{.input}}
+func WithPassword(password string) EmailAgentOptions {
+	return func(agent *EmailAgent) {
+		agent.Password = password
+	}
+}
 
-  Thought:{{.agent_scratchpad}}
-  
-  `
+func WithEncryption(encryption mail.Encryption) EmailAgentOptions {
+	return func(agent *EmailAgent) {
+		agent.Encryption = encryption
+	}
 }

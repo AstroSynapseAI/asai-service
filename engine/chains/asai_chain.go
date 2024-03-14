@@ -88,6 +88,17 @@ func (chain *AsaiChain) LoadAgents() {
 			}
 		}
 
+		if agent.GetAgentSlug() == "email-agent" && agent.IsAgentActive() {
+
+			activeAgent, err = email.NewEmailAgent(
+				email.WithLLM(agent.GetAgentLLM().(*openai.Chat)),
+				email.WithConfig(agent.GetAgentConfig()),
+			)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
+
 		if activeAgent != nil {
 			chain.Agents = append(chain.Agents, activeAgent)
 		}

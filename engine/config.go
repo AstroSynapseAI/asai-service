@@ -143,6 +143,10 @@ func (cnf *ActiveAgent) GetAgentLLM() llms.LanguageModel {
 	return llm
 }
 
+func (cnf *ActiveAgent) GetAgentConfig() string {
+	return cnf.ActiveAgent.Config
+}
+
 func (cnf *ActiveAgent) GetAgentPrimer() string {
 	return cnf.ActiveAgent.Primer
 }

@@ -34,48 +34,37 @@ const (
 )
 
 type EmailAgent struct {
-	Primer    string
-	LLM       *openai.Chat
-	Executor  agents.Executor
-	EmailTool *email.Client
+	Primer     string
+	LLM        *openai.Chat
+	Executor   agents.Executor
+	EmailTool  *email.Client
+	IMAPServer string
+	SMTPServer string
+	IMAPPort   int
+	SMTPPort   int
+	Password   string
+	Username   string
+	Encryption mail.Encryption
 }
 
 func NewEmailAgent(options ...EmailAgentOptions) (*EmailAgent, error) {
 	// create a new email agent
-	emailAgent := &EmailAgent{
-		EmailTool: email.NewClient(
-			email.WithHost("mail.gandi.net"),
-			email.WithPassword("asai1234"),
-			email.WithUsername("dispatch@astrosynapse.com"),
-			email.WithEncryption(mail.EncryptionSSLTLS),
-			email.WithPort(465),
-		),
-	}
+	emailAgent := &EmailAgent{}
 
 	// apply email agent options
 	for _, option := range options {
 		option(emailAgent)
 	}
 
-	// promptTmplt := prompts.PromptTemplate{
-	// 	Template:       emailAgent.Primer,
-	// 	TemplateFormat: prompts.TemplateFormatGoTemplate,
-	// 	InputVariables: []string{"input", "agent_scratchpad"},
-	// 	PartialVariables: map[string]interface{}{
-	// 		"tool_names":        asaiTools.Names([]tools.Tool{emailAgent.EmailTool}),
-	// 		"tool_descriptions": asaiTools.Descriptions([]tools.Tool{emailAgent.EmailTool}),
-	// 	},
-	// }
-	//
-	// agent := agents.NewOneShotAgent(
-	// 	emailAgent.LLM,
-	// 	[]tools.Tool{emailAgent.EmailTool},
-	// 	agents.WithPrompt(promptTmplt),
-	// 	agents.WithMaxIterations(3),
-	// 	agents.WithMemory(memory.NewSimple()),
-	// )
-	//
-	// emailAgent.Executor = agents.NewExecutor(agent, []tools.Tool{emailAgent.EmailTool})
+	emailClient := email.NewClient(
+		email.WithHost(emailAgent.SMTPServer),
+		email.WithPassword(emailAgent.Password),
+		email.WithUsername(emailAgent.Username),
+		email.WithEncryption(emailAgent.Encryption),
+		email.WithPort(emailAgent.SMTPPort),
+	)
+
+	emailAgent.EmailTool = emailClient
 
 	return emailAgent, nil
 }
