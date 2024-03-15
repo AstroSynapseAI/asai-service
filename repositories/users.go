@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"time"
 
 	"github.com/AstroSynapseAI/app-service/models"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
@@ -25,7 +26,7 @@ func (user *UsersRepository) Login(username string, password string) (models.Use
 	err := user.Repo.DB.Where("username = ? AND password = ?", username, password).First(&record).Error
 	if err != nil {
 		if err.Error() == "record not found" {
-			err = fmt.Errorf("Invalid username or password")
+			err = fmt.Errorf("invalid username or password")
 		}
 		return models.User{}, err
 	}
@@ -86,6 +87,31 @@ func (user *UsersRepository) CreateInvite(username string) (models.User, error) 
 	return userRecord, nil
 }
 
+func (user *UsersRepository) CreateAndSendRecoveryToken(email string) (models.User, error) {
+
+	account, err := user.GetAccountByEmail(email)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	recoveryToken, err := user.GenerateToken(64)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	userRecord, err := user.GetUserByAccountID(account.UserID)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	updatedUserRecord, err := user.InsertPasswordResetToken(userRecord.ID, recoveryToken, time.Now().Add(24*time.Hour))
+	if err != nil {
+		return models.User{}, err
+	}
+
+	return updatedUserRecord, nil
+}
+
 func (user *UsersRepository) ConfirmInvite(username string, password string, token string) (models.User, error) {
 	invitedUser, err := user.GetByInviteToken(token)
 	if err != nil {
@@ -139,6 +165,34 @@ func (user *UsersRepository) GetByUsername(username string) (models.User, error)
 		return models.User{}, err
 	}
 
+	return record, nil
+}
+
+func (user *UsersRepository) GetUserByAccountID(id uint) (models.User, error) {
+
+	var record models.User
+	err := user.Repo.DB.Where("id = ?", id).First(&record).Error
+	if err != nil {
+		return models.User{}, err
+	}
+	return record, nil
+}
+
+func (user *UsersRepository) GetAccountByEmail(email string) (models.Account, error) {
+	var record models.Account
+	err := user.Repo.DB.Where("email = ?", email).First(&record).Error
+	if err != nil {
+		return models.Account{}, err
+	}
+	return record, nil
+}
+
+func (user *UsersRepository) GetByResetToken(token string) (models.User, error) {
+	var record models.User
+	err := user.Repo.DB.Where("password_reset_token = ?", token).First(&record).Error
+	if err != nil {
+		return models.User{}, fmt.Errorf("invalid reset token")
+	}
 	return record, nil
 }
 
@@ -244,6 +298,46 @@ func (user *UsersRepository) UpdatePassword(userID uint, password string) (model
 	}
 
 	record.Password = password
+
+	_, err = user.Repo.Update(userID, record)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	return record, nil
+}
+
+func (user *UsersRepository) InsertPasswordResetToken(userID uint, resetToken string, resetTokenExpiry time.Time) (models.User, error) {
+
+	var record models.User
+	err := user.Repo.DB.Where("id = ?", userID).First(&record).Error
+	if err != nil {
+		return models.User{}, err
+	}
+
+	record.PasswordResetToken = resetToken
+	record.PasswordResetTokenExpiry = resetTokenExpiry
+
+	_, err = user.Repo.Update(userID, record)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	return record, nil
+}
+
+func (user *UsersRepository) RemovePasswordResetToken(userID uint) (models.User, error) {
+	var record models.User
+	err := user.Repo.DB.Where("id = ?", userID).First(&record).Error
+	if err != nil {
+		return models.User{}, err
+	}
+
+	zeroTime := time.Time{}
+	desiredTime := zeroTime.Add(24 * time.Hour)
+
+	record.PasswordResetToken = ""
+	record.PasswordResetTokenExpiry = desiredTime
 
 	_, err = user.Repo.Update(userID, record)
 	if err != nil {

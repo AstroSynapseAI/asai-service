@@ -8,3 +8,4 @@ api-requests.http
 node_modules
 yarn.lock
 package.json
+config.json

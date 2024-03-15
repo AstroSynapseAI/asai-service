@@ -3,12 +3,17 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/AstroSynapseAI/app-service/models"
 	"github.com/AstroSynapseAI/app-service/repositories"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/AstroSynapseAI/app-service/sdk/rest"
+	"github.com/sendgrid/sendgrid-go"
+	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"github.com/thanhpk/randstr"
+	"gopkg.in/yaml.v2"
 
 	"github.com/AstroSynapseAI/app-service/sdk/crud/orms/gorm"
 )
@@ -31,6 +36,7 @@ func (ctrl *UsersController) Run() {
 	ctrl.Post("/register", ctrl.Register)
 	ctrl.Post("/register/invite", ctrl.RegisterInvite)
 	ctrl.Post("/invite", ctrl.CreateInvite)
+	ctrl.Post("/password_recovery", ctrl.CreatePasswordRecovery)
 	ctrl.Post("/{id}/accounts/save", ctrl.SaveAccount)
 	ctrl.Post("/{id}/save/profile", ctrl.SaveProfile)
 
@@ -42,6 +48,7 @@ func (ctrl *UsersController) Run() {
 	ctrl.Get("/{id}/avatars", ctrl.GetAvatar)
 	ctrl.Get("/invited/{token}", ctrl.GetInvitedUser)
 	ctrl.Get("/token", ctrl.GetToken)
+	ctrl.Get("/password_recovery/{token}", ctrl.ValidatePasswordRecoveryToken)
 
 }
 
@@ -97,8 +104,137 @@ func (ctrl *UsersController) GetInvitedUser(ctx *rest.Context) {
 	ctx.JsonResponse(http.StatusOK, user)
 }
 
+func (ctrl *UsersController) ValidatePasswordRecoveryToken(ctx *rest.Context) {
+	fmt.Println("UsersController.ValidatePasswordRecoveryToken")
+
+	recoveryToken := ctx.GetParam("token")
+	if recoveryToken == "" {
+		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Invalid request body"})
+		return
+	}
+
+	user, err := ctrl.User.GetByResetToken(recoveryToken)
+	if err != nil {
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: err.Error()})
+		return
+	}
+
+	if time.Since(user.PasswordResetTokenExpiry) >= 24*time.Hour {
+		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Token expired"})
+		return
+	}
+
+	ctx.JsonResponse(http.StatusOK, user)
+}
+
 // Custom routes
-//
+
+// password recovery
+func (ctrl *UsersController) CreatePasswordRecovery(ctx *rest.Context) {
+	fmt.Println("UsersController.CreatePasswordRecovery")
+	var input struct {
+		Email string `json:"email"`
+	}
+
+	err := ctx.JsonDecode(&input)
+	if err != nil {
+		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Invalid request body"})
+		return
+	}
+
+	record, err := ctrl.User.CreateAndSendRecoveryToken(input.Email)
+	if err != nil {
+		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: err.Error()})
+		return
+	}
+
+	var envSetup string
+
+	if os.Getenv("ENVIRONMENT") == "LOCAL DEV" {
+		envSetup = "http://localhost:5173/password_reset/"
+	}
+
+	if os.Getenv("ENVIRONMENT") == "HEROKU DEV" {
+		envSetup = "https://dev.asai.astrosynapse.ai/password_reset/"
+	}
+
+	if os.Getenv("ENVIRONMENT") == "AWS DEV" {
+		envSetup = "https://asai.astrosynapse.ai/password_reset/"
+	}
+
+	fromEmail, err := getSendgridEmail()
+	if err != nil {
+		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Error sending email"})
+		return
+	}
+
+	from := mail.NewEmail("ASAI", fromEmail)
+	subject := "Password recovery"
+	to := mail.NewEmail("Recipient Name", input.Email)
+	plainTextContent := "Password reset link"
+	resetLink := envSetup + record.PasswordResetToken
+
+	htmlContent := "<p>Open the following link to reset your password:</p>"
+	htmlContent += "<p><a href=\"" + resetLink + "\">" + resetLink + "</a></p>"
+
+	message := mail.NewSingleEmail(from, subject, to, plainTextContent, htmlContent)
+
+	apiKey, err := getSendgridAPIKey()
+	if err != nil {
+		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Error sending email"})
+		return
+	}
+
+	client := sendgrid.NewSendClient(apiKey)
+
+	// Send the email
+	response, err := client.Send(message)
+	if err != nil {
+		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Error sending email"})
+		return
+	}
+
+	ctx.JsonResponse(http.StatusOK, response)
+}
+
+func getSendgridAPIKey() (string, error) {
+
+	var Config struct {
+		SendgridAPIKey string `yaml:"sendgrid_api_key"`
+	}
+
+	keys, err := os.ReadFile("./app/keys.yaml")
+	if err != nil {
+		fmt.Println("Error reading keys.yaml:", err)
+	}
+
+	err = yaml.Unmarshal(keys, &Config)
+	if err != nil {
+		fmt.Println("Error unmarshalling keys.yaml:", err)
+	}
+
+	return Config.SendgridAPIKey, nil
+}
+
+func getSendgridEmail() (string, error) {
+
+	var Config struct {
+		SendgridEmail string `yaml:"sendgrid_email"`
+	}
+
+	keys, err := os.ReadFile("./app/keys.yaml")
+	if err != nil {
+		fmt.Println("Error reading keys.yaml:", err)
+	}
+
+	err = yaml.Unmarshal(keys, &Config)
+	if err != nil {
+		fmt.Println("Error unmarshalling keys.yaml:", err)
+	}
+
+	return Config.SendgridEmail, nil
+}
+
 // create user invite
 func (ctrl *UsersController) CreateInvite(ctx *rest.Context) {
 	fmt.Println("UsersController.CreateInvite")
@@ -231,6 +367,29 @@ func (ctrl *UsersController) GetAccounts(ctx *rest.Context) {
 	}
 
 	ctx.JsonResponse(http.StatusOK, accounts)
+}
+
+// write a function that will fetch account by email from database
+func (ctrl *UsersController) GetAccountByEmail(ctx *rest.Context) {
+	fmt.Println("UsersController.GetAccountByEmail")
+	//userID := ctx.GetID()
+	var reqData struct {
+		Email string `json:"email"`
+	}
+
+	err := ctx.JsonDecode(&reqData)
+	if err != nil {
+		ctx.SetStatus(http.StatusBadRequest)
+		return
+	}
+
+	account, err := ctrl.User.GetAccountByEmail(reqData.Email)
+	if err != nil {
+		ctx.SetStatus(http.StatusInternalServerError)
+		return
+	}
+
+	ctx.JsonResponse(http.StatusOK, account)
 }
 
 func (ctrl *UsersController) GetAccount(ctx *rest.Context) {
@@ -383,7 +542,13 @@ func (ctrl *UsersController) ChangePassword(ctx *rest.Context) {
 		return
 	}
 
-	ctx.JsonResponse(http.StatusOK, user)
+	usr, err := ctrl.User.RemovePasswordResetToken(user.ID)
+	if err != nil {
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
+		return
+	}
+
+	ctx.JsonResponse(http.StatusOK, usr)
 }
 
 // func (ctrl *UsersController) ChangeEmail(ctx *rest.Context) {
