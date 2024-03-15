@@ -27,6 +27,7 @@ type ActiveAgent struct {
 	IsPublic         bool              `json:"is_public"`
 	Primer           string            `json:"primer,omitempty"`
 	LLMID            uint              `json:"llm_id,omitempty"`
+	Config           string            `json:"config,omitempty"`
 	AvatarID         uint              `json:"avatar_id,omitempty"`
 	AgentID          uint              `json:"agent_id,omitempty"`
 	LLM              LLM               `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"llm,omitempty"`
@@ -37,6 +38,7 @@ type ActiveAgent struct {
 
 type ActiveAgentTool struct {
 	gorm.Model
+	Config        string      `json:"config,omitempty"`
 	IsActive      bool        `json:"is_active"`
 	IsPublic      bool        `json:"is_public"`
 	Token         string      `json:"token,omitempty"`
@@ -48,6 +50,7 @@ type ActiveAgentTool struct {
 
 type ActiveTool struct {
 	gorm.Model
+	Config   string `json:"config,omitempty"`
 	IsActive bool   `json:"is_active"`
 	IsPublic bool   `json:"is_public"`
 	Token    string `json:"token,omitempty"`
@@ -59,6 +62,7 @@ type ActiveTool struct {
 
 type ActivePlugin struct {
 	gorm.Model
+	Config   string `json:"config,omitempty"`
 	IsActive bool   `json:"is_active"`
 	IsPublic bool   `json:"is_public"`
 	Token    string `json:"token,omitempty"`
@@ -70,6 +74,7 @@ type ActivePlugin struct {
 
 type ActiveLLM struct {
 	gorm.Model
+	Config   string `json:"config,omitempty"`
 	IsActive bool   `json:"is_active"`
 	Token    string `json:"token,omitempty"`
 	AvatarID uint   `json:"avatar_id,omitempty"`

@@ -70,11 +70,6 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 		}
 	}
 
-	fmt.Println("Search Agent Tools:")
-	for _, tool := range searchTools {
-		fmt.Println(tool.Name())
-	}
-
 	// searchTmplt, err := templates.Load("search.txt")
 	// if err != nil {
 	// 	fmt.Println(err)
@@ -111,6 +106,7 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 
 func (agent *SearchAgent) Call(ctx context.Context, input string) (string, error) {
 	fmt.Println("Search Agent Running...")
+	fmt.Println(input)
 	reponse, err := chains.Run(ctx, agent.Executor, input)
 	if err != nil {
 		return "Search Agent encountered an error: " + err.Error(), nil

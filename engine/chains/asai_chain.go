@@ -1,11 +1,16 @@
 package chains
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"os"
 	"time"
 
+	"gopkg.in/yaml.v3"
+
 	"github.com/AstroSynapseAI/app-service/engine"
+	"github.com/AstroSynapseAI/app-service/engine/agents/email"
 	"github.com/AstroSynapseAI/app-service/engine/agents/search"
 	"github.com/AstroSynapseAI/app-service/engine/callbacks"
 	"github.com/AstroSynapseAI/app-service/engine/memory"
@@ -18,6 +23,7 @@ import (
 	"github.com/tmc/langchaingo/llms"
 
 	"github.com/tmc/langchaingo/chains"
+	"github.com/tmc/langchaingo/llms/openai"
 	"github.com/tmc/langchaingo/prompts"
 	"github.com/tmc/langchaingo/schema"
 	"github.com/tmc/langchaingo/tools"
@@ -55,6 +61,77 @@ func (chain *AsaiChain) LoadAvatar(userID uint, sessionID string, clientType str
 }
 
 func (chain *AsaiChain) LoadAgents() {
+	// temp config for stage-ing the agent
+	var configJson string
+	var llm *openai.Chat
+
+	if os.Getenv("ENVIRONMENT") == "LOCAL DEV" {
+		var Config struct {
+			OpenAPIKey    string `yaml:"open_api_key"`
+			SerpAPIKey    string `yaml:"serpapi_api_key"`
+			DiscordApiKey string `yaml:"discord_api_key"`
+			WelcomeChID   string `yaml:"welcome_channel_id"`
+		}
+
+		keys, err := os.ReadFile("./app/keys.yaml")
+		if err != nil {
+			fmt.Println("Error reading keys.yaml:", err)
+			return
+		}
+
+		err = yaml.Unmarshal(keys, &Config)
+		if err != nil {
+			fmt.Println("Error unmarshalling keys.yaml:", err)
+			return
+		}
+
+		llm, err = openai.NewChat(
+			openai.WithToken(Config.OpenAPIKey),
+			openai.WithModel("gpt-4-turbo-preview"),
+		)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		file, err := os.Open("./engine/agents/email/config.json")
+		if err != nil {
+			fmt.Println(err)
+		}
+		defer file.Close()
+
+		buf := new(bytes.Buffer)
+		_, err = buf.ReadFrom(file)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		configJson = buf.String()
+
+	} else if os.Getenv("ENVIRONMENT") == "HEROKU DEV" {
+		configJson = os.Getenv("EMAIL_CONFIG_TEST")
+		var err error
+
+		llm, err = openai.NewChat(
+			openai.WithToken(os.Getenv("OPENAI_API_KEY")),
+			openai.WithModel("gpt-4-turbo-preview"),
+		)
+
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+
+	emailAgent, err := email.NewEmailAgent(
+		email.WithLLM(llm),
+		email.WithConfig(configJson),
+	)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	chain.Agents = append(chain.Agents, emailAgent)
+
 	for _, agent := range chain.config.GetAgents() {
 		var activeAgent tools.Tool
 		var err error
@@ -74,7 +151,6 @@ func (chain *AsaiChain) LoadAgents() {
 		if activeAgent != nil {
 			chain.Agents = append(chain.Agents, activeAgent)
 		}
-
 	}
 }
 
