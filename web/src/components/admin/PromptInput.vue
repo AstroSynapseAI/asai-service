@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { Form, Field, useForm } from 'vee-validate';
 import { useChatStore } from '@/stores/chat.store.js';
 import { useUserStore } from '@/stores/user.store.js';
@@ -7,6 +7,13 @@ import { useUserStore } from '@/stores/user.store.js';
 const user = useUserStore();
 const chatStore = useChatStore();
 const MAX_ROWS = 10;
+
+const props = defineProps({
+  promptInput: {
+    type: String,
+    required: false,
+  }
+});
 
 let { resetForm, handleSubmit, defineField } = useForm({
   initialValues: {
@@ -17,6 +24,11 @@ let { resetForm, handleSubmit, defineField } = useForm({
 const [prompt, promptAttrs] = defineField('prompt');
 const promptElement = ref(null);
 let inputRowNum = ref(0);
+
+watch(() => props.promptInput, (value) => {
+  prompt.value = value;
+  promptElement.value.$el.focus();
+});
 
 function getInputRowNumber() {
   const lineHeight = parseInt(window.getComputedStyle(promptElement.value.$el).getPropertyValue("line-height"));

@@ -18,6 +18,7 @@ const user = useUserStore();
 
 const conversationContainer = ref(null);
 const promptContainer = ref(null);
+const promptInput = ref('');
 
 const md = new MarkdownIt({breaks: true});
 const lastMessageIndex = computed(() => messages.value.length - 1)
@@ -61,14 +62,19 @@ onMounted(async () => {
 });
 
 const regeneratePrompt = function regeneratePrompt() {
-  console.info('Regenerate');
   const lastHumanMessage = messages.value[messages.value.length - 2] || {};
 
     chatStore.sendPrompt({
       session_id: user.session_id,
       avatar_id: user.avatar.ID,
-      msg: lastHumanMessage.content,
+      msg: lastHumanMessage.content || '',
     });
+}
+
+const editPrompt = function editPrompt(index) {
+  const lastHumanMessage = messages.value[index] || {};
+  promptInput.value = lastHumanMessage.content;
+  scrollToBottom();
 }
 
 </script>
@@ -94,6 +100,9 @@ const regeneratePrompt = function regeneratePrompt() {
                         <button v-if="message.sender === 'ai'" @click="regeneratePrompt" class="retry-button btn my-2 p-0" :disabled="chatStore.isLoading" title="Regenerate prompt">
                           <i class="align-middle" data-feather="refresh-cw"></i>
                         </button>
+                        <button v-if="message.sender === 'human'" @click="() => editPrompt(index)" class="retry-button btn my-2 p-0" :disabled="chatStore.isLoading" title="Edit last prompt">
+                          <i class="align-middle" data-feather="edit"></i>
+                        </button>
                     </div>
                   
                     <div class="col-10">
@@ -115,7 +124,7 @@ const regeneratePrompt = function regeneratePrompt() {
             
               <div ref="promptContainer" class="prompt-container">
                 <hr class="border border-3 opacity-100">
-                <PromptInput />
+                <PromptInput v-bind:promptInput="promptInput" />
               </div>
 
             
