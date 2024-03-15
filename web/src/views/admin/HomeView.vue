@@ -61,8 +61,8 @@ onMounted(async () => {
   chatStore.connectWebSocket();
 });
 
-const regeneratePrompt = function regeneratePrompt() {
-  const lastHumanMessage = messages.value[messages.value.length - 2] || {};
+const regeneratePrompt = function regeneratePrompt(index) {
+  const lastHumanMessage = messages.value[index] || {};
 
     chatStore.sendPrompt({
       session_id: user.session_id,
@@ -73,7 +73,7 @@ const regeneratePrompt = function regeneratePrompt() {
 
 const editPrompt = function editPrompt(index) {
   const lastHumanMessage = messages.value[index] || {};
-  promptInput.value = lastHumanMessage.content;
+  promptInput.value = lastHumanMessage.content || '';
   scrollToBottom();
 }
 
@@ -97,7 +97,7 @@ const editPrompt = function editPrompt(index) {
                     <div class="col-1 d-flex flex-column">
                       <img :src="iconASAI" class="logo" alt="Avatar Icon" width="35" v-if="message.sender === 'ai'" />
                       <img :src="iconUser" class="logo" alt="User Icon" width="35" height="50" v-if="message.sender === 'human'" />
-                        <button v-if="message.sender === 'ai'" @click="regeneratePrompt" class="retry-button btn my-2 p-0" :disabled="chatStore.isLoading" title="Regenerate prompt">
+                        <button v-if="message.sender === 'ai' && (index + 1) == messages.length" @click="() => regeneratePrompt(index-1)" class="retry-button btn my-2 p-0" :disabled="chatStore.isLoading" title="Regenerate prompt">
                           <i class="align-middle" data-feather="refresh-cw"></i>
                         </button>
                         <button v-if="message.sender === 'human'" @click="() => editPrompt(index)" class="retry-button btn my-2 p-0" :disabled="chatStore.isLoading" title="Edit last prompt">
