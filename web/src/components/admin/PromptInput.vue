@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { Form, Field, useForm } from 'vee-validate';
 import { useChatStore } from '@/stores/chat.store.js';
 import { useUserStore } from '@/stores/user.store.js';
