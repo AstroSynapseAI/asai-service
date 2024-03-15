@@ -70,12 +70,6 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 		}
 	}
 
-	// searchTmplt, err := templates.Load("search.txt")
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return nil, err
-	// }
-
 	// create search prompt template
 	promptTmplt := prompts.PromptTemplate{
 		Template:       searchAgent.Primer,

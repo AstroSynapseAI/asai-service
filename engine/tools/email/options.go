@@ -39,3 +39,9 @@ func WithSenderEmail(senderEmail string) ClientOptions {
 		c.email.SetFrom(senderEmail)
 	}
 }
+
+func WithReplyTo(replyTo string) ClientOptions {
+	return func(c *Client) {
+		c.email.SetReplyTo(replyTo)
+	}
+}

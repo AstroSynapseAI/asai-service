@@ -18,6 +18,8 @@ type config struct {
 	Username   string `json:"username"`
 	Password   string `json:"password"`
 	Encryption string `json:"encryption"`
+	Sender     string `json:"sender"`
+	ReplyTo    string `json:"reply_to"`
 }
 
 func WithLLM(llm *openai.Chat) EmailAgentOptions {
@@ -42,6 +44,8 @@ func WithConfig(data string) EmailAgentOptions {
 		emailAgent.IMAPPort = configData.IMAPPort
 		emailAgent.Username = configData.Username
 		emailAgent.Password = configData.Password
+		emailAgent.ReplyTo = configData.ReplyTo
+		emailAgent.Sender = configData.Sender
 
 		switch configData.Encryption {
 		case "ssl":

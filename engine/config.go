@@ -260,6 +260,30 @@ func loadActiveLLM(activeLLM models.ActiveLLM) (llms.LanguageModel, error) {
 		}
 
 		return LLM, nil
+	case "gpt-4-turbo-preview":
+		LLM, err := openai.NewChat(
+			openai.WithToken(activeLLM.Token),
+			openai.WithModel("gpt-4-turbo-preview"),
+		)
+
+		if err != nil {
+			fmt.Println("Error setting gpt-4-turbo-preview:", err)
+			return nil, err
+		}
+
+		return LLM, nil
+	case "gpt-3.5":
+		LLM, err := openai.NewChat(
+			openai.WithToken(activeLLM.Token),
+			openai.WithModel("gpt-3.5"),
+		)
+
+		if err != nil {
+			fmt.Println("Error setting gpt-3.5:", err)
+			return nil, err
+		}
+
+		return LLM, nil
 	default:
 		fmt.Println("Unknown LLM:", activeLLM.LLM.Slug)
 		return nil, errors.New("unknown LLM")
