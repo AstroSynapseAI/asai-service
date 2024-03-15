@@ -21,6 +21,7 @@ type AgentConfig interface {
 	GetAgentName() string
 	GetAgentSlug() string
 	GetAgentLLM() llms.LanguageModel
+	GetAgentConfig() string
 	GetAgentPrimer() string
 	IsAgentPublic() bool
 	IsAgentActive() bool
