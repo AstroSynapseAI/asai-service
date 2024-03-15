@@ -50,6 +50,8 @@ func WithConfig(data string) EmailAgentOptions {
 			emailAgent.Encryption = mail.EncryptionTLS
 		case "starttls":
 			emailAgent.Encryption = mail.EncryptionSTARTTLS
+		case "ssltls":
+			emailAgent.Encryption = mail.EncryptionSSLTLS
 		default:
 			emailAgent.Encryption = mail.EncryptionNone
 		}

@@ -33,6 +33,12 @@ func NewClient(options ...ClientOptions) *Client {
 		option(client)
 	}
 
+	// client.server.Host = "mail.gandi.net"
+	// client.server.Username = "dispatch@astrosynapse.com"
+	// client.server.Password = "asai1234"
+	// client.server.Encryption = mail.EncryptionSSLTLS
+	// client.server.Port = 465
+
 	return client
 }
 

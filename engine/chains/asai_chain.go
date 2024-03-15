@@ -89,6 +89,9 @@ func (chain *AsaiChain) LoadAgents() {
 			openai.WithToken(Config.OpenAPIKey),
 			openai.WithModel("gpt-4-turbo-preview"),
 		)
+		if err != nil {
+			fmt.Println(err)
+		}
 
 		file, err := os.Open("./engine/agents/email/config.json")
 		if err != nil {

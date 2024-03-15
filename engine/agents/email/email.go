@@ -49,12 +49,19 @@ type EmailAgent struct {
 
 func NewEmailAgent(options ...EmailAgentOptions) (*EmailAgent, error) {
 	// create a new email agent
+
 	emailAgent := &EmailAgent{}
 
 	// apply email agent options
 	for _, option := range options {
 		option(emailAgent)
 	}
+
+	// fmt.Println("Host: ", emailAgent.SMTPServer)
+	// fmt.Println("Port: ", emailAgent.SMTPPort)
+	// fmt.Println("Username: ", emailAgent.Username)
+	// fmt.Println("Password: ", emailAgent.Password)
+	// fmt.Println("Encryption: ", emailAgent.Encryption)
 
 	emailClient := email.NewClient(
 		email.WithHost(emailAgent.SMTPServer),
@@ -76,7 +83,9 @@ func (emailAgent *EmailAgent) Name() string {
 func (emailAgent *EmailAgent) Description() string {
 	return `
   Email agent enables sending emails. The agent expects
-  email address and email subject and message as input, in the format:
+  email address, email subject and the email message as input. 
+  Please use the following format:
+  
   - send to: email@example.com
   - subject: Email subject
   - message: Email content

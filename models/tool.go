@@ -35,11 +35,11 @@ func (*Tool) SeedModel(db *database.Database) error {
 				Slug:        "metaphor-search",
 				Description: "Metaphor Search API, API key required.",
 			},
-			{
-				Name:        "Email Tool",
-				Slug:        "email",
-				Description: "Email tool enables sending emails.",
-			},
+			// {
+			// 	Name:        "Email Tool",
+			// 	Slug:        "email",
+			// 	Description: "Email tool enables sending emails.",
+			// },
 		}
 
 		if result := db.Adapter.Gorm().Create(&tools); result.Error != nil {

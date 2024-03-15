@@ -89,12 +89,12 @@ func (*Agent) SeedModel(db *database.Database) error {
 				FINAL THOUGHTS:
 				[Place any final thoughts or a concluding summary here]`, ""),
 			},
-			{
-				Name:        "Email Agent",
-				Slug:        "email-agent",
-				Description: "Connects to your mail server for automated email sending.",
-				Primer:      "",
-			},
+			// {
+			// 	Name:        "Email Agent",
+			// 	Slug:        "email-agent",
+			// 	Description: "Connects to your mail server for automated email sending.",
+			// 	Primer:      "",
+			// },
 		}
 
 		if result := db.Adapter.Gorm().Create(&agents); result.Error != nil {
