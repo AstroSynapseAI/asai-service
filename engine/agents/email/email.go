@@ -38,15 +38,8 @@ type EmailAgent struct {
 	LLM        *openai.Chat
 	Executor   agents.Executor
 	EmailTool  *email.Client
-	IMAPServer string
-	SMTPServer string
-	IMAPPort   int
-	SMTPPort   int
-	Password   string
-	Username   string
 	Encryption mail.Encryption
-	Sender     string
-	ReplyTo    string
+	Config     config
 }
 
 func NewEmailAgent(options ...EmailAgentOptions) (*EmailAgent, error) {
@@ -60,13 +53,13 @@ func NewEmailAgent(options ...EmailAgentOptions) (*EmailAgent, error) {
 	}
 
 	emailClient := email.NewClient(
-		email.WithHost(emailAgent.SMTPServer),
-		email.WithPassword(emailAgent.Password),
-		email.WithUsername(emailAgent.Username),
+		email.WithHost(emailAgent.Config.SMTPServer),
+		email.WithPassword(emailAgent.Config.Password),
+		email.WithUsername(emailAgent.Config.Username),
 		email.WithEncryption(emailAgent.Encryption),
-		email.WithPort(emailAgent.SMTPPort),
-		email.WithSenderEmail(emailAgent.Sender),
-		email.WithReplyTo(emailAgent.ReplyTo),
+		email.WithPort(emailAgent.Config.SMTPPort),
+		email.WithSenderEmail(emailAgent.Config.Sender),
+		email.WithReplyTo(emailAgent.Config.ReplyTo),
 	)
 
 	emailAgent.EmailTool = emailClient
@@ -92,7 +85,7 @@ func (emailAgent *EmailAgent) Call(ctx context.Context, input string) (string, e
 	fmt.Println(input)
 
 	msg := []schema.ChatMessage{
-		schema.SystemChatMessage{Content: JsonPrompt},
+		schema.SystemChatMessage{Content: emailAgent.Primer},
 		schema.HumanChatMessage{Content: input},
 	}
 

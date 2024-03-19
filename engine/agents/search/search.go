@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/AstroSynapseAI/app-service/engine"
 	"github.com/AstroSynapseAI/app-service/engine/tools/google"
 
 	asaiTools "github.com/AstroSynapseAI/app-service/engine/tools"
@@ -24,11 +23,11 @@ import (
 var _ tools.Tool = &SearchAgent{}
 
 type SearchAgent struct {
-	Memory     schema.Memory
-	Primer     string
-	LLM        llms.LanguageModel
-	ToolsConfg []engine.AgentToolConfig
-	Executor   agents.Executor
+	Memory   schema.Memory
+	Primer   string
+	LLM      llms.LanguageModel
+	Executor agents.Executor
+	Config   config
 }
 
 func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
@@ -49,26 +48,35 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 	// create search agent tools
 	searchTools := []tools.Tool{}
 
-	for _, tool := range searchAgent.ToolsConfg {
-		if tool.GetSlug() == "google-search" && tool.IsActive() {
-			google, err := google.New(tool.GetToken(), 10)
-			if err != nil {
-				fmt.Println(err)
-				return nil, err
-			}
-
-			searchTools = append(searchTools, google)
+	if searchAgent.Config.DDGIsActive {
+		ddg, err := duckduckgo.New(10, duckduckgo.DefaultUserAgent)
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
 		}
 
-		if tool.GetSlug() == "ddg-search" && tool.IsActive() {
-			ddg, err := duckduckgo.New(10, duckduckgo.DefaultUserAgent)
-			if err != nil {
-				fmt.Println(err)
-				return nil, err
-			}
-			searchTools = append(searchTools, ddg)
-		}
+		searchTools = append(searchTools, ddg)
 	}
+
+	if searchAgent.Config.GoogleIsActive {
+		google, err := google.New(searchAgent.Config.GoogleAPIToken, 10)
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+
+		searchTools = append(searchTools, google)
+	}
+
+	// if searchAgent.Config.ExaIsActive {
+	// 	exa, err := asaiTools.NewExa(searchAgent.Config.ExaAPIToken, 10)
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 		return nil, err
+	// 	}
+	//
+	// 	searchTools = append(searchTools, exa)
+	// }
 
 	// create search prompt template
 	promptTmplt := prompts.PromptTemplate{

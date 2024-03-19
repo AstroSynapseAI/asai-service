@@ -93,7 +93,20 @@ func (*Agent) SeedModel(db *database.Database) error {
 				Name:        "Email Agent",
 				Slug:        "email-agent",
 				Description: "Connects to your mail server for automated email sending.",
-				Primer:      "",
+				Primer: rex.ReplaceAllString(`,
+  			You are a helpful assistant designed to output JSON only.
+
+  			You will receive the following as input:
+  			- send to: email@example.com
+  			- subject: Email subject
+  			- message: Email content
+
+  			Your output should be in JSON format only.
+  			{
+    		"sendTo": "email@example.com",
+    		"subject": "Email subject",
+    		"message": "Email HTML content"
+  			}`, ""),
 			},
 		}
 
