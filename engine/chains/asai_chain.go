@@ -52,42 +52,8 @@ func (chain *AsaiChain) LoadAvatar(userID uint, sessionID string, clientType str
 	chain.ClientType = clientType
 	chain.Memory = memory.NewMemory(chain.config)
 	chain.Memory.SetSessionID(sessionID)
-	chain.LoadAgents()
-}
+	chain.Agents = chain.config.GetAgents()
 
-func (chain *AsaiChain) LoadAgents() {
-	for _, agent := range chain.config.GetAgents() {
-		var activeAgent tools.Tool
-		var err error
-
-		if agent.GetAgentSlug() == "search-agent" && agent.IsAgentActive() {
-
-			activeAgent, err = search.NewSearchAgent(
-				search.WithPrimer(agent.GetAgentPrimer()),
-				search.WithLLM(agent.GetAgentLLM()),
-				search.WithConfig(agent.GetAgentConfig()),
-			)
-			if err != nil {
-				fmt.Println(err)
-			}
-		}
-
-		if agent.GetAgentSlug() == "email-agent" && agent.IsAgentActive() {
-
-			activeAgent, err = email.NewEmailAgent(
-				email.WithPrimer(agent.GetAgentPrimer()),
-				email.WithLLM(agent.GetAgentLLM().(*openai.Chat)),
-				email.WithConfig(agent.GetAgentConfig()),
-			)
-			if err != nil {
-				fmt.Println(err)
-			}
-		}
-
-		if activeAgent != nil {
-			chain.Agents = append(chain.Agents, activeAgent)
-		}
-	}
 }
 
 func (chain *AsaiChain) SetStream(stream func(context.Context, []byte)) {

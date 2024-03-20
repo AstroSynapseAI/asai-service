@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/AstroSynapseAI/app-service/engine"
 	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/schema"
 )
@@ -47,10 +46,5 @@ func WithPrimer(primer string) SearchAgentOptions {
 func WithLLM(llm llms.LanguageModel) SearchAgentOptions {
 	return func(agent *SearchAgent) {
 		agent.LLM = llm
-	}
-}
-
-func WithToolsConfig(tools []engine.AgentToolConfig) SearchAgentOptions {
-	return func(agent *SearchAgent) {
 	}
 }

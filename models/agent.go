@@ -93,7 +93,7 @@ func (*Agent) SeedModel(db *database.Database) error {
 				Name:        "Email Agent",
 				Slug:        "email-agent",
 				Description: "Connects to your mail server for automated email sending.",
-				Primer: rex.ReplaceAllString(`,
+				Primer: rex.ReplaceAllString(`
   			You are a helpful assistant designed to output JSON only.
 
   			You will receive the following as input:
