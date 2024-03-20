@@ -103,11 +103,16 @@ func (cnf *Config) AvatarIsPublic() bool {
 
 func (cnf *Config) GetAgents() []tools.Tool {
 	activeAgents := cnf.Avatar.ActiveAgents
-	var loadedAgents []tools.Tool
+	loadedAgents := []tools.Tool{}
 
 	for _, activeAgent := range activeAgents {
 		agent := agents.NewActiveAgent(cnf.Avatar, activeAgent)
-		if agent.GetAgentName() == "search-agent" && agent.IsAgentActive() {
+
+		fmt.Println("Loading agent..." + agent.GetAgentName())
+		fmt.Println("agent is active: " + fmt.Sprint(agent.IsAgentActive()))
+
+		if agent.GetAgentSlug() == "search-agent" && agent.IsAgentActive() {
+			fmt.Println("Loading search agent...")
 			searchAgent, err := search.NewSearchAgent(
 				search.WithPrimer(agent.GetAgentPrimer()),
 				search.WithLLM(agent.GetAgentLLM()),
@@ -122,7 +127,8 @@ func (cnf *Config) GetAgents() []tools.Tool {
 			loadedAgents = append(loadedAgents, searchAgent)
 		}
 
-		if agent.GetAgentName() == "email-agent" && agent.IsAgentActive() {
+		if agent.GetAgentSlug() == "email-agent" && agent.IsAgentActive() {
+			fmt.Println("Loading email agent...")
 			emailAgent, err := email.NewEmailAgent(
 				email.WithPrimer(agent.GetAgentPrimer()),
 				email.WithLLM(agent.GetAgentLLM().(*openai.Chat)),

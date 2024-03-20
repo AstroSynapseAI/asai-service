@@ -3,6 +3,7 @@ package email
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/AstroSynapseAI/app-service/engine/tools/email"
 	"github.com/tmc/langchaingo/agents"
@@ -52,12 +53,17 @@ func NewEmailAgent(options ...EmailAgentOptions) (*EmailAgent, error) {
 		option(emailAgent)
 	}
 
+	SMTPPort, err := strconv.Atoi(emailAgent.Config.SMTPPort)
+	if err != nil {
+		return nil, err
+	}
+
 	emailClient := email.NewClient(
 		email.WithHost(emailAgent.Config.SMTPServer),
 		email.WithPassword(emailAgent.Config.Password),
 		email.WithUsername(emailAgent.Config.Username),
 		email.WithEncryption(emailAgent.Encryption),
-		email.WithPort(emailAgent.Config.SMTPPort),
+		email.WithPort(SMTPPort),
 		email.WithSenderEmail(emailAgent.Config.Sender),
 		email.WithReplyTo(emailAgent.Config.ReplyTo),
 	)

@@ -144,7 +144,7 @@ onMounted(async () => {
 
                   <div class="col-4">
                     <div class="form-floating mb-3">
-                      <select v-model="config.smtp_encryption" class="form-select model-select" aria-label="Select Model">
+                      <select v-model="config.encryption" class="form-select model-select" aria-label="Select Model">
                         <option value="" disabled selected>Select Encryption Type</option>
                         <option value="ssl">SSL</option>
                         <option value="tls">TLS</option>
@@ -169,14 +169,14 @@ onMounted(async () => {
 
                   <div class="col-6">
                     <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="smtp-username" placeholder="username" v-model="config.smtp_username">
+                      <input type="text" class="form-control" id="smtp-username" placeholder="username" v-model="config.username">
                       <label for="smtp-username">Username</label>
                     </div>
                   </div>
 
                   <div class="col-6">
                     <div class="form-floating mb-3">
-                      <input type="password" class="form-control" id="smtp-password" placeholder="password" v-model="config.smtp_password">
+                      <input type="password" class="form-control" id="smtp-password" placeholder="password" v-model="config.password">
                       <label for="smtp-password">Password</label>
                     </div>
                   </div>

@@ -13,8 +13,8 @@ type EmailAgentOptions func(*EmailAgent)
 type config struct {
 	IMAPServer string `json:"imap_server"`
 	SMTPServer string `json:"smtp_server"`
-	IMAPPort   int    `json:"imap_port"`
-	SMTPPort   int    `json:"smtp_port"`
+	IMAPPort   string `json:"imap_port"`
+	SMTPPort   string `json:"smtp_port"`
 	Username   string `json:"username"`
 	Password   string `json:"password"`
 	Encryption string `json:"encryption"`
@@ -76,13 +76,13 @@ func WithSMTPServer(hostname string) EmailAgentOptions {
 
 func WithIMAPPort(port int) EmailAgentOptions {
 	return func(agent *EmailAgent) {
-		agent.Config.IMAPPort = port
+		agent.Config.IMAPPort = fmt.Sprintf("%d", port)
 	}
 }
 
 func WithSMTPPort(port int) EmailAgentOptions {
 	return func(agent *EmailAgent) {
-		agent.Config.SMTPPort = port
+		agent.Config.SMTPPort = fmt.Sprintf("%d", port)
 	}
 }
 
