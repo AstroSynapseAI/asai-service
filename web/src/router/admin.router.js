@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import AgentConfigView from '@/views/admin/AgentConfigView.vue'
+import agentConfigRoutes from "./agents.router";
 
 const adminRoutes = [
   {
@@ -21,10 +23,16 @@ const adminRoutes = [
     name: 'agents',
     component: () => import('@/views/admin/AgentsView.vue')
   },
+  // {
+  //   path: 'avatar/:avatar_id/agents/:agent_id/config/:active_agent_id?',
+  //   name: 'agent-config',
+  //   component: () => import('@/views/admin/AgentConfigView.vue')
+  // },
+
   {
-    path: 'avatar/:avatar_id/agents/:agent_id/config/:active_agent_id?',
-    name: 'agent-config',
-    component: () => import('@/views/admin/AgentConfigView.vue')
+    path: 'avatar/:avatar_id/agents',
+    component: AgentConfigView,
+    children: agentConfigRoutes
   },
   {
     path: 'avatar/:avatar_id/plugins',

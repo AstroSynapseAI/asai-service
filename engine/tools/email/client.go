@@ -33,12 +33,6 @@ func NewClient(options ...ClientOptions) *Client {
 		option(client)
 	}
 
-	// client.server.Host = "mail.gandi.net"
-	// client.server.Username = "dispatch@astrosynapse.com"
-	// client.server.Password = "asai1234"
-	// client.server.Encryption = mail.EncryptionSSLTLS
-	// client.server.Port = 465
-
 	return client
 }
 
@@ -60,9 +54,6 @@ func (client Client) Call(ctx context.Context, input string) (string, error) {
 		fmt.Println(err)
 		return fmt.Sprintf("%v: %s", ErrInvalidInput, err), nil
 	}
-
-	log := fmt.Sprintf("SendTo: %s\nSubject: %s\nMessage: %s\n", toolInput.SendTo, toolInput.Subject, toolInput.Message)
-	fmt.Println(log)
 
 	err = client.newEmail(toolInput.SendTo, toolInput.Subject, toolInput.Message)
 	if err != nil {

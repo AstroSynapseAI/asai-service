@@ -89,7 +89,7 @@ onMounted(async () => {
                   <div class="card-body">
                     <p>{{ agent.description }}</p>
                     <div>
-                      <router-link :to="{ name: 'agent-config', params: { avatar_id: user.avatar.ID, agent_id: agent.ID, active_agent_id: getActiveAgentID(agent.ID)}}" class="btn btn-primary">Configure</router-link>
+                      <router-link :to="{ name: agent.slug, params: { avatar_id: user.avatar.ID, agent_id: agent.ID, active_agent_id: getActiveAgentID(agent.ID)}}" class="btn btn-primary">Configure</router-link>
                     </div>
                   </div>
                 </div>
