@@ -1,8 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AgentConfigView from '@/views/admin/AgentConfigView.vue'
 import agentConfigRoutes from "./agents.router";
+import onboardingRoutes from "./onboarding.router";
 
 const adminRoutes = [
+  {
+    path:'avatar/onboarding',
+    component: () => import('@/views/admin/OnboardingView.vue'),
+    children: onboardingRoutes
+  },
   {
     path: 'avatar/create',
     name: 'create-avatar',
@@ -23,12 +29,6 @@ const adminRoutes = [
     name: 'agents',
     component: () => import('@/views/admin/AgentsView.vue')
   },
-  // {
-  //   path: 'avatar/:avatar_id/agents/:agent_id/config/:active_agent_id?',
-  //   name: 'agent-config',
-  //   component: () => import('@/views/admin/AgentConfigView.vue')
-  // },
-
   {
     path: 'avatar/:avatar_id/agents',
     component: AgentConfigView,
