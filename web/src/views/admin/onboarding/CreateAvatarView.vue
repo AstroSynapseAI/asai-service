@@ -15,7 +15,7 @@ const schema = yup.object({
 });
 
 const formState = reactive({
-  isSubmitting: false, 
+  isSubmitting: false,
 });
 
 // Initiate stores
@@ -30,8 +30,8 @@ const avatarPrimer = ref('');
 
 const llms = toRef(llm, 'records')
 
-const submitForm =  async () => {
-  formState.isSubmitting = true; 
+const submitForm = async () => {
+  formState.isSubmitting = true;
   try {
     const formData = {
       name: avatarName.value,
@@ -39,14 +39,14 @@ const submitForm =  async () => {
       primer: avatarPrimer.value,
     }
     await avatar.saveAvatar(formData);
-    await router.replace({name: 'personality', params: {avatar_id: avatar.userAvatar.ID}});
+    await router.replace({ name: 'personality', params: { avatar_id: avatar.userAvatar.ID } });
     toast.success('Avatar saved successfully');
     formState.isSubmitting = false;
     window.location.reload();
   }
   catch (error) {
     toast.error(error)
-    formState.isSubmitting = false; 
+    formState.isSubmitting = false;
   }
 }
 
@@ -64,12 +64,27 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="container-fluid p-0">
-
-    <h1 class="h3 mb-3">Create your AI Avatar</h1>
+  <div class="container">
+    <div class="row">
+      <div class="col-4 d-flex flex-column align-items-center text-center">
+        <div class="circle mb-5 current"><h2 class="circle-text">1</h2></div>
+        <h3 class="mb-3">Create Avatar</h3>
+        <p class="lead mb-5">Give your AI avatar a name and describe how it should behave.</p>
+      </div>
+      <div class="col-4 d-flex flex-column align-items-center text-center">
+        <div class="circle mb-5"><h2 class="circle-text">2</h2></div>
+        <h3 class="mb-3">Choose models</h3>
+        <p class="lead mb-5">Select one or more LLM models yor avatar will be using.</p>
+      </div>
+      <div class="col-4 text-center d-flex flex-column align-items-center">
+        <div class="circle mb-5"><h2 class="circle-text">3</h2></div>
+        <h3 class="mb-3">Select Agents</h3>
+        <p class="lead mb-5">Your AI Avatar can browse the internet, answer emails, post on social media nad more!</p>
+      </div>
+    </div>
 
     <div class="row">
-      <div class="col-12">
+      <div class="col-8 offset-1">
 
         <div class="card">
 
@@ -78,22 +93,13 @@ onMounted(async () => {
 
               <div class="row mb-5">
 
-                <div class="col-6">
+                <div class="col-12">
                   <div class="form-floating mb-1">
-                    <Field v-model="avatarName" name="AvatarName" type="text" class="form-control" id="floatingInput" placeholder="Name your Avatar..."/>
+                    <Field v-model="avatarName" name="AvatarName" type="text" class="form-control" id="floatingInput"
+                      placeholder="Name your Avatar..." />
                     <label for="floatingInput">Avatar name</label>
                   </div>
                   <ErrorMessage name="AvatarName" />
-                </div>
-
-                <div class="col-6">
-                  <Field name="AvatarLLMID" as="select" v-model="avatarLLMID"  class="form-select model-select mb-1" aria-label="Select Model">
-                    <option value="" disabled selected>Select a LLM</option>
-                    <option v-for="(llm, index) in llms" :value="llm.ID" :key="index">
-                      {{ llm.name }}
-                    </option>
-                  </Field>
-                  <ErrorMessage name="AvatarLLMID" />
                 </div>
 
               </div>
@@ -102,25 +108,26 @@ onMounted(async () => {
                 <div class="col-12">
                   <h3>Primer</h3>
 
-                  <Field
-                    v-model="avatarPrimer"
-                    name="AvatarPrimer"
-                    type="text"
-                    as="textarea"
-                    class="form-control mb-4"
-                    rows="8"
-                    placeholder=""
-                  />
-                  <ErrorMessage name="AvatarPrimer"/>
+                  <Field v-model="avatarPrimer" name="AvatarPrimer" type="text" as="textarea" class="form-control mb-4"
+                    rows="18" placeholder="" />
+                  <ErrorMessage name="AvatarPrimer" />
                 </div>
               </div>
 
-              <button type="submit" class="btn btn-secondary" :disabled="formState.isSubmitting">
-                <span v-if="formState.isSubmitting">
-                  <span class="loader"></span>
-                </span>
-                <span v-else>Save</span>
-              </button>
+              <div class="row">
+                <div class="col-6 text-center d-grid">
+                  <router-link :to="{ name: 'welcome' }" class="btn btn-primary btn-lg btn-back">Back</router-link>
+                </div>
+                <div class="col-6 text-center d-grid mx-auto">
+                  <router-link :to="{ name: 'choose-model' }" class="btn btn-primary btn-lg">Next</router-link>
+                </div>
+              </div>
+              <!-- <button type="submit" class="btn btn-secondary" :disabled="formState.isSubmitting"> -->
+              <!--   <span v-if="formState.isSubmitting"> -->
+              <!--     <span class="loader"></span> -->
+              <!--   </span> -->
+              <!--   <span v-else>Save</span> -->
+              <!-- </button> -->
             </Form>
           </div>
 
@@ -129,8 +136,47 @@ onMounted(async () => {
       </div>
     </div>
   </div>
-  <div>
-    <router-link :to="{name: 'welcome'}" class="btn btn-primary">Back</router-link>
-    <router-link :to="{name: 'choose-model'}" class="btn btn-primary">Next</router-link>
-  </div>
 </template>
+
+<style scoped>
+h1, h3 {
+  font-weight: 700;
+}
+
+.form-control {
+  background-color: #374151;
+}
+
+.btn {
+  background-color: #1c64f2;
+  border-color: #1c64f2;
+}
+
+.btn-back {
+  background-color: transparent;
+}
+.subtitle, .lead {
+  color: grey;
+}
+
+.circle {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   width: 85px;
+   height: 85px;
+   border: 2px solid #1c64f2;
+   border-radius: 50%;
+}
+
+.current {
+  background-color: #1c64f2;
+}
+
+.circle-text {
+   text-align: center;
+   line-height: 50px; /* match this with the height of .circle */
+   margin: 0;
+}
+
+</style>
