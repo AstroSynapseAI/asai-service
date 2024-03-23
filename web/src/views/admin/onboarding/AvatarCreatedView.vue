@@ -1,7 +1,74 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, ref, toRef } from 'vue';
+import { useLLMStore } from '@/stores/llm.store';
+import { useAgentStore } from '@/stores/agent.store';
+import { useAvatarStore } from '@/stores/avatar.store';
+import { useUserStore } from '@/stores/user.store';
+import { useToast } from 'vue-toastification';
+
+const user = useUserStore();
+const llm = useLLMStore();
+const llmRecords = toRef(llm, 'llmRecords');
+
+const agent = useAgentStore();
+const agentRecords = toRef(agent, 'agentRecords');
+
+const avatar = useAvatarStore()
+
+var avatarCreated = ref(false);
+var agentsCreated = ref(false);
+
+
+const createAvatar = async () => {
+  let onbaordingData = JSON.parse(localStorage.getItem('onboarding_data'));
+  if (onbaordingData) {
+    try {
+      await llm.getLLMs();
+
+      if (onbaordingData.avatar_llm == 'gpt') {
+        // if GPT family of models is selected set GPT-4 as default
+        const selected_llm = llmRecords.value.find(llm => llm.Slug === 'gpt-4');
+      }
+      else {
+        console.log('missing LLM');
+      }
+
+      const avatarData = {
+        "user_id": user.current.ID,
+        "avatar_name": onbaordingData.avatar_name,
+        "avatar_primer": onbaordingData.avatar_primer,
+        "avatar_llm_id": selected_llm.ID,
+        "is_public": false
+      }
+
+      await avatar.createAvatar(avatarData); 
+
+      avatarCreated.value = true;
+      
+      await agent.getAgents();
+
+      for (let i = 0; i < onbaordingData.avatar_agents.length; i++) {
+        selected_agent = agentRecords.value.find(agent => agent.Slug === onbaordingData.avatar_agents[i]);
+        let agent_data = {
+          "is_active": true,
+          "is_public": false,
+          "primer": selected_agent.Primer,
+          "llm_id": selected_llm.ID,
+          "avatar_id": avatar.userAvatar.ID,
+          "agent_id": selected_agent.ID
+        }
+        await agent.saveActiveAgent(agent_data);
+      }
+
+      agentsCreated.value = true;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+}
 
 onMounted(() => {
+  
   feather.replace();
 })
 </script>
@@ -24,30 +91,30 @@ onMounted(() => {
     <div class="row">
       <div class="col-4 offset-5">
         
-        <div class="row mb-3">
+        <div class="row mb-3" if="avatarCreated">
           <div class="col-1">
             <div class="checkmark-icon d-flex align-items-center justify-content-center">
               <i data-feather="check" style="width: 24px; height: 24px; color: #1c64f2"></i>
             </div>
           </div>
           <div class="col-8">
-            <p class="ml-2">Search agent is created</p>
+            <p class="ml-2">Your AI Avatar is created</p>
           </div>
         </div>
 
-        <div class="row mb-3">
+        <div class="row mb-3" if="agentsCreated">
           <div class="col-1">
             <div class="checkmark-icon d-flex align-items-center justify-content-center">
               <i data-feather="check" style="width: 24px; height: 24px; color: #1c64f2"></i>
             </div>
           </div>
           <div class="col-8">
-            <p class="ml-2">Email agent is created</p>
+            <p class="ml-2">Agents are created</p>
           </div>
         </div>
       </div>
     </div>
-    <div class="row" style="margin-top: 80px;">
+    <div class="row" style="margin-top: 80px;" if="agentsCreated && avatarCreated">
       <div class="col-4 offset-2 text-center d-grid">
         <router-link :to="{name: 'select-agents'}" class="btn btn-primary btn-lg btn-back">Back</router-link>
       </div>

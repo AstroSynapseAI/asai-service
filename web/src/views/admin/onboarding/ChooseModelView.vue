@@ -1,8 +1,28 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
+
+const selectedModel = ref('');
+const chooseModel = (model) => {
+  // Retrieve existing onboarding data
+  let onboardingData = JSON.parse(localStorage.getItem('onboarding_data')) || {};
+
+  // if the selected model is already chosen, unselect it
+  if (selectedModel.value === model) {
+    selectedModel.value = '';
+    delete onboardingData['avatar_llm'];
+  } else { // else select the model
+    selectedModel.value = model;
+    onboardingData['avatar_llm'] = model;
+  }
+
+  // Store the updated onboarding data
+  localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
+}
 
 
 onMounted(() => {
+  const onboardingData = JSON.parse(localStorage.getItem('onboarding_data'));
+  selectedModel.value = onboardingData?.avatar_llm || '';
   feather.replace();
 })
 </script>
@@ -30,9 +50,12 @@ onMounted(() => {
     <div class="row">
 
       <div class="col-3">
-        <div class="card">
+        <div class="card" @click="chooseModel('gpt')">
           <div class="card-body d-flex flex-column justify-content-center align-items-center">
-           
+            <div class="card-checkmark d-flex flex-column justify-content-center align-items-center" v-if="selectedModel === 'gpt'">
+              <i class="fas fa-check"></i>
+            </div>
+            
             <div class="card-icon">
               <i class="fas fa-puzzle-piece fa-3x"></i>
             </div>
@@ -46,7 +69,7 @@ onMounted(() => {
       </div>
 
       <div class="col-3">
-        <div class="card">
+        <div class="card" data-bs-toggle="tooltip" data-bs-placement="top" title="Coming Soon">
           <div class="card-body d-flex flex-column justify-content-center align-items-center">
            
             <div class="card-icon">
@@ -62,7 +85,7 @@ onMounted(() => {
       </div>
       
       <div class="col-3">
-        <div class="card">
+        <div class="card" data-bs-toggle="tooltip" data-bs-placement="top" title="Coming Soon">
           <div class="card-body d-flex flex-column justify-content-center align-items-center">
            
             <div class="card-icon">
@@ -79,7 +102,7 @@ onMounted(() => {
       </div>
 
       <div class="col-3">
-        <div class="card">
+        <div class="card" data-bs-toggle="tooltip" data-bs-placement="top" title="Coming Soon">
           <div class="card-body d-flex flex-column justify-content-center align-items-center">
            
             <div class="card-icon">
@@ -172,5 +195,19 @@ h1, h3 {
   left: 0;
   background-color: rgba(0,0,0,0.5);
   z-index: 10;
+}
+
+.card-checkmark {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 20px;
+
+  /* Add these lines for colors */
+  color: white;
+  background-color: #1c64f2;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
 }
 </style>

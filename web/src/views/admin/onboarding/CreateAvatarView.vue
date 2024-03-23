@@ -2,64 +2,39 @@
 import { ref, onMounted, toRef, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { Form, Field, ErrorMessage } from 'vee-validate';
-import { useLLMStore } from '@/stores/llm.store.js';
-import { useAvatarStore } from '@/stores/avatar.store.js';
 import { useToast } from 'vue-toastification';
 import * as yup from 'yup';
+
+const router = useRouter();
 
 const toast = useToast();
 const schema = yup.object({
   AvatarName: yup.string().required("The Avatar Name is required"),
-  AvatarLLMID: yup.string().required("The LLM is required"),
-  AvatarPrimer: yup.string()
+  AvatarPrimer: yup.string().required("The Avatar Primer is required"),
 });
-
-const formState = reactive({
-  isSubmitting: false,
-});
-
-// Initiate stores
-const llm = useLLMStore();
-const avatar = useAvatarStore();
-const router = useRouter();
 
 // Form data
 const avatarName = ref('');
-const avatarLLMID = ref('');
 const avatarPrimer = ref('');
 
-const llms = toRef(llm, 'records')
+const submitForm = () => {
+  let onboardingData = JSON.parse(localStorage.getItem('onboarding_data'));
 
-const submitForm = async () => {
-  formState.isSubmitting = true;
-  try {
-    const formData = {
-      name: avatarName.value,
-      llm: avatarLLMID.value,
-      primer: avatarPrimer.value,
-    }
-    await avatar.saveAvatar(formData);
-    await router.replace({ name: 'personality', params: { avatar_id: avatar.userAvatar.ID } });
-    toast.success('Avatar saved successfully');
-    formState.isSubmitting = false;
-    window.location.reload();
-  }
-  catch (error) {
-    toast.error(error)
-    formState.isSubmitting = false;
-  }
+  onboardingData['avatar_name'] = avatarName.value;
+  onboardingData['avatar_primer'] = avatarPrimer.value;
+
+  localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
+  router.push({ name: 'choose-model'});
 }
 
 onMounted(async () => {
-  try {
-    await llm.getLLMs();
-  } catch (error) {
-    console.log(error);
+  const onboardingData = JSON.parse(localStorage.getItem('onboarding_data'));
+  if (onboardingData) {
+    avatarName.value = onboardingData.avatar_name;
+    avatarPrimer.value = onboardingData.avatar_primer;
   }
-
   feather.replace();
 });
-
 
 </script>
 
@@ -119,15 +94,9 @@ onMounted(async () => {
                   <router-link :to="{ name: 'welcome' }" class="btn btn-primary btn-lg btn-back">Back</router-link>
                 </div>
                 <div class="col-6 text-center d-grid mx-auto">
-                  <router-link :to="{ name: 'choose-model' }" class="btn btn-primary btn-lg">Next</router-link>
+                  <button type="submit" class="btn btn-primary btn-lg">Next</button>
                 </div>
               </div>
-              <!-- <button type="submit" class="btn btn-secondary" :disabled="formState.isSubmitting"> -->
-              <!--   <span v-if="formState.isSubmitting"> -->
-              <!--     <span class="loader"></span> -->
-              <!--   </span> -->
-              <!--   <span v-else>Save</span> -->
-              <!-- </button> -->
             </Form>
           </div>
 
@@ -143,7 +112,7 @@ h1, h3 {
   font-weight: 700;
 }
 
-.form-control {
+.form-control  {
   background-color: #374151;
 }
 

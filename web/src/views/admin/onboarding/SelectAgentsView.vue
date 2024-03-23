@@ -1,7 +1,28 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
+
+const selectedAgents = ref([]);
+
+const toggleAgent = (agent) => {
+  let onboardingData = JSON.parse(localStorage.getItem('onboarding_data')); 
+  if (selectedAgents.value.includes(agent)) {
+    selectedAgents.value = selectedAgents.value.filter(item => item !== agent);
+  } 
+  else {
+    selectedAgents.value.push(agent);
+  }
+
+  onboardingData['avatar_agents'] = selectedAgents.value;
+  localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
+}
+
+const agentSelected = (agent) => {
+  return selectedAgents.value.includes(agent);
+}
 
 onMounted(() => {
+  const onboardingData = JSON.parse(localStorage.getItem('onboarding_data'));
+  selectedAgents.value = onboardingData?.avatar_agents || [];
   feather.replace();
 })
 </script>
@@ -37,7 +58,7 @@ onMounted(() => {
             <p class="card-text">Utilizes search engines such as Google, DuckDuckGo, and Metaphor for automated web searches.</p>
             <div class="card-action mt-4">
               <div class="form-check form-switch">
-                <input class="form-check-input float-end" type="checkbox" role="switch" id="search-agent">
+                <input class="form-check-input float-end" type="checkbox" role="switch" id="search-agent" @click="toggleAgent('search-agent')" :checked="agentSelected('search-agent')">
               </div>
             </div>
           </div>
@@ -51,7 +72,7 @@ onMounted(() => {
             <p class="card-text">Email agent connects to your email server, and then comopses and sends email for you.</p>
             <div class="card-action mt-4">
               <div class="form-check form-switch">
-                <input class="form-check-input float-end" type="checkbox" role="switch" id="search-agent">
+                <input class="form-check-input float-end" type="checkbox" role="switch" id="search-agent " @click="toggleAgent('email-agent')" :checked="agentSelected('email-agent')">
               </div>
             </div>
           </div>
