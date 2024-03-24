@@ -3,6 +3,7 @@ package email
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/AstroSynapseAI/app-service/engine/tools/email"
 	"github.com/tmc/langchaingo/agents"
@@ -38,13 +39,8 @@ type EmailAgent struct {
 	LLM        *openai.Chat
 	Executor   agents.Executor
 	EmailTool  *email.Client
-	IMAPServer string
-	SMTPServer string
-	IMAPPort   int
-	SMTPPort   int
-	Password   string
-	Username   string
 	Encryption mail.Encryption
+	Config     config
 }
 
 func NewEmailAgent(options ...EmailAgentOptions) (*EmailAgent, error) {
@@ -57,18 +53,19 @@ func NewEmailAgent(options ...EmailAgentOptions) (*EmailAgent, error) {
 		option(emailAgent)
 	}
 
-	// fmt.Println("Host: ", emailAgent.SMTPServer)
-	// fmt.Println("Port: ", emailAgent.SMTPPort)
-	// fmt.Println("Username: ", emailAgent.Username)
-	// fmt.Println("Password: ", emailAgent.Password)
-	// fmt.Println("Encryption: ", emailAgent.Encryption)
+	SMTPPort, err := strconv.Atoi(emailAgent.Config.SMTPPort)
+	if err != nil {
+		return nil, err
+	}
 
 	emailClient := email.NewClient(
-		email.WithHost(emailAgent.SMTPServer),
-		email.WithPassword(emailAgent.Password),
-		email.WithUsername(emailAgent.Username),
+		email.WithHost(emailAgent.Config.SMTPServer),
+		email.WithPassword(emailAgent.Config.Password),
+		email.WithUsername(emailAgent.Config.Username),
 		email.WithEncryption(emailAgent.Encryption),
-		email.WithPort(emailAgent.SMTPPort),
+		email.WithPort(SMTPPort),
+		email.WithSenderEmail(emailAgent.Config.Sender),
+		email.WithReplyTo(emailAgent.Config.ReplyTo),
 	)
 
 	emailAgent.EmailTool = emailClient
@@ -84,12 +81,9 @@ func (emailAgent *EmailAgent) Description() string {
 	return `
   Email agent enables sending emails. The agent expects
   email address, email subject and the email message as input. 
-  Please use the following format:
-  
-  - send to: email@example.com
-  - subject: Email subject
-  - message: Email content
-  `
+
+	Example:
+  send to: - recepient.email@example.com subject: - insert fully composed email subject message: - insert fully composed email message`
 }
 
 func (emailAgent *EmailAgent) Call(ctx context.Context, input string) (string, error) {
@@ -97,7 +91,7 @@ func (emailAgent *EmailAgent) Call(ctx context.Context, input string) (string, e
 	fmt.Println(input)
 
 	msg := []schema.ChatMessage{
-		schema.SystemChatMessage{Content: JsonPrompt},
+		schema.SystemChatMessage{Content: emailAgent.Primer},
 		schema.HumanChatMessage{Content: input},
 	}
 

@@ -13,11 +13,19 @@ type EmailAgentOptions func(*EmailAgent)
 type config struct {
 	IMAPServer string `json:"imap_server"`
 	SMTPServer string `json:"smtp_server"`
-	IMAPPort   int    `json:"imap_port"`
-	SMTPPort   int    `json:"smtp_port"`
+	IMAPPort   string `json:"imap_port"`
+	SMTPPort   string `json:"smtp_port"`
 	Username   string `json:"username"`
 	Password   string `json:"password"`
 	Encryption string `json:"encryption"`
+	Sender     string `json:"sender"`
+	ReplyTo    string `json:"reply_to"`
+}
+
+func WithPrimer(primer string) EmailAgentOptions {
+	return func(emailAgent *EmailAgent) {
+		emailAgent.Primer = primer
+	}
 }
 
 func WithLLM(llm *openai.Chat) EmailAgentOptions {
@@ -36,12 +44,7 @@ func WithConfig(data string) EmailAgentOptions {
 			return
 		}
 
-		emailAgent.SMTPServer = configData.SMTPServer
-		emailAgent.SMTPPort = configData.SMTPPort
-		emailAgent.IMAPServer = configData.IMAPServer
-		emailAgent.IMAPPort = configData.IMAPPort
-		emailAgent.Username = configData.Username
-		emailAgent.Password = configData.Password
+		emailAgent.Config = configData
 
 		switch configData.Encryption {
 		case "ssl":
@@ -61,37 +64,37 @@ func WithConfig(data string) EmailAgentOptions {
 
 func WithIMAPServer(hostname string) EmailAgentOptions {
 	return func(agent *EmailAgent) {
-		agent.IMAPServer = hostname
+		agent.Config.IMAPServer = hostname
 	}
 }
 
 func WithSMTPServer(hostname string) EmailAgentOptions {
 	return func(agent *EmailAgent) {
-		agent.SMTPServer = hostname
+		agent.Config.SMTPServer = hostname
 	}
 }
 
 func WithIMAPPort(port int) EmailAgentOptions {
 	return func(agent *EmailAgent) {
-		agent.IMAPPort = port
+		agent.Config.IMAPPort = fmt.Sprintf("%d", port)
 	}
 }
 
 func WithSMTPPort(port int) EmailAgentOptions {
 	return func(agent *EmailAgent) {
-		agent.SMTPPort = port
+		agent.Config.SMTPPort = fmt.Sprintf("%d", port)
 	}
 }
 
 func WithUsername(username string) EmailAgentOptions {
 	return func(agent *EmailAgent) {
-		agent.Username = username
+		agent.Config.Username = username
 	}
 }
 
 func WithPassword(password string) EmailAgentOptions {
 	return func(agent *EmailAgent) {
-		agent.Password = password
+		agent.Config.Password = password
 	}
 }
 
