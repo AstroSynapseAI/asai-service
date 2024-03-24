@@ -20,6 +20,10 @@ const avatarPrimer = ref('');
 const submitForm = () => {
   let onboardingData = JSON.parse(localStorage.getItem('onboarding_data'));
 
+  if (!onboardingData) {
+    onboardingData = {};
+  }
+
   onboardingData['avatar_name'] = avatarName.value;
   onboardingData['avatar_primer'] = avatarPrimer.value;
 

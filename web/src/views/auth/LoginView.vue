@@ -36,7 +36,7 @@ const submitLogin = handleSubmit(async values => {
         router.push({name: 'admin', params: { avatar_id: user.avatar.ID }});
         return;
       }
-      router.push({name: 'create-avatar'});
+      router.push({name: 'welcome'});
     }
     formState.isSubmitting = false;
   }

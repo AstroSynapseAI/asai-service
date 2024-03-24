@@ -9,11 +9,11 @@ const adminRoutes = [
     component: () => import('@/views/admin/OnboardingView.vue'),
     children: onboardingRoutes
   },
-  {
-    path: 'avatar/create',
-    name: 'create-avatar',
-    component: () => import('@/views/admin/CreateAvatarView.vue')
-  },
+  // {
+  //   path: 'avatar/create',
+  //   name: 'create-avatar',
+  //   component: () => import('@/views/admin/CreateAvatarView.vue')
+  // },
   {
     path: 'avatar/:avatar_id',
     name: 'admin',

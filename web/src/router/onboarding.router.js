@@ -7,8 +7,8 @@ const onboardingRoutes = [
     component: () => import('@/views/admin/onboarding/WelcomeView.vue')
   },
   {
-    path: 'create-avatar',
-    name: 'avatar-create',
+    path: 'create',
+    name: 'create-avatar',
     component: () => import('@/views/admin/onboarding/CreateAvatarView.vue')
   },
   {

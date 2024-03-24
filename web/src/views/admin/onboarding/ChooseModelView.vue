@@ -121,7 +121,7 @@ onMounted(() => {
 
     <div class="row" style="margin-top: 80px;"> 
       <div class="col-4 offset-2 text-center d-grid">
-        <router-link :to="{ name: 'avatar-create' }" class="btn btn-primary btn-lg btn-back">Back</router-link>
+        <router-link :to="{ name: 'create-avatar' }" class="btn btn-primary btn-lg btn-back">Back</router-link>
       </div>
       <div class="col-4 text-center d-grid">
         <router-link :to="{ name: 'select-agents' }" class="btn btn-primary btn-lg">Next</router-link>

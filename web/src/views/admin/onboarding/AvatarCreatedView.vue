@@ -8,15 +8,19 @@ import { useToast } from 'vue-toastification';
 
 const user = useUserStore();
 const llm = useLLMStore();
-const llmRecords = toRef(llm, 'llmRecords');
+const llmRecords = toRef(llm, 'records');
 
 const agent = useAgentStore();
-const agentRecords = toRef(agent, 'agentRecords');
+const agentRecords = toRef(agent, 'records');
+
 
 const avatar = useAvatarStore()
 
 var avatarCreated = ref(false);
 var agentsCreated = ref(false);
+
+const selectedLLM = ref('');
+const selectedAgent = ref('');
 
 
 const createAvatar = async () => {
@@ -25,9 +29,13 @@ const createAvatar = async () => {
     try {
       await llm.getLLMs();
 
+      console.log(llmRecords.value);
+      console.log(onbaordingData);
       if (onbaordingData.avatar_llm == 'gpt') {
         // if GPT family of models is selected set GPT-4 as default
-        const selected_llm = llmRecords.value.find(llm => llm.Slug === 'gpt-4');
+        console.log('setting GPT-4 as default LLM');
+        selectedLLM.value = llmRecords.value.find(llm => llm.slug === 'gpt-4');
+        console.log(selectedLLM.value);
       }
       else {
         console.log('missing LLM');
@@ -35,47 +43,52 @@ const createAvatar = async () => {
 
       const avatarData = {
         "user_id": user.current.ID,
-        "avatar_name": onbaordingData.avatar_name,
-        "avatar_primer": onbaordingData.avatar_primer,
-        "avatar_llm_id": selected_llm.ID,
-        "is_public": false
+        "name": onbaordingData.avatar_name,
+        "primer": onbaordingData.avatar_primer,
+        "llm": selectedLLM.value.ID,
       }
 
-      await avatar.createAvatar(avatarData); 
+      await avatar.saveAvatar(avatarData); 
 
       avatarCreated.value = true;
       
       await agent.getAgents();
 
       for (let i = 0; i < onbaordingData.avatar_agents.length; i++) {
-        selected_agent = agentRecords.value.find(agent => agent.Slug === onbaordingData.avatar_agents[i]);
+        selectedAgent.value = agentRecords.value.find(agent => agent.slug === onbaordingData.avatar_agents[i]);
         let agent_data = {
           "is_active": true,
           "is_public": false,
-          "primer": selected_agent.Primer,
-          "llm_id": selected_llm.ID,
+          "primer": selectedAgent.value.primer,
+          "llm_id": selectedLLM.value.ID,
           "avatar_id": avatar.userAvatar.ID,
-          "agent_id": selected_agent.ID
+          "agent_id": selectedAgent.value.ID
         }
         await agent.saveActiveAgent(agent_data);
       }
 
       agentsCreated.value = true;
+      localStorage.removeItem('onboarding_data');
     } catch (error) {
       console.error(error);
     }
   }
 }
 
-onMounted(() => {
-  
+onMounted( async () => {
+  try {
+    await createAvatar();
+  }
+  catch (error) {
+    console.error(error);
+  }
   feather.replace();
 })
 </script>
 
 
 <template>
-  <div>
+  <div class="container">
     <div class="row mb-5">
       <div class="col-8 text-center offset-2">
         <h1 class="display-6 mb-3">Your Avatar is getting ready</h1>

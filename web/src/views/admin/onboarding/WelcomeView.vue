@@ -29,7 +29,7 @@
     </div>
     <div class="row">
       <div class="col-4 offset-4 text-center d-grid mx-auto">
-        <router-link :to="{ name: 'avatar-create' }" class="btn btn-primary btn-lg">Create your Avatar</router-link>
+        <router-link :to="{ name: 'create-avatar' }" class="btn btn-primary btn-lg">Create your Avatar</router-link>
       </div>
     </div>
 
