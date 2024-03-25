@@ -31,6 +31,7 @@ const submitForm = () => {
   router.push({ name: 'choose-model'});
 }
 
+
 onMounted(async () => {
   const onboardingData = JSON.parse(localStorage.getItem('onboarding_data'));
   if (onboardingData) {
@@ -75,7 +76,7 @@ onMounted(async () => {
                 <div class="col-12">
                   <div class="form-floating mb-1">
                     <Field v-model="avatarName" name="AvatarName" type="text" class="form-control" id="floatingInput"
-                      placeholder="Name your Avatar..." />
+                      placeholder="Name your Avatar..."  />
                     <label for="floatingInput">Avatar name</label>
                   </div>
                   <ErrorMessage name="AvatarName" />
@@ -94,6 +95,7 @@ onMounted(async () => {
               </div>
 
               <div class="row">
+                
                 <div class="col-6 text-center d-grid">
                   <router-link :to="{ name: 'welcome' }" class="btn btn-primary btn-lg btn-back">Back</router-link>
                 </div>
