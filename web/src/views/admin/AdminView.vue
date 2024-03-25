@@ -20,4 +20,4 @@ import '@/assets/adminkit/static/js/app.js';
   
   </div>
 
-</template>
+</template> 

@@ -9,8 +9,8 @@ import '@/assets/adminkit/static/js/app.js';
 <template>
 
   <div class="wrapper">
-    <Navbar />
     <div class="main">
+      <Navbar />
       <main class="content">
 
         <div class="container-fluid p-0">

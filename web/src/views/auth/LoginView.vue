@@ -30,18 +30,24 @@ const submitLogin = handleSubmit(async values => {
   formState.isSubmitting = true;
   try {
     const loggedIn = await auth.login(username.value, password.value)
-    if (loggedIn) {
-      await user.getUserAvatar(auth.user.ID);
-      if (user.avatar) {
-        router.push({name: 'admin', params: { avatar_id: user.avatar.ID }});
-        return;
-      }
+    console.log('user id ' + auth.user.ID);
+    const hasAvatar = await user.hasAvatar(auth.user.ID)
+    console.log('has avatar ' + hasAvatar);
+     
+    if (loggedIn && hasAvatar) {
+      console.log('go to admin')
+      router.push({name: 'admin', params: { avatar_id: user.avatar.ID }});
+    }
+    else {
+      console.log('go to welcome')
       router.push({name: 'welcome'});
     }
+    
     formState.isSubmitting = false;
   }
   catch (err) {
-    toast.error(err);
+    console.log(err);
+    // toast.error(err);
     formState.isSubmitting = false; 
   }
 });
