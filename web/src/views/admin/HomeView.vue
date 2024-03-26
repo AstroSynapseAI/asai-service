@@ -20,7 +20,7 @@ const conversationContainer = ref(null);
 const promptContainer = ref(null);
 const promptInput = ref('');
 
-const md = new MarkdownIt({breaks: true});
+const md = new MarkdownIt({ breaks: true });
 const lastMessageIndex = computed(() => messages.value.length - 1)
 const lastMessageText = computed(() => messages.value[lastMessageIndex.value]?.content || "")
 
@@ -45,10 +45,13 @@ watch(lastMessageText, () => {
 
 onMounted(async () => {
   try {
-    if (!user.session_id) {
+    console.log('home mounted');
+    if (user.session_id === null) {
+      console.log('no session');
       // generate new token and session
       await user.getSessionToken();
     } else {
+      console.log('has session');
       // fetch the session messages
       await chatStore.getPrivateSession(route.params.avatar_id, user.session_id);
     }
@@ -64,11 +67,11 @@ onMounted(async () => {
 const regeneratePrompt = function regeneratePrompt(index) {
   const lastHumanMessage = messages.value[index] || {};
 
-    chatStore.sendPrompt({
-      session_id: user.session_id,
-      avatar_id: user.avatar.ID,
-      msg: lastHumanMessage.content || '',
-    });
+  chatStore.sendPrompt({
+    session_id: user.session_id,
+    avatar_id: user.avatar.ID,
+    msg: lastHumanMessage.content || '',
+  });
 }
 
 const editPrompt = function editPrompt(index) {
@@ -89,31 +92,38 @@ const editPrompt = function editPrompt(index) {
             <div class="container d-flex flex-column">
 
               <div ref="conversationContainer" class="conversation-container flex-grow-1 overflow-auto">
-                
+
                 <template v-if="messages.length > 0">
-                
+
                   <div class="conversation-item row" v-for="(message, index) in messages" :key="index">
-                  
+
                     <div class="col-1 d-flex flex-column">
                       <img :src="iconASAI" class="logo" alt="Avatar Icon" width="35" v-if="message.sender === 'ai'" />
-                      <img :src="iconUser" class="logo" alt="User Icon" width="35" height="50" v-if="message.sender === 'human'" />
-                        <button v-if="message.sender === 'ai' && (index + 1) == messages.length" @click="() => regeneratePrompt(index-1)" class="retry-button btn my-2 p-0" :disabled="chatStore.isLoading" title="Regenerate prompt">
-                          <i class="align-middle" data-feather="refresh-cw"></i>
-                        </button>
-                        <button v-if="message.sender === 'human'" @click="() => editPrompt(index)" class="retry-button btn my-2 p-0" :disabled="chatStore.isLoading" title="Edit last prompt">
-                          <i class="align-middle" data-feather="edit"></i>
-                        </button>
+                      <img :src="iconUser" class="logo" alt="User Icon" width="35" height="50"
+                        v-if="message.sender === 'human'" />
+                      <button v-if="message.sender === 'ai' && (index + 1) == messages.length"
+                        @click="() => regeneratePrompt(index - 1)" class="retry-button btn my-2 p-0"
+                        :disabled="chatStore.isLoading" title="Regenerate prompt">
+                        <i class="align-middle" data-feather="refresh-cw"></i>
+                      </button>
+                      <button v-if="message.sender === 'human'" @click="() => editPrompt(index)"
+                        class="retry-button btn my-2 p-0" :disabled="chatStore.isLoading" title="Edit last prompt">
+                        <i class="align-middle" data-feather="edit"></i>
+                      </button>
                     </div>
-                  
+
                     <div class="col-10">
                       <div v-if="message.isLoading">
-                        <p><span class="me-3">I'm thinking...  </span><span class="spinner mb-2 me-2"><img v-if="!message.isAgentRunnig" src="../../assets/loader.png" alt=""></span></p>
-                        <p v-if="message.isAgentRunnig"><span class="me-3 fst-italic">Activating agent: {{ message.agentName }}...  </span><span class="spinner mb-2 me-2"><img src="../../assets/loader.png" alt=""></span></p>
+                        <p><span class="me-3">I'm thinking... </span><span class="spinner mb-2 me-2"><img
+                              v-if="!message.isAgentRunnig" src="../../assets/loader.png" alt=""></span></p>
+                        <p v-if="message.isAgentRunnig"><span class="me-3 fst-italic">Activating agent: {{
+                  message.agentName }}... </span><span class="spinner mb-2 me-2"><img
+                              src="../../assets/loader.png" alt=""></span></p>
                       </div>
-                      
+
                       <div v-else class="message-content pe-3" v-html="md.render(message.content.trim())"></div>
                     </div>
-                    
+
                     <hr class="separator opacity-100" v-if="messages.length > 1 && index !== messages.length - 1">
 
                   </div>
@@ -121,20 +131,20 @@ const editPrompt = function editPrompt(index) {
                 </template>
 
               </div>
-            
+
               <div ref="promptContainer" class="prompt-container">
                 <hr class="border border-3 opacity-100">
                 <PromptInput v-bind:promptInput="promptInput" />
               </div>
 
-            
+
             </div>
           </div>
         </div>
       </div>
 
-      
-    
+
+
     </div>
   </div>
 </template>
@@ -143,6 +153,7 @@ const editPrompt = function editPrompt(index) {
 main {
   display: block !important;
 }
+
 .container-fluid {
   color: white;
 }
@@ -150,21 +161,27 @@ main {
 .conversation-container {
   max-height: calc(90vh - 30px);
   padding: 1.25rem;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
 }
+
 .conversation-container ::-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
+  display: none;
+  /* Chrome, Safari */
   padding: 1.5rem;
 }
 
 .card-body .container {
   min-height: 85vh;
 }
+
 .card-body {
   background-color: #19232E !important;
   color: white !important;
 }
+
 .retry-button {
   vertical-align: middle;
   border-color: transparent !important;
@@ -182,11 +199,25 @@ main {
 }
 
 @keyframes rotate {
-  0%    { transform: rotate(0deg); }
-  25%   { transform: rotate(90deg); }
-  50%   { transform: rotate(180deg); }
-  75%   { transform: rotate(270deg); }
-  100%  { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(90deg);
+  }
+
+  50% {
+    transform: rotate(180deg);
+  }
+
+  75% {
+    transform: rotate(270deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .spinner img {
@@ -197,5 +228,4 @@ main {
   height: 18px;
   margin-bottom: 5px;
 }
-
 </style>

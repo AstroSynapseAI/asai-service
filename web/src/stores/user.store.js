@@ -32,9 +32,12 @@ export const useUserStore = defineStore({
       }
     },
     async getSessionToken() {
+      console.log("Loading session...");
       try {
         const session = await fetchWrapper.get(`${apiUrl}/users/token`);
-        this.session_id = session.session_id;
+        console.log(session);
+        this.session_id = session.token;
+        console.log("Session loaded:", session.session_id);
       } catch (error) {
         console.error(error);
       }
