@@ -19,6 +19,15 @@ export const useUserStore = defineStore({
   getters: {
   },
   actions: {
+    async get() {
+      try {
+        const currentUser = await fetchWrapper.get(`${usersURL}/${this.current.ID}`);
+        this.current = currentUser
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    
     async hasAvatar(user_id) {
       try {
         const avatar = await fetchWrapper.get(`${usersURL}/${user_id}/avatars`);
@@ -32,12 +41,9 @@ export const useUserStore = defineStore({
       }
     },
     async getSessionToken() {
-      console.log("Loading session...");
       try {
         const session = await fetchWrapper.get(`${apiUrl}/users/token`);
-        console.log(session);
         this.session_id = session.token;
-        console.log("Session loaded:", session.session_id);
       } catch (error) {
         console.error(error);
       }

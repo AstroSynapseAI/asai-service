@@ -24,6 +24,7 @@ export const useAuthStore = defineStore({
           this.apiToken = user.api_token || null;
           this.isLoggedIn = true;
           this.user = user;
+          console.log("logged in user", this.user);
           return true;
         }
         return false;
@@ -105,7 +106,8 @@ export const useAuthStore = defineStore({
     logout() {
       localStorage.removeItem("user");
       localStorage.removeItem("avatar");
-      localStorage.removeItem("onboarding-data");
+      localStorage.removeItem("onboarding_data");
+      localStorage.removeItem("session_id");
       this.isLoggedIn = false;
       this.apiToken = null;
       router.push("/login");

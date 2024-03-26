@@ -10,7 +10,6 @@
     "heroku-dev": "env-cmd -f .env.dev vite build"
   },
   "dependencies": {
-    "@popperjs/core": "^2.11.8",
     "@vueuse/core": "^10.9.0",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.0",
