@@ -132,7 +132,7 @@ onMounted( async () => {
         <router-link :to="{name: 'select-agents'}" class="btn btn-primary btn-lg btn-back">Back</router-link>
       </div>
       <div class="col-4 text-center d-grid">
-        <router-link :to="{name: 'admin', params: { avatar_id: user.avatar.ID }}" class="btn btn-primary btn-lg">Continue</router-link>
+        <router-link :to="{name: 'select-agents'}" class="btn btn-primary btn-lg">Continue</router-link>
       </div>
     </div>
   </div>

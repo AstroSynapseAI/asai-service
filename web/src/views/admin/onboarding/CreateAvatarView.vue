@@ -2,6 +2,7 @@
 import { ref, onMounted, toRef, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { Form, Field, ErrorMessage } from 'vee-validate';
+import { useToast } from 'vue-toastification';
 import * as yup from 'yup';
 
 const router = useRouter();
@@ -14,7 +15,7 @@ const schema = yup.object({
 
 // Form data
 const avatarName = ref('');
-const avatarPrimer = ref('You are a helpful assistant.');
+const avatarPrimer = ref('');
 
 const submitForm = () => {
   let onboardingData = JSON.parse(localStorage.getItem('onboarding_data'));
@@ -29,7 +30,6 @@ const submitForm = () => {
   localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
   router.push({ name: 'choose-model'});
 }
-
 
 onMounted(async () => {
   const onboardingData = JSON.parse(localStorage.getItem('onboarding_data'));
@@ -48,7 +48,7 @@ onMounted(async () => {
       <div class="col-4 d-flex flex-column align-items-center text-center">
         <div class="circle mb-5 current"><h2 class="circle-text">1</h2></div>
         <h3 class="mb-3">Create Avatar</h3>
-        <p class="lead mb-5" style="color: white">Give your AI avatar a name and describe how it should behave.</p>
+        <p class="lead mb-5">Give your AI avatar a name and describe how it should behave.</p>
       </div>
       <div class="col-4 d-flex flex-column align-items-center text-center">
         <div class="circle mb-5"><h2 class="circle-text">2</h2></div>
@@ -63,7 +63,7 @@ onMounted(async () => {
     </div>
 
     <div class="row">
-      <div class="col-8 offset-2">
+      <div class="col-8 offset-1">
 
         <div class="card">
 
@@ -74,14 +74,8 @@ onMounted(async () => {
 
                 <div class="col-12">
                   <div class="form-floating mb-1">
-                    <Field 
-                      v-model="avatarName"
-                      name="AvatarName"
-                      type="text"
-                      class="form-control mb-2"
-                      id="floatingInput"
-                      placeholder="Name your Avatar..."  
-                    />
+                    <Field v-model="avatarName" name="AvatarName" type="text" class="form-control" id="floatingInput"
+                      placeholder="Name your Avatar..." />
                     <label for="floatingInput">Avatar name</label>
                   </div>
                   <ErrorMessage name="AvatarName" />
@@ -93,19 +87,13 @@ onMounted(async () => {
                 <div class="col-12">
                   <h3>Primer</h3>
 
-                  <Field 
-                    v-model="avatarPrimer" 
-                    name="AvatarPrimer" 
-                    type="text" as="textarea"
-                    class="form-control mb-2"
-                    rows="18" placeholder=""
-                  />
+                  <Field v-model="avatarPrimer" name="AvatarPrimer" type="text" as="textarea" class="form-control mb-4"
+                    rows="18" placeholder="" />
                   <ErrorMessage name="AvatarPrimer" />
                 </div>
               </div>
 
               <div class="row">
-                
                 <div class="col-6 text-center d-grid">
                   <router-link :to="{ name: 'welcome' }" class="btn btn-primary btn-lg btn-back">Back</router-link>
                 </div>

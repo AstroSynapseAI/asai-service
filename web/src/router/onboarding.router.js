@@ -4,27 +4,27 @@ const onboardingRoutes = [
   {
     path: '',
     name: 'welcome',
-    component: () => import('@/views/onboarding/WelcomeView.vue')
+    component: () => import('@/views/admin/onboarding/WelcomeView.vue')
   },
   {
     path: 'create',
     name: 'create-avatar',
-    component: () => import('@/views/onboarding/CreateAvatarView.vue')
+    component: () => import('@/views/admin/onboarding/CreateAvatarView.vue')
   },
   {
     path: 'model',
     name: 'choose-model',
-    component: () => import('@/views/onboarding/ChooseModelView.vue')
+    component: () => import('@/views/admin/onboarding/ChooseModelView.vue')
   },
   {
     path: 'agents',
     name: 'select-agents',
-    component: () => import('@/views/onboarding/SelectAgentsView.vue')
+    component: () => import('@/views/admin/onboarding/SelectAgentsView.vue')
   },
   {
     path: 'created',
     name: 'avatar-created',
-    component: () => import('@/views/onboarding/AvatarCreatedView.vue')
+    component: () => import('@/views/admin/onboarding/AvatarCreatedView.vue')
   }
 ]
 

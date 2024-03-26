@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { fetchWrapper } from '../helpers/fetch-wrapper.js';
 import { useChatStore } from './chat.store.js';
-import { useStorage } from '@vueuse/core';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 const usersURL = `${apiUrl}/users`;
@@ -9,32 +8,20 @@ const usersURL = `${apiUrl}/users`;
 export const useUserStore = defineStore({
   id: 'users',
   state: () => ({
-    current: useStorage('user', {}),
-    avatar: useStorage('avatar', {}),
-    session_id: useStorage('session_id', null),
     account: {},
     record: {},
     records: [],
   }),
   getters: {
+    current: () => JSON.parse(localStorage.getItem('user')),
+    avatar: () => JSON.parse(localStorage.getItem('avatar')),
+    session_id: () => localStorage.getItem('session_id'),
   },
   actions: {
-    async hasAvatar(user_id) {
-      try {
-        const avatar = await fetchWrapper.get(`${usersURL}/${user_id}/avatars`);
-        this.avatar = avatar
-        return true
-      } catch (error) {
-        console.error(error);
-        if (error.status === 404) {
-          return false
-        }
-      }
-    },
     async getSessionToken() {
       try {
         const session = await fetchWrapper.get(`${apiUrl}/users/token`);
-        this.session_id = session.session_id;
+        localStorage.setItem('session_id', session.token);
       } catch (error) {
         console.error(error);
       }
@@ -50,10 +37,9 @@ export const useUserStore = defineStore({
     },
 
     async getUserAvatar(user_id) {
-      console.log('fetch avatar')
       try {
         const avatar = await fetchWrapper.get(`${usersURL}/${user_id}/avatars`);
-        this.avatar = avatar
+        localStorage.setItem('avatar', JSON.stringify(avatar));
       } catch (error) {
         console.error(error);
       }
@@ -67,6 +53,31 @@ export const useUserStore = defineStore({
         console.error(error);
       }
     },
+
+    // legacy function
+    async getSession() {
+      console.log("Creating session...")
+      const chatStore = useChatStore();
+      this.user = JSON.parse(localStorage.getItem('user'));
+
+      if (!this.user) {
+        try {
+          chatStore.messages = [{
+              sender: "ai",
+              content: "Hello there... I'm Asai, How can I help you?"
+          }];
+          const user = await fetchWrapper.get(`${usersURL}/session`);
+          localStorage.setItem('user', JSON.stringify(user));
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      if (this.user) {
+        console.log("User:", this.user);
+        chatStore.loadHistory();
+      }
+    }, 
 
     async saveProfile(user_id, formData) {
       try {
