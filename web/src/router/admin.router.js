@@ -4,12 +4,7 @@ import agentConfigRoutes from "./agents.router";
 
 const adminRoutes = [
   {
-    path: 'avatar/create',
-    name: 'create-avatar',
-    component: () => import('@/views/admin/CreateAvatarView.vue')
-  },
-  {
-    path: 'avatar/:avatar_id',
+    path: 'avatar/:avatar_id?',
     name: 'admin',
     component: () => import('@/views/admin/HomeView.vue')
   },
@@ -23,12 +18,6 @@ const adminRoutes = [
     name: 'agents',
     component: () => import('@/views/admin/AgentsView.vue')
   },
-  // {
-  //   path: 'avatar/:avatar_id/agents/:agent_id/config/:active_agent_id?',
-  //   name: 'agent-config',
-  //   component: () => import('@/views/admin/AgentConfigView.vue')
-  // },
-
   {
     path: 'avatar/:avatar_id/agents',
     component: AgentConfigView,
