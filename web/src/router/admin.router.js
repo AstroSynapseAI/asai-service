@@ -1,19 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AgentConfigView from '@/views/admin/AgentConfigView.vue'
 import agentConfigRoutes from "./agents.router";
-import onboardingRoutes from "./onboarding.router";
 
 const adminRoutes = [
-  {
-    path:'avatar/onboarding',
-    component: () => import('@/views/admin/OnboardingView.vue'),
-    children: onboardingRoutes
-  },
-  // {
-  //   path: 'avatar/create',
-  //   name: 'create-avatar',
-  //   component: () => import('@/views/admin/CreateAvatarView.vue')
-  // },
   {
     path: 'avatar/:avatar_id',
     name: 'admin',

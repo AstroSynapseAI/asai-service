@@ -1,6 +1,6 @@
 <script setup>
 import { reactive, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth.store';
 import { Form, Field, ErrorMessage } from 'vee-validate';
@@ -15,6 +15,7 @@ const schema = yup.object({
     .oneOf([yup.ref('Password'), null], 'Passwords must match')
 });
 
+const router = useRouter();
 const route = useRoute();
 const auth = useAuthStore();
 const username = ref('');
@@ -35,11 +36,12 @@ const register = async () => {
      });
 
      if (loggedIn) {
-       window.location.href = '/admin/avatar/create';
+       router.push({name: 'welcome'});
      }
   }
   catch (error) {
-    toast.error(error)
+    console.log(error);
+    // toast.error(error)
     formState.isSubmitting = false; 
   }
 };
