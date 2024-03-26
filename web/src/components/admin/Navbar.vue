@@ -44,7 +44,7 @@ const logout = () => {
 
 <style scoped>
 .navbar-bg {
-  background-color: #374151 !important;
+  background-color: #222e3c !important;
 }
 .navbar {
   height: 65px;

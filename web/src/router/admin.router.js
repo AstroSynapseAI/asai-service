@@ -4,7 +4,7 @@ import agentConfigRoutes from "./agents.router";
 
 const adminRoutes = [
   {
-    path: 'avatar/:avatar_id',
+    path: 'avatar/:avatar_id?',
     name: 'admin',
     component: () => import('@/views/admin/HomeView.vue')
   },

@@ -1,9 +1,16 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, toRef } from 'vue';
 import { useRouter } from 'vue-router';
 import { Form, Field, ErrorMessage } from 'vee-validate';
 
+import { useLLMStore } from '@/stores/llm.store';
+import { useAgentStore } from '@/stores/agent.store';
+import { useAvatarStore } from '@/stores/avatar.store';
+import { useUserStore } from '@/stores/user.store';
+import { useToast } from 'vue-toastification';
+
 const router = useRouter();
+const toast = useToast();
 
 const selectedAgents = ref([]);
 const skipSMTP = ref(false);
@@ -20,6 +27,63 @@ const config = ref({
   "reply_to": "",
 });
 
+const user = useUserStore();
+const llm = useLLMStore();
+const llmRecords = toRef(llm, 'records');
+
+const agent = useAgentStore();
+const agentRecords = toRef(agent, 'records');
+
+const avatar = useAvatarStore()
+
+const selectedLLM = ref('');
+const selectedAgent = ref('');
+
+const createAvatar = async () => {
+  let onbaordingData = JSON.parse(localStorage.getItem('onboarding_data'));
+  if (onbaordingData) {
+    try {
+      await llm.getLLMs();
+
+      if (onbaordingData.avatar_llm == 'gpt') {
+        // if GPT family of models is selected set GPT-4 as default
+        selectedLLM.value = llmRecords.value.find(llm => llm.slug === 'gpt-4');
+      }
+      else {
+        console.log('missing LLM');
+      }
+
+      const avatarData = {
+        "user_id": user.current.ID,
+        "name": onbaordingData.avatar_name,
+        "primer": onbaordingData.avatar_primer,
+        "llm": selectedLLM.value.ID,
+      }
+
+      await avatar.saveAvatar(avatarData); 
+
+      await agent.getAgents();
+
+      for (let i = 0; i < onbaordingData.avatar_agents.length; i++) {
+        selectedAgent.value = agentRecords.value.find(agent => agent.slug === onbaordingData.avatar_agents[i]);
+        let agent_data = {
+          "is_active": true,
+          "is_public": false,
+          "primer": selectedAgent.value.primer,
+          "llm_id": selectedLLM.value.ID,
+          "avatar_id": avatar.userAvatar.ID,
+          "agent_id": selectedAgent.value.ID
+        }
+        await agent.saveActiveAgent(agent_data);
+      }
+
+      localStorage.removeItem('onboarding_data');
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went worng, we couldn't create your avatar");
+    }
+  }
+}
 
 const toggleAgent = (agent) => {
   let onboardingData = JSON.parse(localStorage.getItem('onboarding_data')); 
@@ -53,12 +117,16 @@ const skip = () => {
   localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
 }
 
-const next = () => {
+const next = async () => {
   const onboardingData = JSON.parse(localStorage.getItem('onboarding_data'));
-  console.log(config.value);
   onboardingData['email_config'] = config.value;
-  localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
-  // router.push({ name: 'avatar-created' });
+  try {
+    await createAvatar();
+    localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
+    router.push({ name: 'avatar-created' });
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 onMounted(() => {
@@ -243,7 +311,6 @@ onMounted(() => {
       </div>
       <div class="col-4 text-center d-grid">
         <button class="btn btn-primary btn-lg" @click="next">Next</button>
-        <!-- <router-link :to="{ name: 'avatar-created' }" class="btn btn-primary btn-lg">Next</router-link> -->
       </div>
     </div>
   </div>
