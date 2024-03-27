@@ -20,7 +20,6 @@ const checkPasswordMatch = () => {
   isTyping.value = true;
 };
 
-
 const isSaveButtonDisabled = computed(() => {
   return !username.value.trim() || !firstName.value.trim() || !lastName.value.trim();
 });
@@ -117,6 +116,7 @@ onMounted(async () => {
       username.value = user.account.username ?? "";
       firstName.value = user.account.first_name;
       lastName.value = user.account.last_name;
+      email.value = user.account.email;
     }
   }
   catch (error) {
@@ -140,6 +140,12 @@ onMounted(async () => {
               <div class="form-floating mb-3">
                 <input type="text" class="form-control" id="username" placeholder="Username" v-model="username">
                 <label for="username">Username</label>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="email" placeholder="Email" v-model="email">
+                <label for="email">Email</label>
               </div>
             </div>
           </div>
