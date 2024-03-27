@@ -20,6 +20,7 @@ const checkPasswordMatch = () => {
   isTyping.value = true;
 };
 
+
 const isSaveButtonDisabled = computed(() => {
   return !username.value.trim() || !firstName.value.trim() || !lastName.value.trim();
 });
@@ -164,25 +165,25 @@ onMounted(async () => {
           <hr>
           <h3>Change Password</h3>
           <div class="row">
-            <div class="col-6">
-              <div class="form-floating mb-3">
-                <input type="password" class="form-control" id="newPassword" placeholder="New Password" v-model="newPassword" @input="checkPasswordMatch">
-                <label for="newPassword">New Password</label>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="form-floating mb-3">
-                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" v-model="confirmPassword" @input="checkPasswordMatch">
-                <label for="confirmPassword">Confirm Password</label>
-                <div v-if="isTyping && newPassword !== confirmPassword">
-                    Passwords do not match
-                  </div>
-                  <div v-else-if="isTyping && newPassword.length.trim < 8 || confirmPassword.length < 8">
-                    New password has to have more than 8 characters
-                  </div>
-              </div>
-            </div>
-          </div>
+  <div class="col-6">
+    <div class="form-floating mb-3">
+      <input type="password" class="form-control" id="newPassword" placeholder="New Password" v-model="newPassword" @input="checkPasswordMatch">
+      <label for="newPassword">New Password</label>
+    </div>
+  </div>
+  <div class="col-6">
+    <div class="form-floating mb-3">
+      <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" v-model="confirmPassword" @input="checkPasswordMatch">
+      <label for="confirmPassword">Confirm Password</label>
+      <div v-if="isTyping && newPassword !== confirmPassword">
+        Passwords do not match
+      </div>
+      <div v-else-if="isTyping && (newPassword.length < 8 || confirmPassword.length < 8)">
+        New password has to have more than 8 characters
+      </div>
+    </div>
+  </div>
+</div>
           <div class="row"> 
             <div class="col-12">
               <button class="btn btn-primary float-end" @click="changePassword" :disabled="isChangeButtonDisabled">Change</button>
