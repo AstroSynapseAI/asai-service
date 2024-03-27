@@ -59,26 +59,21 @@ onMounted(() => {
         </div>
       </div>
     </nav>
-    <div class="row">
-      <div class="col-md-6">
-        <h3 class="px-3 mb-4 mt-3 mt-md-0"> Enter your email and ASAI will send you a link to reset your password</h3>
-        <Form class="form-control" @submit="submitPasswordRecovery" :validation-schema="schema">
-          <ErrorMessage name="Email" />
-              <Field v-model="email" name="Email" type="email" class="email-input d-block" placeholder="Email"></Field>
-              <button class="send-button btn btn-light" :disabled="formState.isSubmitting">
-                <span v-if="formState.isSubmitting">
-                  <span class="loader"></span>
-                </span>
-                <span v-else>RESET</span>
-              </button>
-        </Form>
-      </div>
 
-      <div class="col-md-6">
-       
-      </div>
-    
+    <div class="col-md-6">
+        <h3 class="px-3 mb-4 mt-3 mt-md-0">Enter your email and ASAI will send you a link to reset your password</h3>
+        <Form class="form-control d-flex" @submit="submitPasswordRecovery" :validation-schema="schema">
+          <ErrorMessage name="Email" />
+          <Field v-model="email" name="Email" type="email" class="email-input flex-fill mb-0 corner-0" placeholder="Email"></Field>
+          <button class="send-button btn btn-light" :disabled="formState.isSubmitting">
+            <span v-if="formState.isSubmitting">
+                <span class="loader"></span>
+            </span>
+            <span v-else>RESET</span>
+          </button>
+        </Form>
     </div>
+    
   </div>
 </template>
 
