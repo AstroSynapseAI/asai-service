@@ -3,7 +3,7 @@ import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { onMounted } from 'vue';
 import { Form, Field, useForm, ErrorMessage } from 'vee-validate';
-import { useAuthStore } from '@/stores/auth.store.js'; 
+import { useAuthStore } from '@/stores/auth.store.js';
 import { useUserStore } from '@/stores/user.store.js';
 const { handleSubmit } = useForm();
 import { useToast } from 'vue-toastification';
@@ -23,31 +23,37 @@ let username = ref('');
 let password = ref('');
 
 const formState = reactive({
-  isSubmitting: false, 
+  isSubmitting: false,
 });
 
 const submitLogin = handleSubmit(async values => {
   formState.isSubmitting = true;
   try {
     const loggedIn = await auth.login(username.value, password.value)
-    if (loggedIn) {
-      await user.getUserAvatar(auth.user.ID);
-      if (user.avatar) {
-        router.push({name: 'admin', params: { avatar_id: user.avatar.ID }});
-        return;
-      }
-      router.push({name: 'create-avatar'});
+    console.log('user id ' + auth.user.ID);
+    const hasAvatar = await user.hasAvatar(auth.user.ID)
+    console.log('has avatar ' + hasAvatar);
+
+    if (loggedIn && hasAvatar) {
+      console.log('go to admin')
+      router.push({ name: 'admin', params: { avatar_id: user.avatar.ID } });
     }
+    else {
+      console.log('go to welcome')
+      router.push({ name: 'welcome' });
+    }
+
     formState.isSubmitting = false;
   }
   catch (err) {
+    console.log(err);
     toast.error(err);
-    formState.isSubmitting = false; 
+    formState.isSubmitting = false;
   }
 });
 
 onMounted(() => {
-  feather.replace(); 
+  feather.replace();
 });
 
 </script>
@@ -64,7 +70,7 @@ onMounted(() => {
 
             <div class="row">
               <div class="col-auto">
-                <router-link :to="{name: 'home'}" class="btn text-white">
+                <router-link :to="{ name: 'home' }" class="btn text-white">
                   <i class="align-middle feather-icon" data-feather="home"></i>
                 </router-link>
               </div>
@@ -80,10 +86,11 @@ onMounted(() => {
         <img class="logo" src="@/assets/ASAILogotype.svg" alt="">
         <div class="card">
           <div class="card-body">
-            
+
             <Form class="form-control" @submit="submitLogin" :validation-schema="schema">
               <ErrorMessage name="Username" />
-              <Field v-model="username" id="Email" name="Username" type="email" class="email-input d-block" placeholder="Username"></Field>
+              <Field v-model="username" id="Email" name="Username" type="email" class="email-input d-block"
+                placeholder="Username"></Field>
               <ErrorMessage name="Password" />
               <Field v-model="password" id="Password" name="Password" type="password" class="pass-input d-block" placeholder="Password"></Field>
 
@@ -105,15 +112,18 @@ onMounted(() => {
           </div>
         </div>
       </div>
-      
+
       <div class="col-md-6">
-        <h3 class="px-3 mb-4 mt-3 mt-md-0"> Asai cloud is currently in <b>closed beta</b>, and access is limited to <b>invite only</b>. Plese send us your email, if you are interested, and we will add you in the next onboarding batch of testers.</h3>
+        <h3 class="px-3 mb-4 mt-3 mt-md-0"> Asai cloud is currently in <b>closed beta</b>, and access is limited to
+          <b>invite only</b>. Plese send us your email, if you are interested, and we will add you in the next
+          onboarding batch of testers.</h3>
         <Form class="form-control d-flex" action="https://formspree.io/f/xyyqjdgr" method="POST">
-          <Field id="waitlist-email" name="WaitList Email" type="email" class="email-input flex-fill mb-0 corner-0" placeholder="Email"></Field>
+          <Field id="waitlist-email" name="WaitList Email" type="email" class="email-input flex-fill mb-0 corner-0"
+            placeholder="Email"></Field>
           <button class="send-button btn btn-light" @click="''">Submit</button>
         </Form>
       </div>
-    
+
     </div>
   </div>
 </template>
@@ -132,7 +142,12 @@ nav {
   color: white !important;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: white;
 }
 
@@ -146,14 +161,17 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
   margin-bottom: 3em;
 }
+
 .card {
-  background-color: black; 
-  border: 1px solid white; 
+  background-color: black;
+  border: 1px solid white;
   border-radius: 0;
   width: 100%;
 }
-.card-body { 
-  color: white; /* To make text visible in dark background */
+
+.card-body {
+  color: white;
+  /* To make text visible in dark background */
 }
 
 .form-control {
@@ -164,7 +182,8 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 0;
 }
 
-.email-input, .pass-input {
+.email-input,
+.pass-input {
   width: 100%;
   margin-bottom: 2em;
   height: 3em;
@@ -188,23 +207,26 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .loader {
-    width: 18px;
-    height: 18px;
-    border: 2px solid #FFF;
-    border-bottom-color: transparent;
-    border-radius: 50%;
-    display: inline-block;
-    box-sizing: border-box;
-    animation: rotation 1s linear infinite;
-    }
-    @keyframes rotation {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-} 
+  width: 18px;
+  height: 18px;
+  border: 2px solid #FFF;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .send-button {
   min-width: 150px;
 }
