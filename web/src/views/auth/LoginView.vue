@@ -31,10 +31,6 @@ const submitLogin = handleSubmit(async values => {
   try {
     const loggedIn = await auth.login(username.value, password.value)
     const hasAvatar = await user.hasAvatar(auth.user.ID)
-
-    console.log('current user ', user.current);
-    console.log('auth user ', auth.user);
-
     if (loggedIn && hasAvatar) {
       user.current = auth.user; // this is a hack, because I dont understand how useStore and local storage works. TODO
       router.push({ name: 'admin', params: { avatar_id: user.avatar.ID } });

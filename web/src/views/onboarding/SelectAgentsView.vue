@@ -15,6 +15,8 @@ const toast = useToast();
 const selectedAgents = ref([]);
 const skipSMTP = ref(false);
 const SMTPRequired = ref(false);
+const agentConfig = ref({});
+
 const config = ref({
   "imap_server": "",
   "smtp_server": "",
@@ -26,6 +28,14 @@ const config = ref({
   "sender": "",
   "reply_to": "",
 });
+
+const searchConfig = ref({
+  "ddg_is_active": true,
+  "google_api_token": "",
+  "google_is_active": false,
+  "exa_api_token": "",
+  "exa_is_active": false
+})
 
 const user = useUserStore();
 const llm = useLLMStore();
@@ -63,7 +73,7 @@ const createAvatar = async () => {
       await avatar.saveAvatar(avatarData);
 
       const activeLLMData = {
-        "token": onbaordingData.avatar_token,
+        "token": onbaordingData.openai_token,
         "is_active": true,
         "is_public": false,
         "llm_id": selectedLLM.value.ID,
@@ -78,17 +88,13 @@ const createAvatar = async () => {
       for (let i = 0; i < onbaordingData.avatar_agents.length; i++) {
         selectedAgent.value = agentRecords.value.find(agent => agent.slug === onbaordingData.avatar_agents[i]);
         if (selectedAgent.value.slug === 'email-agent') {
-          const agentConfig = config.value;
+          agentConfig.value = config.value;
         }
-        else {
-          const agentConfig = {
-            "ddg_is_active": true,
-            "google_api_token": "",
-            "google_is_active": false,
-            "exa_api_token": "",
-            "exa_is_active": false
-          }
+
+        if (selectedAgent.value.slug === 'search-agent') {
+          agentConfig.value = searchConfig.value;
         }
+
 
         let agent_data = {
           "is_active": true,
@@ -96,8 +102,11 @@ const createAvatar = async () => {
           "primer": selectedAgent.value.primer,
           "llm_id": selectedLLM.value.ID,
           "avatar_id": avatar.userAvatar.ID,
-          "agent_id": selectedAgent.value.ID,
-          "config": JSON.stringify(agentConfig.value)
+          "agent_id": selectedAgent.value.ID
+        }
+
+        if (agentConfig) {
+          agent_data['config'] = JSON.stringify(agentConfig.value);
         }
         await agent.saveActiveAgent(agent_data);
       }

@@ -24,7 +24,6 @@ export const useAuthStore = defineStore({
           this.apiToken = user.api_token || null;
           this.isLoggedIn = true;
           this.user = user;
-          console.log("logged in user", this.user);
           return true;
         }
         return false;
