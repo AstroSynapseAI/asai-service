@@ -44,9 +44,7 @@ onMounted(() => {
           <div class="col-6">
             <span class="navbar-brand text-white">AI Avatars Platform</span>
           </div>
-
           <div class="navbar-menu col-6 d-flex justify-content-end">
-
             <div class="row">
               <div class="col-auto">
                 <router-link :to="{name: 'home'}" class="btn text-white">
@@ -54,26 +52,28 @@ onMounted(() => {
                 </router-link>
               </div>
             </div>
-
           </div>
         </div>
       </div>
     </nav>
 
     <div class="col-md-6">
-        <h3 class="px-3 mb-4 mt-3 mt-md-0">Enter your email and ASAI will send you a link to reset your password</h3>
-        <Form class="form-control d-flex" @submit="submitPasswordRecovery" :validation-schema="schema">
-          <ErrorMessage name="Email" />
-          <Field v-model="email" name="Email" type="email" class="email-input flex-fill mb-0 corner-0" placeholder="Email"></Field>
+      <h3 class="px-3 mb-4 mt-3 mt-md-0">Enter your email and ASAI will send you a link to reset your password</h3>
+      <Form class="form-control d-flex flex-column" @submit="submitPasswordRecovery" :validation-schema="schema">
+        <div class="d-flex flex-row align-items-center">
+          <div class="flex-grow-1 mr-0">
+            <Field v-model="email" name="Email" type="email" class="email-input mb-0 corner-0" placeholder="Email"></Field>
+          </div>
           <button class="send-button btn btn-light" :disabled="formState.isSubmitting">
             <span v-if="formState.isSubmitting">
-                <span class="loader"></span>
+              <span class="loader"></span>
             </span>
             <span v-else>RESET</span>
           </button>
-        </Form>
+        </div>
+        <ErrorMessage name="Email"/>
+      </Form>
     </div>
-    
   </div>
 </template>
 
