@@ -8,8 +8,11 @@ import LoginView from '@/views/auth/LoginView.vue'
 import AdminView from '@/views/admin/AdminView.vue'
 import RegisterView from '@/views/auth/RegisterView.vue'
 import ForgotPasswordView from '@/views/auth/ForgotPasswordView.vue'
-import adminRoutes from "./admin.router";
 import PasswordResetView from "../views/auth/PasswordResetView.vue";
+import onboardingView from '@/views/onboarding/OnboardingView.vue';
+
+import adminRoutes from "./admin.router";
+import onboardingRoutes from "./onboarding.router";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -59,6 +62,7 @@ const router = createRouter({
     //   meta: { requiresAuth: false },
     //   component: AsaiChatView
     // },
+    { path: '/onboarding', component: onboardingView, children: onboardingRoutes },
     { path: "/admin", component: AdminView, children: adminRoutes },
     { path: "/:pathMatch(.*)*", redirect: "/" },
   ],
