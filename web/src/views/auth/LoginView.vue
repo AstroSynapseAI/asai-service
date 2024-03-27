@@ -30,16 +30,12 @@ const submitLogin = handleSubmit(async values => {
   formState.isSubmitting = true;
   try {
     const loggedIn = await auth.login(username.value, password.value)
-    console.log('user id ' + auth.user.ID);
     const hasAvatar = await user.hasAvatar(auth.user.ID)
-    console.log('has avatar ' + hasAvatar);
-
     if (loggedIn && hasAvatar) {
-      console.log('go to admin')
+      user.current = auth.user; // this is a hack, because I dont understand how useStore and local storage works. TODO
       router.push({ name: 'admin', params: { avatar_id: user.avatar.ID } });
     }
     else {
-      console.log('go to welcome')
       router.push({ name: 'welcome' });
     }
 
@@ -114,7 +110,8 @@ onMounted(() => {
       <div class="col-md-6">
         <h3 class="px-3 mb-4 mt-3 mt-md-0"> Asai cloud is currently in <b>closed beta</b>, and access is limited to
           <b>invite only</b>. Plese send us your email, if you are interested, and we will add you in the next
-          onboarding batch of testers.</h3>
+          onboarding batch of testers.
+        </h3>
         <Form class="form-control d-flex" action="https://formspree.io/f/xyyqjdgr" method="POST">
           <Field id="waitlist-email" name="WaitList Email" type="email" class="email-input flex-fill mb-0 corner-0"
             placeholder="Email"></Field>

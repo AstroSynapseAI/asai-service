@@ -105,6 +105,8 @@ export const useAuthStore = defineStore({
     logout() {
       localStorage.removeItem("user");
       localStorage.removeItem("avatar");
+      localStorage.removeItem("onboarding_data");
+      localStorage.removeItem("session_id");
       this.isLoggedIn = false;
       this.apiToken = null;
       router.push("/login");
