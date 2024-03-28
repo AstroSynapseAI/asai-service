@@ -11,7 +11,7 @@ const toast = useToast();
 const schema = yup.object({
   AvatarName: yup.string().required("The Avatar Name is required"),
   AvatarLLMID: yup.string().required("The LLM is required"),
-  AvatarPrimer: yup.string()
+  AvatarPrimer: yup.string().required("The Primer is required"),
 });
 
 const formState = reactive({
