@@ -7,7 +7,6 @@ const userIsAdmin = ref(false);
 
 
 onMounted(() => {
-	console.log("Sidebar user ", user.current);
 	userIsAdmin.value = user.current?.is_admin;
 	feather.replace()
 });

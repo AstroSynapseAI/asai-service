@@ -3,6 +3,15 @@ import { useRoute, useRouter } from 'vue-router';
 import { onMounted, ref, toRef } from 'vue';
 import { useLLMStore } from '@/stores/llm.store';
 import { useAvatarStore } from '@/stores/avatar.store';
+import { useToast } from 'vue-toastification';
+import { Form, Field, ErrorMessage } from 'vee-validate';
+import * as yup from 'yup';
+
+const schema = yup.object({
+  ApiToken: yup.string().required(),
+});
+
+const toast = useToast();
 
 const route = useRoute();
 const router = useRouter();
@@ -11,44 +20,73 @@ const avatar = useAvatarStore();
 
 const modelName = ref('');
 const modelToken = ref('');
-const isActive = ref(false);
+const llmRecords = toRef(llm, 'records');
+const activeLLMs = toRef(avatar, 'activeLLMs');
+const selectedModels = ref([]);
 
-const toggleActive = () => {
-  isActive.value = !isActive.value
+const llms = () => {
+  const provider = route.params.provider.toLowerCase();
+  return llmRecords.value.filter(llm => llm.provider.toLowerCase() === provider);
+}
+
+const isActive = (ID) => {
+  const activeLLM = activeLLMs.value.find(activeLLM => {
+    return activeLLM.llm.ID === ID;
+  })
+  return activeLLM ? activeLLM.is_active : false
+}
+
+const toggleActive = async (ID) => {
+  if (selectedModels.value.includes(ID)) {
+    selectedModels.value = selectedModels.value.filter(m => m !== ID);
+  } else {
+    selectedModels.value.push(ID);
+  }
 }
 
 const saveModel = async () => {
   try {
-    await llm.saveLLM({
-      ID: parseInt(route.params.active_model_id),
-      avatar_id: parseInt(route.params.avatar_id),
-      llm_id: parseInt(route.params.model_id),
-      is_active: isActive.value,
-      token: modelToken.value
-    })  
-    router.push({name: 'models', params: {avatar_id: route.params.avatar_id}});
+    for (const ID of selectedModels.value) {
+      const activeLLM = activeLLMs.value.find(activeLLM => {
+        return activeLLM.llm.ID === ID;
+      })
+
+      await llm.saveLLM({
+        ID: activeLLM.ID ? activeLLM.ID : null,
+        avatar_id: parseInt(route.params.avatar_id),
+        llm_id: ID,
+        is_active: true,
+        token: modelToken.value
+      })
+    }
+
+    await avatar.getActiveLLMs(route.params.avatar_id);
+    router.push({ name: 'models', params: { avatar_id: route.params.avatar_id } });
   }
   catch (error) {
     console.log(error);
+    toast.error('Error while saving model configuration');
   }
-  
 }
 
 onMounted(async () => {
+  if (route.params.provider === 'openai') {
+    modelName.value = 'GPT by OpenAi'
+  }
   try {
-    await llm.getLLM(route.params.model_id);
-    modelName.value = llm.record.name;
-    if (route.params.active_model_id) {
-      await avatar.getActiveLLM( route.params.avatar_id, route.params.model_id);
-      if (avatar.activeLLM) {
-        isActive.value = avatar.activeLLM.is_active;
-        modelToken.value = avatar.activeLLM.token;
+    await llm.getLLMs();
+    await avatar.getActiveLLMs(route.params.avatar_id);
+    for (const activeLLM of activeLLMs.value) {
+      if (activeLLM.llm.provider === 'OpenAI' && activeLLM.token) {
+        modelToken.value = activeLLM.token;
+        break
       }
     }
   }
   catch (error) {
     console.log(error);
   }
+
   feather.replace();
 })
 </script>
@@ -56,44 +94,54 @@ onMounted(async () => {
 <template>
 
   <div class="container-fluid p-0">
-    <h1 class="h3 mb-3">Configure: {{ modelName }}
-      <div class="form-check form-switch float-end me-5">
-        <label class="form-check-label" for="flexSwitchCheckDefault">Active</label>
-        <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" :checked="isActive" @click="toggleActive">
-      </div>
-    </h1>
+    <h1 class="h3 mb-3">Configure: {{ modelName }}</h1>
 
     <div class="row">
-      <div class="col-12">
+      <div class="col-12 card">
+        <div class="card-body">
+          <div class="container">
+            <div class="row">
 
-        <div class="card">
+              <div class="col-6">
+                <div class="form-floating mb-3">
+                  <input v-model="modelToken" type="text" name="ApiToken" class="form-control" id="floatingInput"
+                    placeholder="Token...">
+                  <ErrorMessage name="ApiToken" class="text-danger" />
+                  <label for="floatingInput">Token*</label>
+                </div>
+              </div>
 
-          <div class="card-body">
-            <div class="container">
-
-              <div class="row">
-                <div class="col-12">
-                  <div class="form-floating mb-3">
-                    <input v-model="modelToken" type="text" class="form-control" id="floatingInput" placeholder="Token...">
-                    <label for="floatingInput">Token</label>
+              <!-- This list needs to be properly loaded by checking with openai or other llm providers to see what llms the token has available -->
+              <div class="col-6">
+                <div class="row" v-for="(llm, index) in llmRecords">
+                  <div class="col-4">
+                    <p>{{ llm.name }}</p>
+                  </div>
+                  <div class="col-4">
+                    <div class="form-check form-switch float-end me-5">
+                      <label class="form-check-label" :for="llm.name">Active</label>
+                      <input class="form-check-input" type="checkbox" :id="llm.name" :checked="isActive(llm.ID)">
+                    </div>
                   </div>
                 </div>
               </div>
-              
-              <div class="row mt-3">
-                <div class="col-12">
-                  <button type="button" class="btn btn-secondary" @click="saveModel">Save</button>
-                </div>    
-              </div>
-
             </div>
-
+            <div class="row mt-3">
+              <div class="col-12">
+                <button type="button" class="btn btn-primary" @click="saveModel">Save</button>
+              </div>
+            </div>
           </div>
-
         </div>
 
       </div>
     </div>
   </div>
 
-  </template>
+</template>
+
+<style scoped>
+.form-control {
+  background-color: #374151;
+}
+</style>

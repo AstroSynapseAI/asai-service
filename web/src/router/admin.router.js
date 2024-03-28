@@ -39,6 +39,11 @@ const adminRoutes = [
     component: () => import('@/views/admin/ModelsView.vue')
   },
   {
+    path: 'avatar/:avatar_id/models/:provider',
+    name: 'models-config',
+    component: () => import('@/views/admin/ModelConfigView.vue')
+  },
+  {
     path: 'avatar/:avatar_id/models/:model_id/config/:active_model_id?',
     name: 'model-config',
     component: () => import('@/views/admin/ModelConfigView.vue')

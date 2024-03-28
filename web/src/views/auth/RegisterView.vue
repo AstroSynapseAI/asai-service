@@ -23,30 +23,30 @@ const password = ref('');
 const confirmPassword = ref('');
 
 const formState = reactive({
-  isSubmitting: false, 
+  isSubmitting: false,
 });
 
 const register = async () => {
-  formState.isSubmitting = true; 
+  formState.isSubmitting = true;
   try {
-     const loggedIn = await auth.registerInvite({
-       username: username.value,
-       password: password.value,
-       invite_token: route.params.invite_token
-     });
+    const loggedIn = await auth.registerInvite({
+      username: username.value,
+      password: password.value,
+      invite_token: route.params.invite_token
+    });
 
-     if (loggedIn) {
-       router.push({name: 'welcome'});
-     }
+    if (loggedIn) {
+      router.push({ name: 'welcome' });
+    }
   }
   catch (error) {
     console.log(error);
     // toast.error(error)
-    formState.isSubmitting = false; 
+    formState.isSubmitting = false;
   }
 };
 onMounted(async () => {
-  feather.replace(); 
+  feather.replace();
   if (route.params.invite_token) {
     try {
       let user = await auth.getInvitedUser(route.params.invite_token);
@@ -72,7 +72,7 @@ onMounted(async () => {
 
             <div class="row">
               <div class="col-auto">
-                <router-link :to="{name: 'home'}" class="btn text-white">
+                <router-link :to="{ name: 'home' }" class="btn text-white">
                   <i class="align-middle feather-icon" data-feather="home"></i>
                 </router-link>
               </div>
@@ -89,11 +89,14 @@ onMounted(async () => {
           <div class="card-body">
             <Form class="form-control" @submit="register" :validation-schema="schema">
               <ErrorMessage name="Username" />
-              <Field v-model="username" name="Username" type="email" class="email-input d-block" placeholder="Username"/>
-<ErrorMessage name="Password" />
-              <Field v-model="password" name="Password" type="password" class="pass-input d-block" placeholder="Password"/>
-<ErrorMessage name="ConfirmPassword" />
-              <Field v-model="confirmPassword" name="ConfirmPassword" type="password" class="pass-input d-block" placeholder="Confirm Password"/>
+              <Field v-model="username" name="Username" type="email" class="email-input d-block"
+                placeholder="Username" />
+              <ErrorMessage name="Password" />
+              <Field v-model="password" name="Password" type="password" class="pass-input d-block"
+                placeholder="Password" />
+              <ErrorMessage name="ConfirmPassword" />
+              <Field v-model="confirmPassword" name="ConfirmPassword" type="password" class="pass-input d-block"
+                placeholder="Confirm Password" />
               <button class="send-button btn btn-light" :disabled="formState.isSubmitting">
                 <span v-if="formState.isSubmitting">
                   <span class="loader"></span>
@@ -104,7 +107,7 @@ onMounted(async () => {
           </div>
         </div>
       </div>
-      
+
     </div>
   </div>
 </template>
@@ -120,24 +123,25 @@ nav {
 }
 
 .loader {
-    width: 18px;
-    height: 18px;
-    border: 2px solid #FFF;
-    border-bottom-color: transparent;
-    border-radius: 50%;
-    display: inline-block;
-    box-sizing: border-box;
-    animation: rotation 1s linear infinite;
-    }
+  width: 18px;
+  height: 18px;
+  border: 2px solid #FFF;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
 
-    @keyframes rotation {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-} 
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
 .send-button {
   min-width: 150px;
@@ -147,7 +151,12 @@ nav {
   color: white !important;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: white;
 }
 
@@ -161,14 +170,17 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
   margin-bottom: 3em;
 }
+
 .card {
-  background-color: black; 
-  border: 1px solid white; 
+  background-color: black;
+  border: 1px solid white;
   border-radius: 0;
   width: 100%;
 }
+
 .card-body {
-  color: white; /* To make text visible in dark background */
+  color: white;
+  /* To make text visible in dark background */
 }
 
 .form-control {
@@ -179,7 +191,8 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 0;
 }
 
-.email-input, .pass-input {
+.email-input,
+.pass-input {
   width: 100%;
   margin-bottom: 2em;
   height: 3em;

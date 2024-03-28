@@ -5,9 +5,10 @@ import { onMounted } from 'vue';
 import { Form, Field, useForm, ErrorMessage } from 'vee-validate';
 import { useAuthStore } from '@/stores/auth.store.js';
 import { useUserStore } from '@/stores/user.store.js';
-const { handleSubmit } = useForm();
 import { useToast } from 'vue-toastification';
 import * as yup from 'yup';
+
+const { handleSubmit } = useForm();
 
 const toast = useToast();
 const schema = yup.object({
