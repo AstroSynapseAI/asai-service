@@ -36,6 +36,10 @@ const isActive = (ID) => {
   return activeLLM ? activeLLM.is_active : false
 }
 
+const isSelected = (ID) => {
+  return selectedModels.value.includes(ID);
+}
+
 const toggleActive = async (ID) => {
   if (selectedModels.value.includes(ID)) {
     selectedModels.value = selectedModels.value.filter(m => m !== ID);
@@ -46,22 +50,22 @@ const toggleActive = async (ID) => {
 
 const saveModel = async () => {
   try {
-    for (const ID of selectedModels.value) {
+    for (const model of llms()) {
       const activeLLM = activeLLMs.value.find(activeLLM => {
-        return activeLLM.llm.ID === ID;
+        return activeLLM.llm.ID === model.ID;
       })
 
       await llm.saveLLM({
-        ID: activeLLM.ID ? activeLLM.ID : null,
+        ID: activeLLM ? activeLLM.ID : undefined,
+        token: modelToken.value,
         avatar_id: parseInt(route.params.avatar_id),
-        llm_id: ID,
-        is_active: true,
-        token: modelToken.value
+        llm_id: model.ID,
+        is_active: isSelected(model.ID)
       })
     }
 
     await avatar.getActiveLLMs(route.params.avatar_id);
-    router.push({ name: 'models', params: { avatar_id: route.params.avatar_id } });
+    toast.success('Model configuration saved');
   }
   catch (error) {
     console.log(error);
@@ -71,10 +75,15 @@ const saveModel = async () => {
 
 onMounted(async () => {
   if (route.params.provider === 'openai') {
-    modelName.value = 'GPT by OpenAi'
+    modelName.value = 'GPT by OpenAI'
   }
   try {
     await llm.getLLMs();
+    for (const model of llms()) {
+      if (isActive(model.ID)) {
+        selectedModels.value.push(model.ID);
+      }
+    }
     await avatar.getActiveLLMs(route.params.avatar_id);
     for (const activeLLM of activeLLMs.value) {
       if (activeLLM.llm.provider === 'OpenAI' && activeLLM.token) {
@@ -120,7 +129,8 @@ onMounted(async () => {
                   <div class="col-4">
                     <div class="form-check form-switch float-end me-5">
                       <label class="form-check-label" :for="llm.name">Active</label>
-                      <input class="form-check-input" type="checkbox" :id="llm.name" :checked="isActive(llm.ID)">
+                      <input class="form-check-input" type="checkbox" :id="llm.name" :checked="isActive(llm.ID)"
+                        @click="toggleActive(llm.ID)">
                     </div>
                   </div>
                 </div>

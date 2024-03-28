@@ -34,7 +34,6 @@ export const useAgentStore = defineStore({
     },
     async saveActiveAgent(formData) {
       try {
-        console.log("Saving active agent...", formData)
         const activeAgent = await fetchWrapper.post(`${agentsURL}/save/active`, formData);
         this.activeAgent = activeAgent;
       } catch (error) {
