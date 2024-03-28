@@ -116,6 +116,7 @@ onMounted(async () => {
       username.value = user.account.username ?? "";
       firstName.value = user.account.first_name;
       lastName.value = user.account.last_name;
+      email.value = user.account.email;
     }
   }
   catch (error) {
@@ -139,6 +140,12 @@ onMounted(async () => {
               <div class="form-floating mb-3">
                 <input type="text" class="form-control" id="username" placeholder="Username" v-model="username">
                 <label for="username">Username</label>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="email" placeholder="Email" v-model="email">
+                <label for="email">Email</label>
               </div>
             </div>
           </div>
@@ -175,11 +182,11 @@ onMounted(async () => {
                 <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" v-model="confirmPassword" @input="checkPasswordMatch">
                 <label for="confirmPassword">Confirm Password</label>
                 <div v-if="isTyping && newPassword !== confirmPassword">
-                    Passwords do not match
-                  </div>
-                  <div v-else-if="isTyping && newPassword.length.trim < 8 || confirmPassword.length < 8">
-                    New password has to have more than 8 characters
-                  </div>
+                  Passwords do not match
+                </div>
+                <div v-else-if="isTyping && (newPassword.length < 8 || confirmPassword.length < 8)">
+                  New password has to have more than 8 characters
+                </div>
               </div>
             </div>
           </div>

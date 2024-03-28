@@ -46,7 +46,6 @@ func (cnf *Config) InitDB() {
 
 	migration := gorm.NewGormMigrator(cnf.DB)
 	migration.AddMigrations(&Migrations{})
-
 	migration.Run()
 
 	seeder := gorm.NewGormSeeder(cnf.DB)
