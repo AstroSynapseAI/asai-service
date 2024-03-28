@@ -11,7 +11,6 @@ const skipToken = ref(false);
 
 const selectedModel = ref('');
 const chooseModel = (model) => {
-  console.log('model', model);
   // Retrieve existing onboarding data
   let onboardingData = JSON.parse(localStorage.getItem('onboarding_data')) || {};
 
@@ -23,6 +22,7 @@ const chooseModel = (model) => {
 
     selectedModel.value = '';
     delete onboardingData['avatar_llm'];
+
   } else { // else select the model
     selectedModel.value = model;
     onboardingData['avatar_llm'] = model;
@@ -53,6 +53,7 @@ const next = () => {
   localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
   router.push({ name: 'select-agents' });
 }
+
 onMounted(() => {
   const onboardingData = JSON.parse(localStorage.getItem('onboarding_data'));
   selectedModel.value = onboardingData?.avatar_llm || '';

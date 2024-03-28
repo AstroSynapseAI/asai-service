@@ -5,9 +5,10 @@ import { onMounted } from 'vue';
 import { Form, Field, useForm, ErrorMessage } from 'vee-validate';
 import { useAuthStore } from '@/stores/auth.store.js';
 import { useUserStore } from '@/stores/user.store.js';
-const { handleSubmit } = useForm();
 import { useToast } from 'vue-toastification';
 import * as yup from 'yup';
+
+const { handleSubmit } = useForm();
 
 const toast = useToast();
 const schema = yup.object({
@@ -88,21 +89,23 @@ onMounted(() => {
               <Field v-model="username" id="Email" name="Username" type="email" class="email-input d-block"
                 placeholder="Username"></Field>
               <ErrorMessage name="Password" />
-              <Field v-model="password" id="Password" name="Password" type="password" class="pass-input d-block"
-                placeholder="Password"></Field>
-              <button class="send-button btn btn-light" :disabled="formState.isSubmitting">
+              <Field v-model="password" id="Password" name="Password" type="password" class="pass-input d-block" placeholder="Password"></Field>
+
+              <div style="display: flex; flex-direction: column; align-items: flex-start;">
+              <div class="col-auto">
+                <button class="send-button btn btn-light" :disabled="formState.isSubmitting">
                 <span v-if="formState.isSubmitting">
                   <span class="loader"></span>
                 </span>
                 <span v-else>LOGIN</span>
               </button>
-              <div class="col-auto">
-                <router-link :to="{ name: 'forgot_password' }" class="btn btn-light" style="margin-top: 10px;">
-                  <span>Forgot password?</span>
-                </router-link>
               </div>
-            </Form>
-
+              <router-link :to="{name: 'forgot_password'}" class="text-decoration-underline" style="margin-top: 10px;">
+                Forgot password?
+            </router-link>
+            </div>
+          </Form>
+            
           </div>
         </div>
       </div>

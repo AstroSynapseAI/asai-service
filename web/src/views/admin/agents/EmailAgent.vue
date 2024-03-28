@@ -30,7 +30,7 @@ const config = ref({
   "reply_to": "",
 });
 
- const submitForm = async () => {
+const submitForm = async () => {
   const formData = {
     ID: parseInt(route.params.active_agent_id),
     avatar_id: parseInt(route.params.avatar_id),
@@ -39,7 +39,7 @@ const config = ref({
     primer: agentPrimer.value,
     is_active: isActiveAgent.value,
     is_public: isPublicAgent.value,
-    config: JSON.stringify(config.value), 
+    config: JSON.stringify(config.value),
   }
 
   if (agentRecord.value.ID) {
@@ -73,7 +73,7 @@ onMounted(async () => {
         config.value = JSON.parse(avatar.activeAgent.config);
       }
     }
-  } 
+  }
   catch (error) {
     console.log(error);
   }
@@ -82,20 +82,22 @@ onMounted(async () => {
 });
 </script>
 
- 
+
 <template>
   <h1 class="h3 mb-3">Configure: {{ agentRecord.name }}
     <div class="form-check form-switch float-end me-5">
       <label class="form-check-label" for="flexSwitchCheckDefault">Active</label>
-      <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" :checked="isActiveAgent" @click="isActiveAgent = !isActiveAgent">
+      <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" :checked="isActiveAgent"
+        @click="isActiveAgent = !isActiveAgent">
     </div>
     <div class="form-check form-switch float-end me-3">
       <label class="form-check-label" for="flexSwitchCheckDefault">Public</label>
-      <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" :checked="isPublicAgent" @click="isPublicAgent = !isPublicAgent">
+      <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" :checked="isPublicAgent"
+        @click="isPublicAgent = !isPublicAgent">
     </div>
   </h1>
 
-  
+
   <div class="card">
     <div class="card-body">
       <div class="container-fluid">
@@ -103,23 +105,16 @@ onMounted(async () => {
         <div class="row">
 
           <div class="col-6">
-            <h3>Primer</h3>
-            <Field
-              v-model="agentPrimer"
-              name="agent_primer"
-              type="text"
-              as="textarea"
-              class="form-control"
-              rows="30"
-              placeholder="How should the agent behave..."
-            ></Field>
+            <h3 class="mb-3">Primer</h3>
+            <Field v-model="agentPrimer" name="agent_primer" type="text" as="textarea" class="form-control" rows="30"
+              placeholder="How should the agent behave..."></Field>
           </div>
 
           <div class="col-6">
-            
+
             <div class="row">
               <div class="col-12">
-                <h3>Agent Model</h3>
+                <h3 class="mb-3">Agent Model</h3>
                 <select v-model="activeAgentLLMID" class="form-select model-select" aria-label="Select Model">
                   <option value="" disabled selected>Select a LLM</option>
                   <option v-for="(llm, index) in llmRecords" :value="llm.ID" :key="index">
@@ -131,13 +126,14 @@ onMounted(async () => {
 
             <div class="row">
               <div clas="col-12">
-                <h3>Email Config</h3>
+                <h3 class="my-3">Email Config</h3>
 
                 <div class="row">
 
                   <div class="col-6">
                     <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="smtp-server" placeholder="mail.example.com" v-model="config.smtp_server">
+                      <input type="text" class="form-control" id="smtp-server" placeholder="mail.example.com"
+                        v-model="config.smtp_server">
                       <label for="smtp-server">SMTP Server</label>
                     </div>
                   </div>
@@ -158,7 +154,8 @@ onMounted(async () => {
 
                   <div class="col-2">
                     <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="smtp-port" placeholder="587" v-model="config.smtp_port">
+                      <input type="text" class="form-control" id="smtp-port" placeholder="587"
+                        v-model="config.smtp_port">
                       <label for="smtp-port">Port</label>
                     </div>
                   </div>
@@ -169,20 +166,22 @@ onMounted(async () => {
 
                   <div class="col-6">
                     <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="smtp-username" placeholder="username" v-model="config.username">
+                      <input type="text" class="form-control" id="smtp-username" placeholder="username"
+                        v-model="config.username">
                       <label for="smtp-username">Username</label>
                     </div>
                   </div>
 
                   <div class="col-6">
                     <div class="form-floating mb-3">
-                      <input type="password" class="form-control" id="smtp-password" placeholder="password" v-model="config.password">
+                      <input type="password" class="form-control" id="smtp-password" placeholder="password"
+                        v-model="config.password">
                       <label for="smtp-password">Password</label>
                     </div>
                   </div>
 
                 </div>
- 
+
                 <div class="row">
 
                   <div class="col-6">
@@ -194,21 +193,22 @@ onMounted(async () => {
 
                   <div class="col-6">
                     <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="reply-to" placeholder="reply-to" v-model="config.reply_to">
+                      <input type="text" class="form-control" id="reply-to" placeholder="reply-to"
+                        v-model="config.reply_to">
                       <label for="reply-to">Reply To</label>
                     </div>
                   </div>
 
-                </div>               
+                </div>
               </div>
             </div>
-          </div> 
+          </div>
         </div>
 
         <div class="row mt-3">
           <div class="col-12">
             <button type="button" class="btn btn-secondary" @click="submitForm">Save</button>
-          </div>    
+          </div>
         </div>
 
       </div>
@@ -216,3 +216,10 @@ onMounted(async () => {
   </div>
 
 </template>
+
+<style scoped>
+.form-control,
+.form-select {
+  background-color: #374151;
+}
+</style>

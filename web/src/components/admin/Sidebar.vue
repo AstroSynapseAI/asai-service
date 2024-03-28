@@ -7,7 +7,6 @@ const userIsAdmin = ref(false);
 
 
 onMounted(() => {
-	console.log("Sidebar user ", user.current);
 	userIsAdmin.value = user.current?.is_admin;
 	feather.replace()
 });
@@ -32,26 +31,26 @@ onMounted(() => {
 				<li class="sidebar-header">Configure</li>
 
 				<li class="sidebar-item">
-					<router-link :to="{ name: 'personality', params: { avatar_id: user.avatar?.ID } }" class="sidebar-link">
-						<i class="align-middle" data-feather="meh"></i> <span class="align-middle">Personality</span>
-					</router-link>
-				</li>
-
-				<li class="sidebar-item">
 					<router-link :to="{ name: 'models', params: { avatar_id: user.avatar?.ID } }" class="sidebar-link">
 						<i class="align-middle" data-feather="codesandbox"></i> <span class="align-middle">Models</span>
 					</router-link>
 				</li>
 
 				<li class="sidebar-item">
-					<router-link :to="{ name: 'tools', params: { avatar_id: user.avatar?.ID } }" class="sidebar-link">
-						<i class="align-middle" data-feather="tool"></i> <span class="align-middle">Tools</span>
+					<router-link :to="{ name: 'personality', params: { avatar_id: user.avatar?.ID } }" class="sidebar-link">
+						<i class="align-middle" data-feather="meh"></i> <span class="align-middle">Personality</span>
 					</router-link>
 				</li>
 
 				<li class="sidebar-item">
 					<router-link :to="{ name: 'agents', params: { avatar_id: user.avatar?.ID } }" class="sidebar-link">
 						<i class="align-middle" data-feather="layers"></i> <span class="align-middle">Agents</span>
+					</router-link>
+				</li>
+
+				<li class="sidebar-item">
+					<router-link :to="{ name: 'tools', params: { avatar_id: user.avatar?.ID } }" class="sidebar-link">
+						<i class="align-middle" data-feather="tool"></i> <span class="align-middle">Tools</span>
 					</router-link>
 				</li>
 

@@ -25,7 +25,7 @@ const toggleActive = async (agentID) => {
     return activeAgent.agent.ID == agentID;
   });
 
-  if(activeAgent){
+  if (activeAgent) {
     activeAgent.is_active = !activeAgent.is_active;
   }
 
@@ -50,12 +50,12 @@ const getActiveAgentID = (agentID) => {
 onMounted(async () => {
   await agent.getAgents();
   try {
-    await avatar.getActiveAgents(user.avatar.ID);  
+    await avatar.getActiveAgents(user.avatar.ID);
   }
   catch (error) {
     console.log(error);
   }
-  
+
   feather.replace();
 });
 
@@ -70,30 +70,33 @@ onMounted(async () => {
         <div class="container">
 
           <div class="row" v-for="(_, index) in agentsRecords.filter((a, i) => i % 2 === 0)" :key="'row' + index">
-              <!-- Render the current and next agent (if it exists) within the same row -->
-              <div class="col-6" v-for="agent in agentsRecords.slice(index, index + 2)" :key="agent.ID">
-                <div class="card">
-                  <div class="card-header">
-                    <div class="row">
-                      <div class="col">
-                        <h5 class="card-title">{{ agent.name }}</h5>
-                      </div>
-                      <div class="col-auto">
-                        <div class="form-check form-switch d-flex align-items-center" v-if="getActiveAgentID(agent.ID)">
-                          <input class="form-check-input me-2" type="checkbox" id="flexSwitchCheckDefault" :checked="agentIsActive(agent.ID)" @click="toggleActive(agent.ID)">
-                          <label style="margin-bottom: -5px;" for="flexSwitchCheckDefault">Active</label>
-                        </div>
-                      </div>
+            <!-- Render the current and next agent (if it exists) within the same row -->
+            <div class="col-6" v-for="agent in agentsRecords.slice(index, index + 2)" :key="agent.ID">
+              <div class="card">
+                <div class="card-header">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title">{{ agent.name }}</h5>
                     </div>
-                  </div>
-                  <div class="card-body">
-                    <p>{{ agent.description }}</p>
-                    <div>
-                      <router-link :to="{ name: agent.slug, params: { avatar_id: user.avatar.ID, agent_id: agent.ID, active_agent_id: getActiveAgentID(agent.ID)}}" class="btn btn-primary">Configure</router-link>
+                    <div class="col-auto">
+                      <div class="form-check form-switch d-flex align-items-center" v-if="getActiveAgentID(agent.ID)">
+                        <input class="form-check-input me-2" type="checkbox" id="flexSwitchCheckDefault"
+                          :checked="agentIsActive(agent.ID)" @click="toggleActive(agent.ID)">
+                        <label style="margin-bottom: -5px;" for="flexSwitchCheckDefault">Active</label>
+                      </div>
                     </div>
                   </div>
                 </div>
+                <div class="card-body">
+                  <p>{{ agent.description }}</p>
+                  <div>
+                    <router-link
+                      :to="{ name: agent.slug, params: { avatar_id: user.avatar.ID, agent_id: agent.ID, active_agent_id: getActiveAgentID(agent.ID) } }"
+                      class="btn btn-primary">Configure</router-link>
+                  </div>
+                </div>
               </div>
+            </div>
           </div>
 
         </div>
@@ -102,3 +105,9 @@ onMounted(async () => {
   </div>
 
 </template>
+
+<style scoped>
+.card {
+  min-height: 250px;
+}
+</style>
