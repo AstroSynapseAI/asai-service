@@ -44,9 +44,9 @@ func (cnf *Config) InitDB() {
 
 	cnf.DB = database.New(adapter)
 
-	/*migration := gorm.NewGormMigrator(cnf.DB)
+	migration := gorm.NewGormMigrator(cnf.DB)
 	migration.AddMigrations(&Migrations{})
-	migration.Run()*/
+	migration.Run()
 
 	seeder := gorm.NewGormSeeder(cnf.DB)
 	seeders := seeder.AddSeeder(
