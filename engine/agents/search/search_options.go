@@ -9,11 +9,11 @@ import (
 )
 
 type config struct {
-	DDGIsActive    bool
-	GoogleAPIToken string
-	GoogleIsActive bool
-	ExaAPIToken    string
-	ExaIsActive    bool
+	DDGIsActive    bool   `json:"ddg_is_active,omitempty"`
+	GoogleAPIToken string `json:"google_api_token,omitempty"`
+	GoogleIsActive bool   `json:"google_is_active,omitempty"`
+	ExaAPIToken    string `json:"exa_api_token,omitempty"`
+	ExaIsActive    bool   `json:"exa_is_active,omitempty"`
 }
 
 type SearchAgentOptions func(agent *SearchAgent)
