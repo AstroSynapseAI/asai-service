@@ -17,6 +17,7 @@ type Agent struct {
 
 func (*Agent) SeedModel(db *database.Database) error {
 	for _, action := range agentSeedActions(db) {
+		println("Seeding: " + action.ID)
 		result := db.Adapter.Gorm().Where("seeder_name = ?", action.ID).First(&DBSeeder{})
 
 		if result.Error == gorm.ErrRecordNotFound {
@@ -26,7 +27,9 @@ func (*Agent) SeedModel(db *database.Database) error {
 			}
 		}
 
-		return db.Adapter.Gorm().Where("seeder_name = ?", action.ID).Delete(&DBSeeder{}).Error
+		if result := db.Adapter.Gorm().Create(&DBSeeder{SeederName: action.ID}); result.Error != nil {
+			return result.Error
+		}
 	}
 	return nil
 }
@@ -42,7 +45,7 @@ type SeedAction struct {
 func agentSeedActions(db *database.Database) []SeedAction {
 	return []SeedAction{
 		{
-			ID: "seed-agents",
+			ID: "seed_agents",
 			Execute: func(db *database.Database) error {
 				rex := regexp.MustCompile(`(?m)^\s+`)
 				agents := []Agent{
@@ -102,37 +105,6 @@ func agentSeedActions(db *database.Database) []SeedAction {
     					"message": "Email HTML content"
   						}`, ""),
 					},
-					// 	{
-					// 		Name:        "Browser Agent",
-					// 		Slug:        "browser-agent",
-					// 		Description: "Equipped with the capability to scrape, read website contents, and interact with web pages and web applications.",
-					// 		Primer: rex.ReplaceAllString(`
-					// 		Please write a detailed report of the following website and its pages that will not exceed 4048 tokens:
-					//
-					// 		"{{.context}}"
-					//
-					// 		If query is provided, focus on the content related to the query.
-					//
-					// 		Query: {{.query}}
-					//
-					// 		Structure the report in the following format:
-					//
-					// 		WEBSITE SUMMARY:
-					// 		[Place the summary of the entire website here]
-					//
-					// 		PAGE SUMMARIES:
-					// 		- [Page 1 Title]: [Summary of Page 1]
-					// 		- [Page N Title]: [Summary of Page N]
-					// 		...(Create a summary for every sub-page on the website)
-					//
-					// 		LINK INDEX:
-					// 		- Link 1: [Description of Link 1]
-					// 		- Link N: [Description of Link N]
-					// 		...(Depending on relevance, you can add none or N number of links)
-					//
-					// 		FINAL THOUGHTS:
-					// 		[Place any final thoughts or a concluding summary here]`, ""),
-					// 	},
 				}
 
 				return db.Adapter.Gorm().Create(&agents).Error
@@ -155,5 +127,48 @@ func agentSeedActions(db *database.Database) []SeedAction {
 				return db.Adapter.Gorm().Create(&agents).Error
 			},
 		},
+		// {
+		// 	ID: "seed_browser_agent",
+		// 	Execute: func(db *database.Database) error {
+		// 		rex := regexp.MustCompile(`(?m)^\s+`)
+		//
+		// 		agents := []Agent{
+		// 			{
+		// 				Name:        "Browser Agent",
+		// 				Slug:        "browser-agent",
+		// 				Description: "Equipped with the capability to scrape, read website contents, and interact with web pages and web applications.",
+		// 				Primer: rex.ReplaceAllString(`
+		// 					Please write a detailed report of the following website and its pages that will not exceed 4048 tokens:
+		//
+		// 					"{{.context}}"
+		//
+		// 					If query is provided, focus on the content related to the query.
+		//
+		// 					Query: {{.query}}
+		//
+		// 					Structure the report in the following format:
+		//
+		// 					WEBSITE SUMMARY:
+		// 					[Place the summary of the entire website here]
+		//
+		// 					PAGE SUMMARIES:
+		// 					- [Page 1 Title]: [Summary of Page 1]
+		// 					- [Page N Title]: [Summary of Page N]
+		// 					...(Create a summary for every sub-page on the website)
+		//
+		// 					LINK INDEX:
+		// 					- Link 1: [Description of Link 1]
+		// 					- Link N: [Description of Link N]
+		// 					...(Depending on relevance, you can add none or N number of links)
+		//
+		// 					FINAL THOUGHTS:
+		// 					[Place any final thoughts or a concluding summary here]`, ""),
+		// 			},
+		//
+		// 		}
+		//
+		// 		return db.Adapter.Gorm().Create(&agents).Error
+		// 	},
+		// },
 	}
 }
