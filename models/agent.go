@@ -17,7 +17,6 @@ type Agent struct {
 
 func (*Agent) SeedModel(db *database.Database) error {
 	for _, action := range agentSeedActions(db) {
-		println("Seeding: " + action.ID)
 		result := db.Adapter.Gorm().Where("seeder_name = ?", action.ID).First(&DBSeeder{})
 
 		if result.Error == gorm.ErrRecordNotFound {
