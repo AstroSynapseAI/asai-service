@@ -11,7 +11,6 @@ const logout = () => {
 
 onMounted(() => {
   username.value = authStore.user?.username;
-  console.log('username', username.value);
   feather.replace();
 })
 </script>
