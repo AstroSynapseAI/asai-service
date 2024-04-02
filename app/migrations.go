@@ -4,7 +4,6 @@ import (
 	"github.com/AstroSynapseAI/app-service/models"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/go-gormigrate/gormigrate/v2"
-	"gorm.io/gorm"
 )
 
 type Migrations struct{}
