@@ -178,6 +178,15 @@ func (user *UsersRepository) GetUserByAccountID(id uint) (models.User, error) {
 	return record, nil
 }
 
+func (user *UsersRepository) GetAccountByUserID(id uint) (models.Account, error) {
+	var record models.Account
+	err := user.Repo.DB.Where("user_id = ?", id).First(&record).Error
+	if err != nil {
+		return models.Account{}, err
+	}
+	return record, nil
+}
+
 func (user *UsersRepository) GetAccountByEmail(email string) (models.Account, error) {
 	var record models.Account
 	err := user.Repo.DB.Where("email = ?", email).First(&record).Error

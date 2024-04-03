@@ -372,7 +372,6 @@ func (ctrl *UsersController) GetAccounts(ctx *rest.Context) {
 // write a function that will fetch account by email from database
 func (ctrl *UsersController) GetAccountByEmail(ctx *rest.Context) {
 	fmt.Println("UsersController.GetAccountByEmail")
-	//userID := ctx.GetID()
 	var reqData struct {
 		Email string `json:"email"`
 	}
@@ -532,6 +531,7 @@ func (ctrl *UsersController) ChangePassword(ctx *rest.Context) {
 		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Invalid request body"})
 		return
 	}
+
 	if len(reqData.Password) < 8 || reqData.Password == "" {
 		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Password is not long enough"})
 		return
@@ -558,31 +558,29 @@ func (ctrl *UsersController) ChangeEmail(ctx *rest.Context) {
 	userID := ctx.GetID()
 
 	var reqData struct {
-		Email string `json:"email,omitempty"`
+		Email string `json:"email"`
 	}
 
-	err := ctx.JsonDecode(&reqData)
+	account, err := ctrl.User.GetAccountByUserID(userID)
 	if err != nil {
+		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Account not found"})
+		return
+	}
+
+	decodeErr := ctx.JsonDecode(&reqData)
+	if decodeErr != nil {
 		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Invalid request body"})
 		return
 	}
 
-	account := models.Account{
-		UserID: userID,
-		Email:  reqData.Email,
-	}
+	account.Email = reqData.Email
 
-	if account.Email == "" {
-		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Account data is invalid"})
-		return
-	}
-
-	_, err = ctrl.User.SaveAccount(account)
+	updatedAccount, err := ctrl.User.SaveAccount(account)
 	if err != nil {
-		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Failed to save account"})
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
 		return
 	}
 
-	ctx.JsonResponse(http.StatusOK, account)
+	ctx.JsonResponse(http.StatusOK, updatedAccount)
 
 }

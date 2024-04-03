@@ -14,12 +14,17 @@ const confirmEmail = ref('');
 const isLoading = ref(false); 
 const isTyping = ref(false);
 let emailModified = false;
+let userDataModified = false
 
 const toast = useToast();
 
 const onEmailChange = () => {
   console.log("on email change----")
   emailModified = true;
+};
+
+const onUserDataChange = () => {
+  userDataModified = true;
 };
 const checkPasswordMatch = () => {
   isTyping.value = true;
@@ -60,7 +65,9 @@ const onSave = () => {
   if (emailModified) {
     updateEmail();
   }
-  //saveUserInfo();
+  //if (userDataModified) {
+    //saveUserInfo();
+  //}
 };
 
 const saveUserInfo = async () => {
@@ -94,8 +101,8 @@ const updateEmail = async () => {
   }
 
   try {
-    user.changeEmail(user.current.ID, {
-      account_id: user.account.ID,
+
+    await user.changeEmail(user.current.ID, {
       email: email.value,
     })
   }
@@ -149,8 +156,8 @@ onMounted(async () => {
           <h3>User Information</h3>
           <div class="row">
             <div class="col-6">
-              <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="username" placeholder="Username" v-model="username">
+              <div class="form-floating mb-3">  
+                <input type="text" class="form-control" id="username" placeholder="Username" v-model="username" @input="onUserDataChange" >
                 <label for="username">Username</label>
               </div>
             </div>
@@ -164,13 +171,13 @@ onMounted(async () => {
           <div class="row">
             <div class="col-6">
               <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="firstName" placeholder="First Name" v-model="firstName">
+                <input type="text" class="form-control" id="firstName" placeholder="First Name" v-model="firstName" @input="onUserDataChange" >
                 <label for="firstName">First Name</label>
               </div>
             </div>
             <div class="col-6">
               <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="lastName" placeholder="Last Name" v-model="lastName">
+                <input type="text" class="form-control" id="lastName" placeholder="Last Name" v-model="lastName" @input="onUserDataChange" >
                 <label for="lastName">Last Name</label>
               </div>
             </div>

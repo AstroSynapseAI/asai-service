@@ -87,11 +87,11 @@ export const useUserStore = defineStore({
     }, 
 
     async changeEmail(user_id, formData) {
-      console.log("user store changing email")
+
       try {
         await fetchWrapper.put(`${usersURL}/${user_id}/change/email`, formData);
       } catch (error) {
-        console.error(error);
+        throw error.Error
       }
     },
 
