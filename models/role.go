@@ -14,27 +14,22 @@ type Role struct {
 	AvatarRoles []AvatarRole `gorm:"foreignKey:RoleID;" json:"avatar_roles,omitempty"`
 }
 
-func (*Role) SeedModel(db *database.Database) error {
-	seeder := "seed_roles"
+func (*Role) SeedModel(db *database.Database) []database.SeedAction {
+	return []database.SeedAction{
+		{
+			ID: "seed_roles",
+			Execute: func(db *database.Database) error {
+				roles := []Role{
+					{
+						Name:        "Avatar Owner",
+						Slug:        "role-owner",
+						Description: "Owner Role for Avatar",
+						Permission:  "owner",
+					},
+				}
 
-	result := db.Adapter.Gorm().Where("seeder_name = ?", seeder).First(&DBSeeder{})
-	if result.Error == gorm.ErrRecordNotFound {
-		var roles []Role = []Role{
-			{
-				Name:        "Avatar Owner",
-				Slug:        "role-owner",
-				Description: "Owner Role for Avatar",
-				Permission:  "owner",
+				return db.Adapter.Gorm().Create(&roles).Error
 			},
-		}
-
-		if result := db.Adapter.Gorm().Create(&roles); result.Error != nil {
-			return result.Error
-		}
-
-		if result := db.Adapter.Gorm().Create(&DBSeeder{SeederName: seeder}); result.Error != nil {
-			return result.Error
-		}
+		},
 	}
-	return nil
 }

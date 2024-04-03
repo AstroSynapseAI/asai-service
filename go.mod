@@ -14,7 +14,6 @@ require (
 	github.com/tmc/langchaingo v0.0.0-20231110174329-09a09b3b6093
 	github.com/xhit/go-simple-mail/v2 v2.16.0
 	gopkg.in/yaml.v2 v2.3.0
-	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.5.0
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/driver/sqlite v1.5.0

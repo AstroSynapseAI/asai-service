@@ -14,42 +14,36 @@ type Tool struct {
 	ActiveAgentTools []ActiveAgentTool `gorm:"foreignKey:ToolID;" json:"agent_tools"`
 }
 
-func (*Tool) SeedModel(db *database.Database) error {
-	seeder := "seed_tools"
+func (*Tool) SeedModel(db *database.Database) []database.SeedAction {
+	return []database.SeedAction{
+		{
+			ID: "seed_tools",
+			Execute: func(db *database.Database) error {
+				tools := []Tool{
+					{
+						Name:        "Google Search",
+						Slug:        "google-search",
+						Description: "Google Search via SerpAPI, SerpAPI token required.",
+					},
+					// {
+					// 	Name:        "DuckDuckGo Search",
+					// 	Slug:        "ddg-search",
+					// 	Description: "DuckDuckGo Search API, Free Service.",
+					// },
+					// {
+					// 	Name:        "Metaphor Search",
+					// 	Slug:        "metaphor-search",
+					// 	Description: "Metaphor Search API, API key required.",
+					// },
+					{
+						Name:        "PDF Reader",
+						Slug:        "pdf-reader",
+						Description: "Email tool enables sending emails.",
+					},
+				}
 
-	result := db.Adapter.Gorm().Where("seeder_name = ?", seeder).First(&DBSeeder{})
-	if result.Error == gorm.ErrRecordNotFound {
-		var tools []Tool = []Tool{
-			{
-				Name:        "Google Search",
-				Slug:        "google-search",
-				Description: "Google Search via SerpAPI, SerpAPI token required.",
+				return db.Adapter.Gorm().Create(&tools).Error
 			},
-			{
-				Name:        "DuckDuckGo Search",
-				Slug:        "ddg-search",
-				Description: "DuckDuckGo Search API, Free Service.",
-			},
-			{
-				Name:        "Metaphor Search",
-				Slug:        "metaphor-search",
-				Description: "Metaphor Search API, API key required.",
-			},
-			// {
-			// 	Name:        "Email Tool",
-			// 	Slug:        "email",
-			// 	Description: "Email tool enables sending emails.",
-			// },
-		}
-
-		if result := db.Adapter.Gorm().Create(&tools); result.Error != nil {
-			return result.Error
-		}
-
-		if result := db.Adapter.Gorm().Create(&DBSeeder{SeederName: seeder}); result.Error != nil {
-			return result.Error
-		}
+		},
 	}
-
-	return nil
 }

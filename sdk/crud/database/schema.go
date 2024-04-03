@@ -20,7 +20,7 @@ type Adapter interface {
 
 type Migrator interface {
 	Run() error
-	AddModels([]interface{}) 	
+	AddModels([]interface{})
 	AddMigrations(Migrations)
 }
 
@@ -29,8 +29,13 @@ type Migrations interface {
 	GormMigrations() []*gormigrate.Migration
 }
 
+type SeedAction struct {
+	ID      string
+	Execute func(*Database) error
+}
+
 type ModelSeeder interface {
-	SeedModel(*Database) error
+	SeedModel(*Database) []SeedAction
 }
 
 type ORMSeeder interface {
