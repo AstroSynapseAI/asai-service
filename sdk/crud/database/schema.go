@@ -35,11 +35,10 @@ type SeedAction struct {
 }
 
 type ModelSeeder interface {
-	SeedModel(*Database) error
+	SeedModel(*Database) []SeedAction
 }
 
 type ORMSeeder interface {
 	Run() error
 	AddSeeder(seeders ...ModelSeeder) ORMSeeder
 }
-

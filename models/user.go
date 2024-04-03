@@ -30,29 +30,23 @@ type AvatarRole struct {
 	Avatar   Avatar `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"avatar,omitempty"`
 }
 
-func (*User) SeedModel(db *database.Database) error {
-	seeder := "seed_users"
+func (*User) SeedModel(db *database.Database) []database.SeedAction {
+	return []database.SeedAction{
+		{
+			ID: "seed_users",
+			Execute: func(db *database.Database) error {
+				users := []User{
+					{
+						Username:    "SuperAdmin",
+						Password:    "admin_admin",
+						ApiToken:    "tmp_token_superadmin_123",
+						InviteToken: "",
+						IsAdmin:     true,
+					},
+				}
 
-	result := db.Adapter.Gorm().Where("seeder_name = ?", seeder).First(&DBSeeder{})
-	if result.Error == gorm.ErrRecordNotFound {
-		var users []User = []User{
-			{
-				Username:    "SuperAdmin",
-				Password:    "admin_admin",
-				ApiToken:    "tmp_token_superadmin_123",
-				InviteToken: "",
-				IsAdmin:     true,
+				return db.Adapter.Gorm().Create(&users).Error
 			},
-		}
-
-		if result := db.Adapter.Gorm().Create(&users); result.Error != nil {
-			return result.Error
-		}
-
-		if result := db.Adapter.Gorm().Create(&DBSeeder{SeederName: seeder}); result.Error != nil {
-			return result.Error
-		}
+		},
 	}
-
-	return nil
 }

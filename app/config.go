@@ -76,7 +76,6 @@ func (cnf *Config) LoadEnvironment() {
 		cnf.setupLocalDev()
 		return
 	}
-
 	if cnf.ENV == "HEROKU DEV" {
 		cnf.setupHeroku()
 		return

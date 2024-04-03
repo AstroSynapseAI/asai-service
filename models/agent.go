@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
+
 	"gorm.io/gorm"
 	"regexp"
 )
@@ -15,34 +16,8 @@ type Agent struct {
 	ActiveAgents []ActiveAgent `gorm:"foreignKey:AgentID;" json:"active_agents"`
 }
 
-func (*Agent) SeedModel(db *database.Database) error {
-	for _, action := range agentSeedActions(db) {
-		result := db.Adapter.Gorm().Where("seeder_name = ?", action.ID).First(&DBSeeder{})
-
-		if result.Error == gorm.ErrRecordNotFound {
-			err := action.Execute(db)
-			if err != nil {
-				return err
-			}
-		}
-
-		if result := db.Adapter.Gorm().Create(&DBSeeder{SeederName: action.ID}); result.Error != nil {
-			return result.Error
-		}
-	}
-	return nil
-}
-
-// TESTING
-// trying out a new seed pattern here
-
-type SeedAction struct {
-	ID      string
-	Execute func(db *database.Database) error
-}
-
-func agentSeedActions(db *database.Database) []SeedAction {
-	return []SeedAction{
+func (*Agent) SeedModel(db *database.Database) []database.SeedAction {
+	return []database.SeedAction{
 		{
 			ID: "seed_agents",
 			Execute: func(db *database.Database) error {
@@ -110,7 +85,7 @@ func agentSeedActions(db *database.Database) []SeedAction {
 			},
 		},
 		{
-			ID: "seed_agents_d&b_agent",
+			ID: "seed_d&b_agent",
 			Execute: func(db *database.Database) error {
 				rex := regexp.MustCompile(`(?m)^\s+`)
 
