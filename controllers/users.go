@@ -575,7 +575,7 @@ func (ctrl *UsersController) ChangeEmail(ctx *rest.Context) {
 
 	account.ID = reqData.AccountID
 
-	if account.UserID == 0 || account.FirstName == "" || account.LastName == "" {
+	if account.Email == "" {
 		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Account data is invalid"})
 		return
 	}

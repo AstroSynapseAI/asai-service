@@ -60,7 +60,7 @@ const onSave = () => {
   if (emailModified) {
     updateEmail();
   }
-  saveUserInfo();
+  //saveUserInfo();
 };
 
 const saveUserInfo = async () => {
