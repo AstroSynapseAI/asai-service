@@ -43,7 +43,6 @@ func (s *GormSeeder) Run() error {
 				return result.Error
 			}
 		}
-		return nil
 	}
 	return nil
 }

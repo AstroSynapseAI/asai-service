@@ -12,7 +12,6 @@ var _ database.Migrations = (*Migrations)(nil)
 
 func (*Migrations) Models() []interface{} {
 	return []interface{}{
-		&models.DBSeeder{},
 		&models.Account{},
 		&models.ActiveAgentTool{},
 		&models.ActiveAgent{},
