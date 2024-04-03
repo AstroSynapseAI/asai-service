@@ -573,14 +573,19 @@ func (ctrl *UsersController) ChangeEmail(ctx *rest.Context) {
 		return
 	}
 
-	account.Email = reqData.Email
+	if account.Email == "" {
+		//generate random token,write it in email field
+		//send email with url containing token and email to the user
+	} else {
+		account.Email = reqData.Email
 
-	updatedAccount, err := ctrl.User.SaveAccount(account)
-	if err != nil {
-		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
-		return
+		updatedAccount, err := ctrl.User.SaveAccount(account)
+		if err != nil {
+			ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
+			return
+		}
+
+		ctx.JsonResponse(http.StatusOK, updatedAccount)
 	}
-
-	ctx.JsonResponse(http.StatusOK, updatedAccount)
 
 }
