@@ -481,13 +481,14 @@ func (ctrl *UsersController) SaveProfile(ctx *rest.Context) {
 
 	account := models.Account{
 		UserID:    userID,
+		Username:  reqData.Username,
 		FirstName: reqData.FirstName,
 		LastName:  reqData.LastName,
 	}
 
 	account.ID = reqData.AccountID
 
-	if account.UserID == 0 || account.FirstName == "" || account.LastName == "" {
+	if account.UserID == 0 || account.FirstName == "" || account.LastName == "" || account.Username == "" {
 		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Account data is invalid"})
 		return
 	}
@@ -553,24 +554,38 @@ func (ctrl *UsersController) ChangePassword(ctx *rest.Context) {
 
 func (ctrl *UsersController) ChangeEmail(ctx *rest.Context) {
 	fmt.Println("UsersController.ChangeEmail")
+
 	userID := ctx.GetID()
 
 	var reqData struct {
-		AccountID uint   `json:"account_id"`
-		Email     string `json:"email"`
+		AccountID uint   `json:"account_id,omitempty"`
+		Email     string `json:"email,omitempty"`
 	}
 
 	err := ctx.JsonDecode(&reqData)
 	if err != nil {
-		ctx.SetStatus(http.StatusBadRequest)
+		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Invalid request body"})
 		return
 	}
 
-	user, err := ctrl.User.UpdatePassword(userID, reqData.Email)
-	if err != nil {
-		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Failed to update password"})
+	account := models.Account{
+		UserID: userID,
+		Email:  reqData.Email,
+	}
+
+	account.ID = reqData.AccountID
+
+	if account.UserID == 0 || account.FirstName == "" || account.LastName == "" {
+		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Account data is invalid"})
 		return
 	}
-	ctx.JsonResponse(http.StatusOK, user)
+
+	_, err = ctrl.User.SaveAccount(account)
+	if err != nil {
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Failed to save account"})
+		return
+	}
+
+	ctx.JsonResponse(http.StatusOK, account)
 
 }

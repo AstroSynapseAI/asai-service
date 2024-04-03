@@ -115,12 +115,12 @@ func (user *UsersRepository) CreateAndSendRecoveryToken(email string) (models.Us
 func (user *UsersRepository) ConfirmInvite(username string, password string, token string) (models.User, error) {
 	invitedUser, err := user.GetByInviteToken(token)
 	if err != nil {
-		return models.User{}, fmt.Errorf("Invalid invite token")
+		return models.User{}, fmt.Errorf("invalid invite token")
 	}
 
 	existingUser, err := user.GetByUsername(username)
 	if err == nil && existingUser.ID != invitedUser.ID {
-		return models.User{}, fmt.Errorf("User already exists")
+		return models.User{}, fmt.Errorf("user already exists")
 	}
 
 	fmt.Println("username is not taken")
@@ -305,28 +305,6 @@ func (user *UsersRepository) UpdatePassword(userID uint, password string) (model
 	}
 
 	return record, nil
-}
-
-func (user *UsersRepository) UpdateEmail(userID uint, email string) (models.Account, error) {
-	var userRecord models.User
-	err := user.Repo.DB.Where("id = ?", userID).First(&userRecord).Error
-	if err != nil {
-		return models.Account{}, err
-	}
-
-	account, err := user.GetAccount(userID, userRecord.Accounts[0].ID)
-	if err != nil {
-		return models.Account{}, err
-	}
-
-	account.Email = email
-
-	_, err = user.SaveAccount(account)
-	if err != nil {
-		return models.Account{}, err
-	}
-
-	return account, nil
 }
 
 func (user *UsersRepository) InsertPasswordResetToken(userID uint, resetToken string, resetTokenExpiry time.Time) (models.User, error) {

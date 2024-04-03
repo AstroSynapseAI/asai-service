@@ -57,9 +57,9 @@ const isValidEmail = () => {
 };
 
 const onSave = () => {
-  /*if (emailModified) {
+  if (emailModified) {
     updateEmail();
-  }*/
+  }
   saveUserInfo();
 };
 
