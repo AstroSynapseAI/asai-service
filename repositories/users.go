@@ -307,6 +307,28 @@ func (user *UsersRepository) UpdatePassword(userID uint, password string) (model
 	return record, nil
 }
 
+func (user *UsersRepository) UpdateEmail(userID uint, email string) (models.Account, error) {
+	var userRecord models.User
+	err := user.Repo.DB.Where("id = ?", userID).First(&userRecord).Error
+	if err != nil {
+		return models.Account{}, err
+	}
+
+	account, err := user.GetAccount(userID, userRecord.Accounts[0].ID)
+	if err != nil {
+		return models.Account{}, err
+	}
+
+	account.Email = email
+
+	_, err = user.SaveAccount(account)
+	if err != nil {
+		return models.Account{}, err
+	}
+
+	return account, nil
+}
+
 func (user *UsersRepository) InsertPasswordResetToken(userID uint, resetToken string, resetTokenExpiry time.Time) (models.User, error) {
 
 	var record models.User

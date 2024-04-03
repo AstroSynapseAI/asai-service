@@ -41,7 +41,7 @@ func (ctrl *UsersController) Run() {
 	ctrl.Post("/{id}/save/profile", ctrl.SaveProfile)
 
 	ctrl.Put("/{id}/change/password", ctrl.ChangePassword)
-	// ctrl.Put("/{id}/change/email", ctrl.ChangeEmail)
+	ctrl.Put("/{id}/change/email", ctrl.ChangeEmail)
 
 	ctrl.Get("/{id}/accounts", ctrl.GetAccounts)
 	ctrl.Get("/{id}/accounts/{account_id}", ctrl.GetAccount)
@@ -551,20 +551,26 @@ func (ctrl *UsersController) ChangePassword(ctx *rest.Context) {
 	ctx.JsonResponse(http.StatusOK, usr)
 }
 
-// func (ctrl *UsersController) ChangeEmail(ctx *rest.Context) {
-// 	fmt.Println("UsersController.ChangeEmail")
-// 	userID := ctx.GetID()
-// 	var reqData struct {
-// 		AccountID uint   `json:"account_id"`
-// 		Email     string `json:"email"`
-// 	}
+func (ctrl *UsersController) ChangeEmail(ctx *rest.Context) {
+	fmt.Println("UsersController.ChangeEmail")
+	userID := ctx.GetID()
 
-// 	err := ctx.JsonDecode(&reqData)
-// 	if err != nil {
-// 		ctx.SetStatus(http.StatusBadRequest)
-// 		return
-// 	}
+	var reqData struct {
+		AccountID uint   `json:"account_id"`
+		Email     string `json:"email"`
+	}
 
-// 	var account models.Account
+	err := ctx.JsonDecode(&reqData)
+	if err != nil {
+		ctx.SetStatus(http.StatusBadRequest)
+		return
+	}
 
-// }
+	user, err := ctrl.User.UpdatePassword(userID, reqData.Email)
+	if err != nil {
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Failed to update password"})
+		return
+	}
+	ctx.JsonResponse(http.StatusOK, user)
+
+}
