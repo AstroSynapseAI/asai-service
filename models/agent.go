@@ -92,7 +92,7 @@ func (*Agent) SeedModel(db *database.Database) []database.SeedAction {
 				agents := []Agent{
 					{
 						Name:        "Duns & Bradstreet Search Agent",
-						Slug:        "d&b-search-agent",
+						Slug:        "dnb-search-agent",
 						Description: "Searches Duns and Bradstreet database for relevant information.",
 						Primer:      rex.ReplaceAllString(``, ""),
 					},

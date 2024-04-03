@@ -16,6 +16,11 @@ const agentConfigRoutes = [
     path: ':agent_id/config/:active_agent_id?',
     name: 'email-agent',
     component: () => import('@/views/admin/agents/EmailAgent.vue')
+  },
+  {
+    path: ':agent_id/config/:active_agent_id?',
+    name: 'dnb-search-agent',
+    component: () => import('@/views/admin/agents/DnBAgent.vue')
   }
 ] 
 
