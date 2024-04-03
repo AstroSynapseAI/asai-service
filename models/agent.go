@@ -85,7 +85,7 @@ func (*Agent) SeedModel(db *database.Database) []database.SeedAction {
 			},
 		},
 		{
-			ID: "seed_d&b_agent",
+			ID: "seed_dnb_agent",
 			Execute: func(db *database.Database) error {
 				rex := regexp.MustCompile(`(?m)^\s+`)
 
