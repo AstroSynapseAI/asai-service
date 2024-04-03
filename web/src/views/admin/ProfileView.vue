@@ -13,9 +13,14 @@ const email = ref('');
 const confirmEmail = ref('');
 const isLoading = ref(false); 
 const isTyping = ref(false);
+let emailModified = false;
 
 const toast = useToast();
 
+const onEmailChange = () => {
+  console.log("on email change----")
+  emailModified = true;
+};
 const checkPasswordMatch = () => {
   isTyping.value = true;
 };
@@ -49,6 +54,13 @@ const isValidEmail = () => {
   validEmail = validateEmail()
 
   return validEmail
+};
+
+const onSave = () => {
+  if (emailModified) {
+    updateEmail();
+  }
+  saveUserInfo();
 };
 
 const saveUserInfo = async () => {
@@ -144,7 +156,7 @@ onMounted(async () => {
             </div>
             <div class="col-6">
               <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="email" placeholder="Email" v-model="email">
+                <input type="text" class="form-control" id="email" placeholder="Email" v-model="email" @input="onEmailChange">
                 <label for="email">Email</label>
               </div>
             </div>
@@ -165,7 +177,7 @@ onMounted(async () => {
           </div>
           <div class="row"> 
             <div class="col-12">
-              <button class="btn btn-primary float-end" @click="saveUserInfo" :disabled="isSaveButtonDisabled">Save</button>
+              <button class="btn btn-primary float-end" @click="onSave" :disabled="isSaveButtonDisabled">Save</button>
             </div>
           </div>
           <hr>
