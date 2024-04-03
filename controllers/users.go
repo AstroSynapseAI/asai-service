@@ -558,8 +558,7 @@ func (ctrl *UsersController) ChangeEmail(ctx *rest.Context) {
 	userID := ctx.GetID()
 
 	var reqData struct {
-		AccountID uint   `json:"account_id,omitempty"`
-		Email     string `json:"email,omitempty"`
+		Email string `json:"email,omitempty"`
 	}
 
 	err := ctx.JsonDecode(&reqData)
@@ -572,8 +571,6 @@ func (ctrl *UsersController) ChangeEmail(ctx *rest.Context) {
 		UserID: userID,
 		Email:  reqData.Email,
 	}
-
-	account.ID = reqData.AccountID
 
 	if account.Email == "" {
 		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Account data is invalid"})
