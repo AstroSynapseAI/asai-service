@@ -11,7 +11,7 @@ const toast = useToast();
 const avatar = useAvatarStore();
 const agent = useAgentStore();
 const agentRecord = toRef(agent, 'record');
-const route = useRoute();
+const route = useRoute()
 const llm = useLLMStore();
 const llmRecords = toRef(llm, 'records');
 
