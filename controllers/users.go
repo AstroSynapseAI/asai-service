@@ -575,7 +575,7 @@ func (ctrl *UsersController) ChangeEmail(ctx *rest.Context) {
 	if account.Email == "" {
 		fmt.Println("UsersController.ChangeEmail prazan email")
 
-		record, err := ctrl.User.CreateAndSendEmailConfirmation(account.ID)
+		record, err := ctrl.User.CreateAndSendEmailConfirmation(account.ID, reqData.Email)
 		if err != nil {
 			ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: err.Error()})
 			return

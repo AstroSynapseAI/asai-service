@@ -96,18 +96,21 @@ const saveUserInfo = async () => {
 
 
 const updateEmail = async () => {
+  isLoading.value = true
   if (!isValidEmail()) {
-    alert('Email is not valid or emails do not match.')
+    toast.error("Email is not valid or emails do not match.")
+    return
   }
-
   try {
-
     await user.changeEmail(user.current.ID, {
       email: email.value,
     })
   }
   catch (error) {
     console.error(error)
+  }
+  finally {
+    isLoading.value = false
   }
 }
 

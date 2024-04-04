@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/AstroSynapseAI/app-service/models"
@@ -112,7 +113,7 @@ func (user *UsersRepository) CreateAndSendRecoveryToken(email string) (models.Us
 	return updatedUserRecord, nil
 }
 
-func (user *UsersRepository) CreateAndSendEmailConfirmation(id uint) (models.User, error) {
+func (user *UsersRepository) CreateAndSendEmailConfirmation(id uint, email string) (models.User, error) {
 
 	account, err := user.GetAccountByID(id)
 	if err != nil {
@@ -127,10 +128,24 @@ func (user *UsersRepository) CreateAndSendEmailConfirmation(id uint) (models.Use
 	account.Email = token
 	user.SaveAccount(account)
 
+	envSetup := ""
+
+	if os.Getenv("ENVIRONMENT") == "LOCAL DEV" {
+		envSetup = "http://localhost:5173/email_confirmation/?token=" + token + "&email=" + email
+	}
+
+	if os.Getenv("ENVIRONMENT") == "HEROKU DEV" {
+		envSetup = "https://dev.asai.astrosynapse.ai/email_confirmation/?token=" + token + "&email=" + email
+	}
+
+	if os.Getenv("ENVIRONMENT") == "AWS DEV" {
+		envSetup = "https://asai.astrosynapse.ai/email_confirmation/?token=" + token + "&email=" + email
+	}
+
+	fmt.Println("OVO JE ENV SETUP ----", envSetup)
+
 	return models.User{}, nil
 }
-
-//
 
 func (user *UsersRepository) ConfirmInvite(username string, password string, token string) (models.User, error) {
 	invitedUser, err := user.GetByInviteToken(token)
