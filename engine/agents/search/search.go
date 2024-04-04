@@ -25,8 +25,8 @@ var _ tools.Tool = &SearchAgent{}
 type SearchAgent struct {
 	Memory   schema.Memory
 	Primer   string
-	LLM      llms.LanguageModel
-	Executor agents.Executor
+	LLM      llms.Model
+	Executor *agents.Executor
 	Config   config
 }
 
@@ -109,6 +109,7 @@ func NewSearchAgent(options ...SearchAgentOptions) (*SearchAgent, error) {
 func (agent *SearchAgent) Call(ctx context.Context, input string) (string, error) {
 	fmt.Println("Search Agent Running...")
 	fmt.Println(input)
+
 	reponse, err := chains.Run(ctx, agent.Executor, input)
 	if err != nil {
 		return "Search Agent encountered an error: " + err.Error(), nil

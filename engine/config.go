@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/AstroSynapseAI/app-service/engine/agents"
@@ -11,7 +10,7 @@ import (
 	"github.com/AstroSynapseAI/app-service/repositories"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/tmc/langchaingo/llms"
-	"github.com/tmc/langchaingo/llms/ollama"
+	"github.com/tmc/langchaingo/llms/mistral"
 	"github.com/tmc/langchaingo/llms/openai"
 	"github.com/tmc/langchaingo/tools"
 )
@@ -25,7 +24,7 @@ type AvatarConfig interface {
 	LoadConfig(userID uint)
 	GetDB() *database.Database
 	GetAvatarName() string
-	GetAvatarLLM() llms.LanguageModel
+	GetAvatarLLM() llms.Model
 	GetAvatarPrimer() string
 	GetAvatarMemorySize() int
 	AvatarIsPublic() bool
@@ -57,7 +56,7 @@ func (cnf *Config) GetDB() *database.Database {
 	return cnf.DB
 }
 
-func (cnf *Config) GetAvatarLLM() llms.LanguageModel {
+func (cnf *Config) GetAvatarLLM() llms.Model {
 	avatarLLM := cnf.Avatar.LLM
 	activeLLMs := cnf.Avatar.ActiveLLMs
 	if len(activeLLMs) == 0 {
@@ -73,7 +72,7 @@ func (cnf *Config) GetAvatarLLM() llms.LanguageModel {
 		}
 	}
 
-	LLM, err := openai.NewChat(
+	LLM, err := openai.New(
 		openai.WithModel(activeLLM.LLM.Slug),
 		openai.WithToken(activeLLM.Token),
 	)
@@ -131,7 +130,7 @@ func (cnf *Config) GetAgents() []tools.Tool {
 			fmt.Println("Loading email agent...")
 			emailAgent, err := email.NewEmailAgent(
 				email.WithPrimer(agent.GetAgentPrimer()),
-				email.WithLLM(agent.GetAgentLLM().(*openai.Chat)),
+				email.WithLLM(agent.GetAgentLLM()),
 				email.WithConfig(agent.GetAgentConfig()),
 			)
 
@@ -153,59 +152,23 @@ func (cnf *Config) GetTools() []tools.Tool {
 	return loadedTools
 }
 
-func loadActiveLLM(activeLLM models.ActiveLLM) (llms.LanguageModel, error) {
+func loadActiveLLM(activeLLM models.ActiveLLM) (llms.Model, error) {
+	var LLM llms.Model
+	var err error
 
-	switch activeLLM.LLM.Slug {
-	case "mistral":
-		LLM, err := ollama.New(
-			ollama.WithModel("mistral"),
-			ollama.WithServerURL("http://host.docker.internal:11434/"),
+	if activeLLM.LLM.Provider == "mistral" {
+		LLM, err = mistral.New(
+			mistral.WithAPIKey(activeLLM.Token),
+			mistral.WithModel(activeLLM.LLM.Slug),
 		)
-
-		if err != nil {
-			fmt.Println("Error setting mistral:", err)
-			return nil, err
-		}
-
-		return LLM, nil
-	case "gpt-4":
-		LLM, err := openai.NewChat(
-			openai.WithToken(activeLLM.Token),
-			openai.WithModel("gpt-4"),
-		)
-
-		if err != nil {
-			fmt.Println("Error setting gpt-4:", err)
-			return nil, err
-		}
-
-		return LLM, nil
-	case "gpt-4-turbo-preview":
-		LLM, err := openai.NewChat(
-			openai.WithToken(activeLLM.Token),
-			openai.WithModel("gpt-4-turbo-preview"),
-		)
-
-		if err != nil {
-			fmt.Println("Error setting gpt-4-turbo-preview:", err)
-			return nil, err
-		}
-
-		return LLM, nil
-	case "gpt-3.5":
-		LLM, err := openai.NewChat(
-			openai.WithToken(activeLLM.Token),
-			openai.WithModel("gpt-3.5"),
-		)
-
-		if err != nil {
-			fmt.Println("Error setting gpt-3.5:", err)
-			return nil, err
-		}
-
-		return LLM, nil
-	default:
-		fmt.Println("Unknown LLM:", activeLLM.LLM.Slug)
-		return nil, errors.New("unknown LLM")
 	}
+
+	if activeLLM.LLM.Provider == "openai" {
+		LLM, err = openai.New(
+			openai.WithToken(activeLLM.Token),
+			openai.WithModel(activeLLM.LLM.Slug),
+		)
+	}
+
+	return LLM, err
 }

@@ -86,7 +86,7 @@ func (tool PDFTool) Call(ctx context.Context, input string) (string, error) {
 		return "", err
 	}
 
-	err = store.AddDocuments(ctx, docs)
+	_, err = store.AddDocuments(ctx, docs)
 	if err != nil {
 		return "", err
 	}

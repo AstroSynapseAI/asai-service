@@ -25,7 +25,7 @@ import (
 const InitiativePrompt = "New user, has connected."
 
 type AsaiChain struct {
-	LLM        llms.LanguageModel
+	LLM        llms.Model
 	Memory     *memory.AsaiMemory
 	Agents     []tools.Tool
 	Stream     func(context.Context, []byte)

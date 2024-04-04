@@ -8,6 +8,7 @@ type ToolConfig interface {
 	GetName() string
 	GetSlug() string
 	GetToken() string
+	GetConfig() string
 	IsPublic() bool
 	IsActive() bool
 }
@@ -19,7 +20,7 @@ type ActiveTool struct {
 
 var _ ToolConfig = (*ActiveTool)(nil)
 
-func NewActiveTool(tool models.ActiveTool) *ActiveTool {
+func NewActiveTool(avatar models.Avatar, tool models.ActiveTool) *ActiveTool {
 	return &ActiveTool{
 		activeTool: tool,
 	}
@@ -35,6 +36,10 @@ func (cnf *ActiveTool) GetSlug() string {
 
 func (cnf *ActiveTool) GetToken() string {
 	return cnf.activeTool.Token
+}
+
+func (cnf *ActiveTool) GetConfig() string {
+	return ""
 }
 
 func (cnf *ActiveTool) IsPublic() bool {

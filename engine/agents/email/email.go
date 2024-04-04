@@ -7,11 +7,10 @@ import (
 
 	"github.com/AstroSynapseAI/app-service/engine/tools/email"
 	"github.com/tmc/langchaingo/agents"
+	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/schema"
 	"github.com/tmc/langchaingo/tools"
 	"github.com/xhit/go-simple-mail/v2"
-
-	"github.com/tmc/langchaingo/llms/openai"
 )
 
 var _ tools.Tool = &EmailAgent{}
@@ -36,7 +35,7 @@ const (
 
 type EmailAgent struct {
 	Primer     string
-	LLM        *openai.Chat
+	LLM        llms.Model
 	Executor   agents.Executor
 	EmailTool  *email.Client
 	Encryption mail.Encryption
@@ -90,17 +89,17 @@ func (emailAgent *EmailAgent) Call(ctx context.Context, input string) (string, e
 	fmt.Println("Email Agent Running...")
 	fmt.Println(input)
 
-	msg := []schema.ChatMessage{
-		schema.SystemChatMessage{Content: emailAgent.Primer},
-		schema.HumanChatMessage{Content: input},
+	msg := []llms.MessageContent{
+		llms.TextParts(schema.ChatMessageTypeSystem, emailAgent.Primer),
+		llms.TextParts(schema.ChatMessageTypeHuman, input),
 	}
 
-	response, err := emailAgent.LLM.Call(ctx, msg)
+	response, err := emailAgent.LLM.GenerateContent(ctx, msg)
 	if err != nil {
 		return "Email Agent Error: " + err.Error(), nil
 	}
 
-	jsonResponse := response.GetContent()
+	jsonResponse := response.Choices[0].Content
 
 	toolResponse, err := emailAgent.EmailTool.Call(ctx, jsonResponse)
 	if err != nil {
