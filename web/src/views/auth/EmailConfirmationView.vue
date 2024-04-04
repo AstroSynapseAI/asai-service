@@ -7,6 +7,7 @@ import { useToast } from 'vue-toastification';
 
 const auth = useAuthStore();
 const toast = useToast();
+const showButton = ref(false); // Initially hide the button
 
 onMounted(async () => {
     try {
@@ -21,7 +22,7 @@ onMounted(async () => {
             email: email,
             token: token
         });
-        
+        showButton.value = true;
       }
       catch (error) {
         toast.error(error)
@@ -56,7 +57,7 @@ onMounted(async () => {
       <div class="col-md-4">
         <img class="logo" src="@/assets/ASAILogotype.svg" alt="">
             <router-link :to="{ name: 'profile' }">
-                <button class="send-button btn btn-light" @click="''">Go to profile</button>
+                <button v-if="showButton" class="send-button btn btn-light" @click="''">Go to profile</button>
             </router-link>
       </div>
   </div>
