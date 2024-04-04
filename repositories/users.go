@@ -219,6 +219,7 @@ func (user *UsersRepository) GetAccountByUserID(id uint) (models.Account, error)
 	if err != nil {
 		return models.Account{}, err
 	}
+	fmt.Println("GET ACCOUNT BY USER ID ---", record.Email)
 	return record, nil
 }
 

@@ -605,24 +605,11 @@ func (ctrl *UsersController) ChangeEmail(ctx *rest.Context) {
 		return
 	}
 
-	if account.Email == "" {
-		record, err := ctrl.User.CreateAndSendEmailConfirmation(account.ID, reqData.Email)
-		if err != nil {
-			ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: err.Error()})
-			return
-		}
-		ctx.JsonResponse(http.StatusOK, record)
-
-	} else {
-		account.Email = reqData.Email
-
-		updatedAccount, err := ctrl.User.SaveAccount(account)
-		if err != nil {
-			ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
-			return
-		}
-
-		ctx.JsonResponse(http.StatusOK, updatedAccount)
+	record, err := ctrl.User.CreateAndSendEmailConfirmation(account.ID, reqData.Email)
+	if err != nil {
+		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: err.Error()})
+		return
 	}
+	ctx.JsonResponse(http.StatusOK, record)
 
 }

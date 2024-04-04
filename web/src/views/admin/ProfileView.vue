@@ -61,9 +61,10 @@ const isValidEmail = () => {
 };
 
 const onSave = () => {
-  if (emailModified) {
+  /*if (emailModified) {
     updateEmail();
-  }
+  }*/
+  saveUserInfo();
   //if (userDataModified) {
     //saveUserInfo();
   //}
@@ -90,6 +91,10 @@ const saveUserInfo = async () => {
   }
   finally {
     isLoading.value = false
+    console.log("SAVE USER INFO FINISHED")
+    if (emailModified) {
+      updateEmail();
+    }
   }
 }
 
