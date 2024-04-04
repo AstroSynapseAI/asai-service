@@ -12,7 +12,6 @@ var _ database.Migrations = (*Migrations)(nil)
 
 func (*Migrations) Models() []interface{} {
 	return []interface{}{
-		&models.DBSeeder{},
 		&models.Account{},
 		&models.ActiveAgentTool{},
 		&models.ActiveAgent{},
@@ -40,11 +39,10 @@ func (*Migrations) GormMigrations() []*gormigrate.Migration {
 		// 		type User struct {
 		// 			Test int
 		// 		}
-		// 		return tx.AutoMigrate(&User{})
+		// return tx.AutoMigrate(&User{})
 		// 	},
 		// 	Rollback: func(tx *gorm.DB) error {
 		// 		return tx.Migrator().DropColumn(&model.User{}, "test")
 		// 	},
-		// },
 	}
 }

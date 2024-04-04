@@ -1,4 +1,4 @@
-package models
+package gorm
 
 import "time"
 
@@ -9,3 +9,4 @@ type DBSeeder struct {
 	UpdatedAt  time.Time
 	DeletedAt  *time.Time `sql:"index"`
 }
+

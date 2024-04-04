@@ -12,15 +12,17 @@ import (
 var _ database.Migrator = (*GormMigrator)(nil)
 
 type GormMigrator struct {
-	DB 				 *gorm.DB
+	DB         *gorm.DB
 	Migrations []*gormigrate.Migration
 	Models     []interface{}
-} 
+}
 
 func NewGormMigrator(db *database.Database) *GormMigrator {
 	migrations := &GormMigrator{
 		DB: db.Adapter.Gorm(),
 	}
+
+	migrations.Models = append(migrations.Models, &DBSeeder{})
 
 	return migrations
 }
@@ -30,8 +32,8 @@ func (migrator *GormMigrator) AddMigrations(migrations database.Migrations) {
 	migrator.Models = append(migrator.Models, migrations.Models()...)
 }
 
-func (migrator *GormMigrator) AddModels(models []interface{})  {
-	migrator.Models = append(migrator.Models, models)	
+func (migrator *GormMigrator) AddModels(models []interface{}) {
+	migrator.Models = append(migrator.Models, models)
 }
 
 func (migrator *GormMigrator) Run() error {
@@ -88,3 +90,4 @@ func (migrator *GormMigrator) migrateModels() error {
 
 	return nil
 }
+

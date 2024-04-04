@@ -84,20 +84,19 @@ export const useAuthStore = defineStore({
 
     async registerInvite(formData) {
       try {
-        const user = await fetchWrapper.post(
-          `${usersURL}/register/invite`,
-          formData
-        );
+        const user = await fetchWrapper.post(`${usersURL}/register/invite`, formData);
         if (user) {
-          if (user.apiToken) {
-            this.apiToken = user.apiToken;
-          }
+          this.apiToken = user.apiToken || null;
           this.isLoggedIn = true;
-          localStorage.setItem("user", JSON.stringify(user));
+          this.user = user;
           return true;
         }
         return false;
       } catch (error) {
+        console.error(error);
+        this.user = {};
+        this.isLoggedIn = false;
+        this.apiToken = null;
         throw error.Error;
       }
     },

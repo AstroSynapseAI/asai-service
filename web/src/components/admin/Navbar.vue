@@ -1,12 +1,18 @@
 <script setup>
+import { onMounted, ref } from 'vue';
 import { useAuthStore } from '@/stores/auth.store.js';
 
 const authStore = useAuthStore();
+const username = ref('');
 
 const logout = () => {
   authStore.logout();
 }
 
+onMounted(() => {
+  username.value = authStore.user?.username;
+  feather.replace();
+})
 </script>
 
 <template>
@@ -25,7 +31,7 @@ const logout = () => {
           <!-- </a> -->
 
           <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
-            <span class="text-dark me-2">{{ authStore.user.username }}</span>
+            <span class="text-dark me-2">{{ username }}</span>
           </a>
 
           <div class="dropdown-menu dropdown-menu-end">

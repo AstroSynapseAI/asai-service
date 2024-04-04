@@ -3,6 +3,7 @@ import { reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth.store';
+import { useUserStore } from '@/stores/user.store.js';
 import { Form, Field, ErrorMessage } from 'vee-validate';
 import { useToast } from 'vue-toastification';
 import * as yup from 'yup';
@@ -15,6 +16,7 @@ const schema = yup.object({
     .oneOf([yup.ref('Password'), null], 'Passwords must match')
 });
 
+const user = useUserStore();
 const router = useRouter();
 const route = useRoute();
 const auth = useAuthStore();
@@ -36,15 +38,16 @@ const register = async () => {
     });
 
     if (loggedIn) {
+      user.current = auth.user;
       router.push({ name: 'welcome' });
     }
   }
   catch (error) {
-    console.log(error);
-    // toast.error(error)
+    toast.error(error)
     formState.isSubmitting = false;
   }
 };
+
 onMounted(async () => {
   feather.replace();
   if (route.params.invite_token) {
