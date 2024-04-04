@@ -5,7 +5,9 @@ import { useAgentStore } from '@/stores/agent.store';
 import { useLLMStore } from '@/stores/llm.store';
 import { useRoute } from 'vue-router';
 import { useAvatarStore } from '@/stores/avatar.store';
+import { useToast } from 'vue-toastification';
 
+const toast = useToast();
 const avatar = useAvatarStore();
 const agent = useAgentStore();
 const agentRecord = toRef(agent, 'record');
@@ -48,9 +50,11 @@ const submitForm = async () => {
 
   try {
     await agent.saveActiveAgent(formData);
+    toast.success('Agent configuration saved');
   }
   catch (error) {
     console.log(error);
+    toast.error('Error while saving agent configuration');
   }
 }
 

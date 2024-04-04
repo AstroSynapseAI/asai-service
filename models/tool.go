@@ -38,7 +38,7 @@ func (*Tool) SeedModel(db *database.Database) []database.SeedAction {
 					{
 						Name:        "PDF Reader",
 						Slug:        "pdf-reader",
-						Description: "Email tool enables sending emails.",
+						Description: "Enables your avatar to read PDF files.",
 					},
 				}
 
