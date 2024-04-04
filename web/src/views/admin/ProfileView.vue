@@ -61,13 +61,7 @@ const isValidEmail = () => {
 };
 
 const onSave = () => {
-  /*if (emailModified) {
-    updateEmail();
-  }*/
   saveUserInfo();
-  //if (userDataModified) {
-    //saveUserInfo();
-  //}
 };
 
 const saveUserInfo = async () => {
@@ -91,7 +85,6 @@ const saveUserInfo = async () => {
   }
   finally {
     isLoading.value = false
-    console.log("SAVE USER INFO FINISHED")
     if (emailModified) {
       updateEmail();
     }
@@ -109,9 +102,10 @@ const updateEmail = async () => {
     await user.changeEmail(user.current.ID, {
       email: email.value,
     })
+    toast.success("Check your email for confirmation link!");
   }
   catch (error) {
-    console.error(error)
+    toast.error(error)
   }
   finally {
     isLoading.value = false

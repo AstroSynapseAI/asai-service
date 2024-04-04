@@ -10,8 +10,8 @@ import (
 	"github.com/AstroSynapseAI/app-service/repositories"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/AstroSynapseAI/app-service/sdk/rest"
-	"github.com/sendgrid/sendgrid-go"
-	"github.com/sendgrid/sendgrid-go/helpers/mail"
+	mail "github.com/xhit/go-simple-mail/v2"
+
 	"github.com/thanhpk/randstr"
 	"gopkg.in/yaml.v2"
 
@@ -163,45 +163,63 @@ func (ctrl *UsersController) CreatePasswordRecovery(ctx *rest.Context) {
 		envSetup = "https://asai.astrosynapse.ai/password_reset/"
 	}
 
-	fromEmail, err := getSendgridEmail()
-	if err != nil {
-		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Error sending email"})
-		return
+	emailMessage := `
+		<p>Please click on the link below to reset your password:</p>
+		<a href='` + envSetup + `'>Reset your password</a>
+		`
+	confirmationEmail := mail.NewMSG()
+	confirmationEmail.SetFrom("dispatch@astrosynapse.com")
+	confirmationEmail.AddTo(input.Email)
+	confirmationEmail.SetSubject("Confirm your AstroSynapse email")
+	confirmationEmail.SetBody(mail.TextPlain, emailMessage)
+
+	if confirmationEmail.Error != nil {
+		fmt.Println(confirmationEmail.Error)
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
 	}
 
-	from := mail.NewEmail("ASAI", fromEmail)
-	subject := "Password recovery"
-	to := mail.NewEmail("Recipient Name", input.Email)
-	plainTextContent := "Password reset link"
-	resetLink := envSetup + record.PasswordResetToken
-
-	htmlContent := "<p>Open the following link to reset your password:</p>"
-	htmlContent += "<p><a href=\"" + resetLink + "\">" + resetLink + "</a></p>"
-
-	message := mail.NewSingleEmail(from, subject, to, plainTextContent, htmlContent)
-
-	apiKey, err := getSendgridAPIKey()
+	host, err := getSMTPHost()
 	if err != nil {
-		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Error sending email"})
-		return
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
 	}
 
-	client := sendgrid.NewSendClient(apiKey)
-
-	// Send the email
-	response, err := client.Send(message)
+	password, err := getSMTPPassword()
 	if err != nil {
-		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Error sending email"})
-		return
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
 	}
 
-	ctx.JsonResponse(http.StatusOK, response)
+	username, err := getSMTPUsername()
+	if err != nil {
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
+	}
+
+	smtp := mail.NewSMTPClient()
+	smtp.Host = host
+	// smtp.KeepAlive = false
+	// smtp.ConnectTimeout = 10 * time.Second
+	// smtp.SendTimeout = 10 * time.Second
+	smtp.Password = password
+	smtp.Username = username
+	smtp.Encryption = mail.EncryptionSSLTLS
+	smtp.Port = 465
+
+	smtpClient, err := smtp.Connect()
+	if err != nil {
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
+	}
+
+	err = confirmationEmail.Send(smtpClient)
+	if err != nil {
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
+	}
+
+	ctx.JsonResponse(http.StatusOK, record)
 }
 
-func getSendgridAPIKey() (string, error) {
+func getSMTPHost() (string, error) {
 
 	var Config struct {
-		SendgridAPIKey string `yaml:"sendgrid_api_key"`
+		SMTPHost string `yaml:"smtp_host"`
 	}
 
 	keys, err := os.ReadFile("./app/keys.yaml")
@@ -214,13 +232,13 @@ func getSendgridAPIKey() (string, error) {
 		fmt.Println("Error unmarshalling keys.yaml:", err)
 	}
 
-	return Config.SendgridAPIKey, nil
+	return Config.SMTPHost, nil
 }
 
-func getSendgridEmail() (string, error) {
+func getSMTPPassword() (string, error) {
 
 	var Config struct {
-		SendgridEmail string `yaml:"sendgrid_email"`
+		SMTPPassword string `yaml:"smtp_password"`
 	}
 
 	keys, err := os.ReadFile("./app/keys.yaml")
@@ -233,7 +251,26 @@ func getSendgridEmail() (string, error) {
 		fmt.Println("Error unmarshalling keys.yaml:", err)
 	}
 
-	return Config.SendgridEmail, nil
+	return Config.SMTPPassword, nil
+}
+
+func getSMTPUsername() (string, error) {
+
+	var Config struct {
+		SMTPUsername string `yaml:"smtp_username"`
+	}
+
+	keys, err := os.ReadFile("./app/keys.yaml")
+	if err != nil {
+		fmt.Println("Error reading keys.yaml:", err)
+	}
+
+	err = yaml.Unmarshal(keys, &Config)
+	if err != nil {
+		fmt.Println("Error unmarshalling keys.yaml:", err)
+	}
+
+	return Config.SMTPUsername, nil
 }
 
 // create user invite
@@ -605,11 +642,75 @@ func (ctrl *UsersController) ChangeEmail(ctx *rest.Context) {
 		return
 	}
 
-	record, err := ctrl.User.CreateAndSendEmailConfirmation(account.ID, reqData.Email)
+	token, err := ctrl.User.CreateAndSendEmailConfirmation(account.ID, reqData.Email)
 	if err != nil {
 		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: err.Error()})
 		return
 	}
-	ctx.JsonResponse(http.StatusOK, record)
 
+	confirmEmailURL := ""
+
+	if os.Getenv("ENVIRONMENT") == "LOCAL DEV" {
+		confirmEmailURL = "http://localhost:5173/email_confirmation/?token=" + token + "&email=" + reqData.Email
+	}
+
+	if os.Getenv("ENVIRONMENT") == "HEROKU DEV" {
+		confirmEmailURL = "https://dev.asai.astrosynapse.ai/email_confirmation/?token=" + token + "&email=" + reqData.Email
+	}
+
+	if os.Getenv("ENVIRONMENT") == "AWS DEV" {
+		confirmEmailURL = "https://asai.astrosynapse.ai/email_confirmation/?token=" + token + "&email=" + reqData.Email
+	}
+
+	emailMessage := `
+		<p>Please click on the link below to confirm your email address:</p>
+		<a href='` + confirmEmailURL + `'>Confirm Email</a>
+		`
+	confirmationEmail := mail.NewMSG()
+	confirmationEmail.SetFrom("dispatch@astrosynapse.com")
+	confirmationEmail.AddTo(reqData.Email)
+	confirmationEmail.SetSubject("Confirm your AstroSynapse email")
+	confirmationEmail.SetBody(mail.TextPlain, emailMessage)
+
+	if confirmationEmail.Error != nil {
+		fmt.Println(confirmationEmail.Error)
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
+	}
+
+	host, err := getSMTPHost()
+	if err != nil {
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
+	}
+
+	password, err := getSMTPPassword()
+	if err != nil {
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
+	}
+
+	username, err := getSMTPUsername()
+	if err != nil {
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
+	}
+
+	smtp := mail.NewSMTPClient()
+	smtp.Host = host
+	// smtp.KeepAlive = false
+	// smtp.ConnectTimeout = 10 * time.Second
+	// smtp.SendTimeout = 10 * time.Second
+	smtp.Password = password
+	smtp.Username = username
+	smtp.Encryption = mail.EncryptionSSLTLS
+	smtp.Port = 465
+
+	smtpClient, err := smtp.Connect()
+	if err != nil {
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
+	}
+
+	err = confirmationEmail.Send(smtpClient)
+	if err != nil {
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
+	}
+
+	ctx.JsonResponse(http.StatusOK, models.User{})
 }
