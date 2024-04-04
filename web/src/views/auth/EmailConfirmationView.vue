@@ -1,61 +1,37 @@
 <script setup>
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth.store';
 import { onMounted } from 'vue';
-import { Form, Field, useForm, ErrorMessage } from 'vee-validate';
-import { useAuthStore } from '@/stores/auth.store.js';
-import { useUserStore } from '@/stores/user.store.js';
 import { useToast } from 'vue-toastification';
-import * as yup from 'yup';
 
-const { handleSubmit } = useForm();
-
-const toast = useToast();
-const schema = yup.object({
-  Username: yup.string().required(),
-  Password: yup.string().required(),
-});
-
-const router = useRouter();
 const auth = useAuthStore();
-const user = useUserStore();
+const toast = useToast();
 
-let username = ref('');
-let password = ref('');
+onMounted(async () => {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('email');
+        const token = urlParams.get('token');
 
-const formState = reactive({
-  isSubmitting: false,
-});
+        console.log('Email:', email);
+        console.log('Token:', token);
 
-const submitLogin = handleSubmit(async values => {
-  formState.isSubmitting = true;
-  try {
-    const loggedIn = await auth.login(username.value, password.value)
-    const hasAvatar = await user.hasAvatar(auth.user.ID)
-    if (loggedIn && hasAvatar) {
-      user.current = auth.user; // this is a hack, because I dont understand how useStore and local storage works. TODO
-      router.push({ name: 'admin', params: { avatar_id: user.avatar.ID } });
+        const formData = await auth.validateConfirmationEmail({
+            email: email,
+            token: token
+        });
+        
+      }
+      catch (error) {
+        console.log("err-", error)
+        toast.error(error)
     }
-    else {
-      router.push({ name: 'welcome' });
-    }
-
-    formState.isSubmitting = false;
-  }
-  catch (err) {
-    console.log(err);
-    toast.error(err);
-    formState.isSubmitting = false;
-  }
-});
-
-onMounted(() => {
-  feather.replace();
 });
 
 </script>
 <template>
-  <div class="container d-flex flex-column vh-100">
+  <div class="container d-flex flex-column vh-60">
     <nav class="navbar navbar-expand-md bg-dark bg-transparent">
       <div class="container-fluid">
         <div class="row w-100">
@@ -77,52 +53,13 @@ onMounted(() => {
         </div>
       </div>
     </nav>
-    <div class="row">
 
-      <div class="col-md-6">
+      <div class="col-md-4">
         <img class="logo" src="@/assets/ASAILogotype.svg" alt="">
         <div class="card">
-          <div class="card-body">
-
-            <Form class="form-control" @submit="submitLogin" :validation-schema="schema">
-              <ErrorMessage name="Username" />
-              <Field v-model="username" id="Email" name="Username" type="email" class="email-input d-block"
-                placeholder="Username"></Field>
-              <ErrorMessage name="Password" />
-              <Field v-model="password" id="Password" name="Password" type="password" class="pass-input d-block" placeholder="Password"></Field>
-
-              <div style="display: flex; flex-direction: column; align-items: flex-start;">
-              <div class="col-auto">
-                <button class="send-button btn btn-light" :disabled="formState.isSubmitting">
-                <span v-if="formState.isSubmitting">
-                  <span class="loader"></span>
-                </span>
-                <span v-else>LOGIN</span>
-              </button>
-              </div>
-              <router-link :to="{name: 'forgot_password'}" class="text-decoration-underline" style="margin-top: 10px;">
-                Forgot password?
-            </router-link>
-            </div>
-          </Form>
-            
-          </div>
+            <button class="send-button btn btn-light" @click="''">Go to profile</button>
         </div>
       </div>
-
-      <div class="col-md-6">
-        <h3 class="px-3 mb-4 mt-3 mt-md-0"> Asai cloud is currently in <b>closed beta</b>, and access is limited to
-          <b>invite only</b>. Plese send us your email, if you are interested, and we will add you in the next
-          onboarding batch of testers.
-        </h3>
-        <Form class="form-control d-flex" action="https://formspree.io/f/xyyqjdgr" method="POST">
-          <Field id="waitlist-email" name="WaitList Email" type="email" class="email-input flex-fill mb-0 corner-0"
-            placeholder="Email"></Field>
-          <button class="send-button btn btn-light" @click="''">Submit</button>
-        </Form>
-      </div>
-
-    </div>
   </div>
 </template>
 

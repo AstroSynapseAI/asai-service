@@ -35,6 +35,7 @@ func (ctrl *UsersController) Run() {
 	ctrl.Post("/login", ctrl.Login)
 	ctrl.Post("/register", ctrl.Register)
 	ctrl.Post("/register/invite", ctrl.RegisterInvite)
+	ctrl.Post("/confirm_email", ctrl.ConfirmEmail)
 	ctrl.Post("/invite", ctrl.CreateInvite)
 	ctrl.Post("/password_recovery", ctrl.CreatePasswordRecovery)
 	ctrl.Post("/{id}/accounts/save", ctrl.SaveAccount)
@@ -255,6 +256,42 @@ func (ctrl *UsersController) CreateInvite(ctx *rest.Context) {
 	}
 
 	ctx.JsonResponse(http.StatusOK, record)
+}
+
+func (ctrl *UsersController) ConfirmEmail(ctx *rest.Context) {
+	fmt.Println("UsersController.ConfirmEmail")
+
+	var reqData struct {
+		Email string `json:"email"`
+		Token string `json:"token"`
+	}
+
+	err := ctx.JsonDecode(&reqData)
+	if err != nil {
+		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Username is required"})
+		return
+	}
+
+	fmt.Println("UsersController.REQ DATA---", reqData)
+
+	account, err := ctrl.User.GetAccountByEmail(reqData.Token)
+	if err != nil {
+		ctx.SetStatus(http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Println("UsersController.ACCOUNT---", account)
+
+	account.Email = reqData.Email
+
+	updatedAccount, err := ctrl.User.SaveAccount(account)
+	if err != nil {
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
+		return
+	}
+
+	ctx.JsonResponse(http.StatusOK, updatedAccount)
+
 }
 
 // register invited user
