@@ -112,6 +112,26 @@ func (user *UsersRepository) CreateAndSendRecoveryToken(email string) (models.Us
 	return updatedUserRecord, nil
 }
 
+func (user *UsersRepository) CreateAndSendEmailConfirmation(id uint) (models.User, error) {
+
+	account, err := user.GetAccountByID(id)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	token, err := user.GenerateToken(64)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	account.Email = token
+	user.SaveAccount(account)
+
+	return models.User{}, nil
+}
+
+//
+
 func (user *UsersRepository) ConfirmInvite(username string, password string, token string) (models.User, error) {
 	invitedUser, err := user.GetByInviteToken(token)
 	if err != nil {
@@ -181,6 +201,15 @@ func (user *UsersRepository) GetUserByAccountID(id uint) (models.User, error) {
 func (user *UsersRepository) GetAccountByUserID(id uint) (models.Account, error) {
 	var record models.Account
 	err := user.Repo.DB.Where("user_id = ?", id).First(&record).Error
+	if err != nil {
+		return models.Account{}, err
+	}
+	return record, nil
+}
+
+func (user *UsersRepository) GetAccountByID(id uint) (models.Account, error) {
+	var record models.Account
+	err := user.Repo.DB.Where("id = ?", id).First(&record).Error
 	if err != nil {
 		return models.Account{}, err
 	}

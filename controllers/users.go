@@ -369,7 +369,6 @@ func (ctrl *UsersController) GetAccounts(ctx *rest.Context) {
 	ctx.JsonResponse(http.StatusOK, accounts)
 }
 
-// write a function that will fetch account by email from database
 func (ctrl *UsersController) GetAccountByEmail(ctx *rest.Context) {
 	fmt.Println("UsersController.GetAccountByEmail")
 	var reqData struct {
@@ -574,8 +573,17 @@ func (ctrl *UsersController) ChangeEmail(ctx *rest.Context) {
 	}
 
 	if account.Email == "" {
+		fmt.Println("UsersController.ChangeEmail prazan email")
+
+		record, err := ctrl.User.CreateAndSendEmailConfirmation(account.ID)
+		if err != nil {
+			ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: err.Error()})
+			return
+		}
 		//generate random token,write it in email field
 		//send email with url containing token and email to the user
+		ctx.JsonResponse(http.StatusOK, record)
+
 	} else {
 		account.Email = reqData.Email
 
