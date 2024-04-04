@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, toRef } from 'vue';
+import { onMounted, ref, toRef, computed } from 'vue';
 import { useAgentStore } from '@/stores/agent.store';
 import { useUserStore } from '@/stores/user.store';
 import { useAvatarStore } from '@/stores/avatar.store';
@@ -47,6 +47,15 @@ const getActiveAgentID = (agentID) => {
   return activeAgent ? activeAgent.ID : null;
 }
 
+const chunkedAgentsRecords = computed(() => {
+  const result = [];
+  const items = [...agentsRecords.value]; // Clone the original array to avoid direct modification
+  while (items.length) {
+    result.push(items.splice(0, 2)); // Split the array into chunks of 2
+  }
+  return result;
+});
+
 onMounted(async () => {
   await agent.getAgents();
   try {
@@ -69,9 +78,8 @@ onMounted(async () => {
       <div class="col-12">
         <div class="container">
 
-          <div class="row" v-for="(_, index) in agentsRecords.filter((a, i) => i % 2 === 0)" :key="'row' + index">
-            <!-- Render the current and next agent (if it exists) within the same row -->
-            <div class="col-6" v-for="agent in agentsRecords.slice(index, index + 2)" :key="agent.ID">
+          <div v-for="(chunk, index) in chunkedAgentsRecords" :key="index" class="row">
+            <div class="col-6" v-for="agent in chunk" :key="agent.ID">
               <div class="card">
                 <div class="card-header">
                   <div class="row">
@@ -98,8 +106,9 @@ onMounted(async () => {
               </div>
             </div>
           </div>
-
         </div>
+
+
       </div>
     </div>
   </div>

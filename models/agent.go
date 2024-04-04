@@ -85,14 +85,14 @@ func (*Agent) SeedModel(db *database.Database) []database.SeedAction {
 			},
 		},
 		{
-			ID: "seed_d&b_agent",
+			ID: "seed_dnb_agent",
 			Execute: func(db *database.Database) error {
 				rex := regexp.MustCompile(`(?m)^\s+`)
 
 				agents := []Agent{
 					{
 						Name:        "Duns & Bradstreet Search Agent",
-						Slug:        "d&b-search-agent",
+						Slug:        "dnb-search-agent",
 						Description: "Searches Duns and Bradstreet database for relevant information.",
 						Primer:      rex.ReplaceAllString(``, ""),
 					},

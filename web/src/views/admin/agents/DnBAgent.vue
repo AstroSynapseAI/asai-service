@@ -11,7 +11,7 @@ const toast = useToast();
 const avatar = useAvatarStore();
 const agent = useAgentStore();
 const agentRecord = toRef(agent, 'record');
-const route = useRoute();
+const route = useRoute()
 const llm = useLLMStore();
 const llmRecords = toRef(llm, 'records');
 
@@ -21,15 +21,9 @@ const activeAgentLLMID = ref('');
 const isActiveAgent = ref(false);
 const isPublicAgent = ref(false);
 const config = ref({
-  "imap_server": "",
-  "smtp_server": "",
-  "imap_port": "",
-  "smtp_port": "",
   "username": "",
   "password": "",
-  "encryption": "",
-  "sender": "",
-  "reply_to": "",
+  "token": "",
 });
 
 const submitForm = async () => {
@@ -130,41 +124,7 @@ onMounted(async () => {
 
             <div class="row">
               <div clas="col-12">
-                <h3 class="my-3">Email Config</h3>
-
-                <div class="row">
-
-                  <div class="col-6">
-                    <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="smtp-server" placeholder="mail.example.com"
-                        v-model="config.smtp_server">
-                      <label for="smtp-server">SMTP Server</label>
-                    </div>
-                  </div>
-
-                  <div class="col-4">
-                    <div class="form-floating mb-3">
-                      <select v-model="config.encryption" class="form-select model-select" aria-label="Select Model">
-                        <option value="" disabled selected>Select Encryption Type</option>
-                        <option value="ssl">SSL</option>
-                        <option value="tls">TLS</option>
-                        <option value="starttls">STARTTLS</option>
-                        <option value="ssltls">SSL/TLS</option>
-                        <option value="none">None</option>
-                      </select>
-                      <label for="smtp-encryption">Encryption</label>
-                    </div>
-                  </div>
-
-                  <div class="col-2">
-                    <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="smtp-port" placeholder="587"
-                        v-model="config.smtp_port">
-                      <label for="smtp-port">Port</label>
-                    </div>
-                  </div>
-
-                </div>
+                <h3 class="my-3">Authorization</h3>
 
                 <div class="row">
 
@@ -186,20 +146,13 @@ onMounted(async () => {
 
                 </div>
 
+                <h3 class="my-3">Api Key</h3>
                 <div class="row">
 
-                  <div class="col-6">
+                  <div class="col-12">
                     <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="sender" placeholder="sender" v-model="config.sender">
-                      <label for="sender">Sender</label>
-                    </div>
-                  </div>
-
-                  <div class="col-6">
-                    <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="reply-to" placeholder="reply-to"
-                        v-model="config.reply_to">
-                      <label for="reply-to">Reply To</label>
+                      <input type="text" class="form-control" id="sender" placeholder="sender" v-model="config.token">
+                      <label for="sender">Token</label>
                     </div>
                   </div>
 
