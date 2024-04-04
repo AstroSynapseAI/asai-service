@@ -24,7 +24,6 @@ onMounted(async () => {
         
       }
       catch (error) {
-        console.log("err-", error)
         toast.error(error)
     }
 });
@@ -56,9 +55,9 @@ onMounted(async () => {
 
       <div class="col-md-4">
         <img class="logo" src="@/assets/ASAILogotype.svg" alt="">
-        <div class="card">
-            <button class="send-button btn btn-light" @click="''">Go to profile</button>
-        </div>
+            <router-link :to="{ name: 'profile' }">
+                <button class="send-button btn btn-light" @click="''">Go to profile</button>
+            </router-link>
       </div>
   </div>
 </template>
