@@ -154,12 +154,6 @@ main {
 }
 
 .conversation-container {
-  outline: 1px solid yellow;
-  position: absolute;
-  top: 0;
-  left: 0; 
-  right: 0;
-  bottom: 100px;
   max-height: calc(90vh - 30px);
   padding: 1.25rem;
   scrollbar-width: none;
@@ -181,13 +175,6 @@ main {
 .card-body {
   background-color: #19232E !important;
   color: white !important;
-}
-
-.prompt-container {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
 }
 
 .retry-button {
