@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
+import { storeToRefs } from 'pinia';
 import { Form, Field, useForm } from 'vee-validate';
 import { useChatStore } from '@/stores/chat.store.js';
 import { useUserStore } from '@/stores/user.store.js';
@@ -7,6 +8,9 @@ import { useUserStore } from '@/stores/user.store.js';
 const user = useUserStore();
 const chatStore = useChatStore();
 const MAX_ROWS = 10;
+
+const { isLoading } = storeToRefs(chatStore);
+
 
 const props = defineProps({
   promptInput: {
@@ -28,6 +32,15 @@ let inputRowNum = ref(0);
 watch(() => props.promptInput, (value) => {
   prompt.value = value;
   promptElement.value.$el.focus();
+});
+
+
+watch(isLoading, (value, oldValue) => {
+  if (oldValue === true && value === false) {
+    setTimeout(() => {
+      promptElement.value.$el.focus();
+    }, 0);
+  }
 });
 
 function getInputRowNumber() {
@@ -70,7 +83,7 @@ onMounted(() => {
 
 <template>
   <Form @submit="onSubmit">
-    <div :class="{ 'textarea-container': true, 'loading': chatStore.isLoading, 'form-control': true}" class="form-control">
+    <div :class="{ 'textarea-container': true, 'loading': isLoading, 'form-control': true}" class="form-control">
       <Field
         v-on:input="resizeTextArea"
         @keydown.enter.exact.prevent="onSubmit"
@@ -81,10 +94,10 @@ onMounted(() => {
         class=""
         rows="2"
         placeholder="Send a message..."
-        :disabled="chatStore.isLoading"
+        :disabled="isLoading"
         ref="promptElement"
       ></Field>
-      <button class="send-button btn btn-light" :disabled="chatStore.isLoading">
+      <button class="send-button btn btn-light" :disabled="isLoading">
         <i class="align-middle" data-feather="send"></i>
       </button>
     </div>
