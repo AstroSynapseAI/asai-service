@@ -272,15 +272,11 @@ func (ctrl *UsersController) ConfirmEmail(ctx *rest.Context) {
 		return
 	}
 
-	fmt.Println("UsersController.REQ DATA---", reqData)
-
 	account, err := ctrl.User.GetAccountByEmail(reqData.Token)
 	if err != nil {
 		ctx.SetStatus(http.StatusInternalServerError)
 		return
 	}
-
-	fmt.Println("UsersController.ACCOUNT---", account)
 
 	account.Email = reqData.Email
 
@@ -610,15 +606,11 @@ func (ctrl *UsersController) ChangeEmail(ctx *rest.Context) {
 	}
 
 	if account.Email == "" {
-		fmt.Println("UsersController.ChangeEmail prazan email")
-
 		record, err := ctrl.User.CreateAndSendEmailConfirmation(account.ID, reqData.Email)
 		if err != nil {
 			ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: err.Error()})
 			return
 		}
-		//generate random token,write it in email field
-		//send email with url containing token and email to the user
 		ctx.JsonResponse(http.StatusOK, record)
 
 	} else {

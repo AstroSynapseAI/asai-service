@@ -72,7 +72,6 @@ export const useAuthStore = defineStore({
 
     async validateConfirmationEmail(formData) {
       try {
-        console.log("validateConfirmationEmail--- form ddata-->", formData)
         const user = await fetchWrapper.post(
           `${usersURL}/confirm_email`, formData
         );

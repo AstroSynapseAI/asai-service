@@ -19,7 +19,6 @@ let userDataModified = false
 const toast = useToast();
 
 const onEmailChange = () => {
-  console.log("on email change----")
   emailModified = true;
 };
 

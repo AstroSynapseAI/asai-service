@@ -142,7 +142,7 @@ func (user *UsersRepository) CreateAndSendEmailConfirmation(id uint, email strin
 		envSetup = "https://asai.astrosynapse.ai/email_confirmation/?token=" + token + "&email=" + email
 	}
 
-	fmt.Println("OVO JE ENV SETUP ----", envSetup)
+	fmt.Println(envSetup)
 
 	return models.User{}, nil
 }
