@@ -70,6 +70,17 @@ export const useAuthStore = defineStore({
       }
     },
 
+    async validateConfirmationEmail(formData) {
+      try {
+        const user = await fetchWrapper.post(
+          `${usersURL}/confirm_email`, formData
+        );
+        return user
+      } catch (error) {
+        throw error.Error 
+      }
+    },
+
     async getInvitedUser(inviteToken) {
       try {
         const user = await fetchWrapper.get(

@@ -112,15 +112,33 @@ func (user *UsersRepository) CreateAndSendRecoveryToken(email string) (models.Us
 	return updatedUserRecord, nil
 }
 
+func (user *UsersRepository) CreateAndSendEmailConfirmation(id uint, email string) (string, error) {
+
+	account, err := user.GetAccountByID(id)
+	if err != nil {
+		return "", err
+	}
+
+	token, err := user.GenerateToken(64)
+	if err != nil {
+		return "", err
+	}
+
+	account.Email = token
+	user.SaveAccount(account)
+
+	return token, err
+}
+
 func (user *UsersRepository) ConfirmInvite(username string, password string, token string) (models.User, error) {
 	invitedUser, err := user.GetByInviteToken(token)
 	if err != nil {
-		return models.User{}, fmt.Errorf("Invalid invite token")
+		return models.User{}, fmt.Errorf("invalid invite token")
 	}
 
 	existingUser, err := user.GetByUsername(username)
 	if err == nil && existingUser.ID != invitedUser.ID {
-		return models.User{}, fmt.Errorf("User already exists")
+		return models.User{}, fmt.Errorf("user already exists")
 	}
 
 	fmt.Println("username is not taken")
@@ -174,6 +192,24 @@ func (user *UsersRepository) GetUserByAccountID(id uint) (models.User, error) {
 	err := user.Repo.DB.Where("id = ?", id).First(&record).Error
 	if err != nil {
 		return models.User{}, err
+	}
+	return record, nil
+}
+
+func (user *UsersRepository) GetAccountByUserID(id uint) (models.Account, error) {
+	var record models.Account
+	err := user.Repo.DB.Where("user_id = ?", id).First(&record).Error
+	if err != nil {
+		return models.Account{}, err
+	}
+	return record, nil
+}
+
+func (user *UsersRepository) GetAccountByID(id uint) (models.Account, error) {
+	var record models.Account
+	err := user.Repo.DB.Where("id = ?", id).First(&record).Error
+	if err != nil {
+		return models.Account{}, err
 	}
 	return record, nil
 }

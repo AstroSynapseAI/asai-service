@@ -13,9 +13,18 @@ const email = ref('');
 const confirmEmail = ref('');
 const isLoading = ref(false); 
 const isTyping = ref(false);
+let emailModified = false;
+let userDataModified = false
 
 const toast = useToast();
 
+const onEmailChange = () => {
+  emailModified = true;
+};
+
+const onUserDataChange = () => {
+  userDataModified = true;
+};
 const checkPasswordMatch = () => {
   isTyping.value = true;
 };
@@ -51,6 +60,10 @@ const isValidEmail = () => {
   return validEmail
 };
 
+const onSave = () => {
+  saveUserInfo();
+};
+
 const saveUserInfo = async () => {
   isLoading.value = true
   try {
@@ -72,23 +85,30 @@ const saveUserInfo = async () => {
   }
   finally {
     isLoading.value = false
+    if (emailModified) {
+      updateEmail();
+    }
   }
 }
 
 
 const updateEmail = async () => {
+  isLoading.value = true
   if (!isValidEmail()) {
-    alert('Email is not valid or emails do not match.')
+    toast.error("Email is not valid or emails do not match.")
+    return
   }
-
   try {
-    user.changeEmail(user.current.ID, {
-      account_id: user.account.ID,
+    await user.changeEmail(user.current.ID, {
       email: email.value,
     })
+    toast.success("Check your email for confirmation link!");
   }
   catch (error) {
-    console.error(error)
+    toast.error(error)
+  }
+  finally {
+    isLoading.value = false
   }
 }
 
@@ -137,14 +157,14 @@ onMounted(async () => {
           <h3>User Information</h3>
           <div class="row">
             <div class="col-6">
-              <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="username" placeholder="Username" v-model="username">
+              <div class="form-floating mb-3">  
+                <input type="text" class="form-control" id="username" placeholder="Username" v-model="username" @input="onUserDataChange" >
                 <label for="username">Username</label>
               </div>
             </div>
             <div class="col-6">
               <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="email" placeholder="Email" v-model="email">
+                <input type="text" class="form-control" id="email" placeholder="Email" v-model="email" @input="onEmailChange">
                 <label for="email">Email</label>
               </div>
             </div>
@@ -152,20 +172,20 @@ onMounted(async () => {
           <div class="row">
             <div class="col-6">
               <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="firstName" placeholder="First Name" v-model="firstName">
+                <input type="text" class="form-control" id="firstName" placeholder="First Name" v-model="firstName" @input="onUserDataChange" >
                 <label for="firstName">First Name</label>
               </div>
             </div>
             <div class="col-6">
               <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="lastName" placeholder="Last Name" v-model="lastName">
+                <input type="text" class="form-control" id="lastName" placeholder="Last Name" v-model="lastName" @input="onUserDataChange" >
                 <label for="lastName">Last Name</label>
               </div>
             </div>
           </div>
           <div class="row"> 
             <div class="col-12">
-              <button class="btn btn-primary float-end" @click="saveUserInfo" :disabled="isSaveButtonDisabled">Save</button>
+              <button class="btn btn-primary float-end" @click="onSave" :disabled="isSaveButtonDisabled">Save</button>
             </div>
           </div>
           <hr>
