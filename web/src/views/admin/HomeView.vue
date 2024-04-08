@@ -99,12 +99,12 @@ const editPrompt = function editPrompt(index) {
                       <img :src="iconUser" class="logo" alt="User Icon" width="35" height="50"
                         v-if="message.sender === 'human'" />
                       <button v-if="message.sender === 'ai' && (index + 1) == messages.length"
-                        @click="() => regeneratePrompt(index - 1)" class="retry-button btn my-2 p-0"
+                        @click="() => regeneratePrompt(index - 1)" class="retry-button btn mt-2 p-0"
                         :disabled="chatStore.isLoading" title="Regenerate prompt">
                         <i class="align-middle" data-feather="refresh-cw"></i>
                       </button>
                       <button v-if="message.sender === 'human'" @click="() => editPrompt(index)"
-                        class="retry-button btn my-2 p-0" :disabled="chatStore.isLoading" title="Edit last prompt">
+                        class="retry-button btn mt-2 p-0" :disabled="chatStore.isLoading" title="Edit last prompt">
                         <i class="align-middle" data-feather="edit"></i>
                       </button>
                     </div>
@@ -129,7 +129,7 @@ const editPrompt = function editPrompt(index) {
                       <div v-else class="message-content pe-3" v-html="md.render(message.content.trim())"></div>
                     </div>
 
-                    <hr class="separator opacity-100" v-if="messages.length > 1 && index !== messages.length - 1">
+                    <hr class="separator opacity-100 mt-3" v-if="messages.length > 1 && index !== messages.length - 1">
 
                   </div>
 
@@ -141,15 +141,10 @@ const editPrompt = function editPrompt(index) {
                 <hr class="border border-3 opacity-100">
                 <PromptInput v-bind:promptInput="promptInput" />
               </div>
-
-
             </div>
           </div>
         </div>
       </div>
-
-
-
     </div>
   </div>
 </template>
