@@ -1,4 +1,4 @@
-<script setup> 
+<script setup>
 import { onMounted, ref, computed } from 'vue';
 import { useUserStore } from '@/stores/user.store';
 import { useToast } from 'vue-toastification';
@@ -11,7 +11,7 @@ const firstName = ref('');
 const lastName = ref('');
 const email = ref('');
 const confirmEmail = ref('');
-const isLoading = ref(false); 
+const isLoading = ref(false);
 const isTyping = ref(false);
 let emailModified = false;
 let userDataModified = false
@@ -41,6 +41,10 @@ const isChangeButtonDisabled = computed(() => {
     return true;
   }
   return false;
+});
+
+const isEmailChangeButtonDisabled = computed(() => {
+  return isValidEmail()
 });
 
 const validateEmail = () => {
@@ -85,12 +89,8 @@ const saveUserInfo = async () => {
   }
   finally {
     isLoading.value = false
-    if (emailModified) {
-      updateEmail();
-    }
   }
 }
-
 
 const updateEmail = async () => {
   isLoading.value = true
@@ -115,7 +115,7 @@ const updateEmail = async () => {
 const changePassword = async () => {
   isLoading.value = true
   try {
-    await user.changePassword(user.current.ID,{
+    await user.changePassword(user.current.ID, {
       password: newPassword.value
     })
     toast.success("Password changed successfully!");
@@ -147,59 +147,95 @@ onMounted(async () => {
 
 </script>
 
-<template>       
- <div class="adminSpinner" v-if="isLoading"></div>
-  <div class="container-fluid p-0">    
-    <h1 class="h3 mb-3">Account</h1>    
+<template>
+  <div class="adminSpinner" v-if="isLoading"></div>
+  <div class="container-fluid p-0">
+    <h1 class="h3 mb-3">Account</h1>
     <div class="card">
       <div class="card-body">
         <div class="container p-4">
           <h3>User Information</h3>
           <div class="row">
             <div class="col-6">
-              <div class="form-floating mb-3">  
-                <input type="text" class="form-control" id="username" placeholder="Username" v-model="username" @input="onUserDataChange" >
+              <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="username" placeholder="Username" v-model="username"
+                  @input="onUserDataChange">
                 <label for="username">Username</label>
               </div>
             </div>
-            <div class="col-6">
-              <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="email" placeholder="Email" v-model="email" @input="onEmailChange">
-                <label for="email">Email</label>
-              </div>
-            </div>
+            <!-- <div class="col-6"> -->
+            <!--   <div class="form-floating mb-3"> -->
+            <!--     <input type="text" class="form-control" id="email" placeholder="Email" v-model="email" -->
+            <!--       @input="onEmailChange"> -->
+            <!--     <label for="email">Email</label> -->
+            <!--   </div> -->
+            <!-- </div> -->
           </div>
           <div class="row">
             <div class="col-6">
               <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="firstName" placeholder="First Name" v-model="firstName" @input="onUserDataChange" >
+                <input type="text" class="form-control" id="firstName" placeholder="First Name" v-model="firstName"
+                  @input="onUserDataChange">
                 <label for="firstName">First Name</label>
               </div>
             </div>
             <div class="col-6">
               <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="lastName" placeholder="Last Name" v-model="lastName" @input="onUserDataChange" >
+                <input type="text" class="form-control" id="lastName" placeholder="Last Name" v-model="lastName"
+                  @input="onUserDataChange">
                 <label for="lastName">Last Name</label>
               </div>
             </div>
           </div>
-          <div class="row"> 
+          <div class="row">
             <div class="col-12">
               <button class="btn btn-primary float-end" @click="onSave" :disabled="isSaveButtonDisabled">Save</button>
             </div>
           </div>
           <hr>
+
+          <h3>Change Email</h3>
+          <div class="row">
+            <div class="col-6">
+              <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="newEmail" placeholder="New Email" v-model="newEmail"
+                  @input="onEmailChange">
+                <label for="newEmail">New Email</label>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="confirmEmail" placeholder="Confirm Email"
+                  v-model="confirmEmail" @input="onEmailChange">
+                <label for="confirmPassword">Confirm Email</label>
+                <div v-if="isTyping && newEmail !== confirmEmail">
+                  Emails do not match
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <button class="btn btn-primary float-end" @click="updateEmail"
+                :disabled="isEmailChangeButtonDisabled">Change Email</button>
+            </div>
+          </div>
+          <hr>
+
+
           <h3>Change Password</h3>
           <div class="row">
             <div class="col-6">
               <div class="form-floating mb-3">
-                <input type="password" class="form-control" id="newPassword" placeholder="New Password" v-model="newPassword" @input="checkPasswordMatch">
+                <input type="password" class="form-control" id="newPassword" placeholder="New Password"
+                  v-model="newPassword" @input="checkPasswordMatch">
                 <label for="newPassword">New Password</label>
               </div>
             </div>
             <div class="col-6">
               <div class="form-floating mb-3">
-                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" v-model="confirmPassword" @input="checkPasswordMatch">
+                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password"
+                  v-model="confirmPassword" @input="checkPasswordMatch">
                 <label for="confirmPassword">Confirm Password</label>
                 <div v-if="isTyping && newPassword !== confirmPassword">
                   Passwords do not match
@@ -210,13 +246,14 @@ onMounted(async () => {
               </div>
             </div>
           </div>
-          <div class="row"> 
+          <div class="row">
             <div class="col-12">
-              <button class="btn btn-primary float-end" @click="changePassword" :disabled="isChangeButtonDisabled">Change</button>
-            </div>            
+              <button class="btn btn-primary float-end" @click="changePassword"
+                :disabled="isChangeButtonDisabled">Change</button>
+            </div>
           </div>
         </div>
-      </div>      
-    </div>  
-  </div>      
+      </div>
+    </div>
+  </div>
 </template>
