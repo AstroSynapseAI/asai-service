@@ -6,6 +6,9 @@ import { Form, Field, useForm, ErrorMessage } from 'vee-validate';
 import { useAuthStore } from '@/stores/auth.store.js';
 import { useUserStore } from '@/stores/user.store.js';
 import { useToast } from 'vue-toastification';
+
+import AsaiAlert from '@/views/ui/AsaiAlert.vue'; // Adjust the path as needed
+
 import * as yup from 'yup';
 
 const { handleSubmit } = useForm();
@@ -56,6 +59,7 @@ onMounted(() => {
 </script>
 <template>
   <div class="container d-flex flex-column vh-100">
+    <asai-alert></asai-alert>
     <nav class="navbar navbar-expand-md bg-dark bg-transparent">
       <div class="container-fluid">
         <div class="row w-100">
