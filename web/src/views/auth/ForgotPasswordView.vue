@@ -104,6 +104,10 @@ h1, h2, h3, h4, h5, h6 {
   color: white;
 }
 
+.email-input, .send-button {
+  height: 42px;
+}
+
 .loader {
     width: 18px;
     height: 18px;
