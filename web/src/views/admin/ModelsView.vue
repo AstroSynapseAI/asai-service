@@ -138,7 +138,7 @@ onMounted(async () => {
 
             <div class="row">
               <div class="col-12 d-flex flex-column justify-content-center align-items-center">
-                <!-- <div class="card-icon" @click="selectModel('gpt')"> -->
+                <!-- <div class="card-icon" @click="selectModel('mistral')"> -->
                 <div class="card-icon">
                   <i class="fas fa-puzzle-piece fa-3x"></i>
                 </div>
@@ -150,14 +150,13 @@ onMounted(async () => {
 
             <div class="row mt-3">
               <div class="col-12 text-center d-grid">
-                <router-link :to="{ name: 'models-config', params: { provider: 'openai' } }"
+                <router-link :to="{ name: 'models-config', params: { provider: 'mistral' } }"
                   class=" btn btn-primary btn-lg">
                   Configure
                 </router-link>
               </div>
             </div>
 
-            <div class="card-overlay position-absolute"></div>
           </div>
         </div>
       </div>

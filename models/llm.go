@@ -50,5 +50,50 @@ func (*LLM) SeedModel(db *database.Database) []database.SeedAction {
 				return db.Adapter.Gorm().Create(&llms).Error
 			},
 		},
+		{
+			ID: "seed_mistral",
+			Execute: func(db *database.Database) error {
+				llms := []LLM{
+					{
+						Name:        "Mistral-7B",
+						Slug:        "open-mistral-7b",
+						Description: "Mistral is developed by a creative team with high scientific standards",
+						Provider:    "Mistral",
+					},
+					{
+						Name:        "Mixtral-8x7B",
+						Slug:        "open-mixtral-8x7b",
+						Description: "Mistral is developed by a creative team with high scientific standards",
+						Provider:    "Mistral",
+					},
+					{
+						Name:        "Mistral Small Latest",
+						Slug:        "mistral-small-latest",
+						Description: "Mistral is developed by a creative team with high scientific standards",
+						Provider:    "Mistral",
+					},
+					{
+						Name:        "Mistral Medium Latest",
+						Slug:        "mistral-medium-latest",
+						Description: "Mistral is developed by a creative team with high scientific standards",
+						Provider:    "Mistral",
+					},
+					{
+						Name:        "Mistral Large Latest",
+						Slug:        "mistral-large-latest",
+						Description: "Mistral is developed by a creative team with high scientific standards",
+						Provider:    "Mistral",
+					},
+					{
+						Name:        "Mistral Embeder",
+						Slug:        "mistral-embed",
+						Description: "Mistral is developed by a creative team with high scientific standards",
+						Provider:    "Mistral",
+					},
+				}
+
+				return db.Adapter.Gorm().Create(&llms).Error
+			},
+		},
 	}
 }

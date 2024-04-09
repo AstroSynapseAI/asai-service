@@ -23,11 +23,15 @@ const modelToken = ref('');
 const llmRecords = toRef(llm, 'records');
 const activeLLMs = toRef(avatar, 'activeLLMs');
 const selectedModels = ref([]);
+const filteredLLMs = ref();
 
 const llms = () => {
   const provider = route.params.provider.toLowerCase();
-  return llmRecords.value.filter(llm => llm.provider.toLowerCase() === provider);
+  filteredLLMs.value = llmRecords.value.filter(llm => llm.provider.toLowerCase() === provider);
+
+  return filteredLLMs.value
 }
+
 
 const isActive = (ID) => {
   const activeLLM = activeLLMs.value.find(activeLLM => {
@@ -77,6 +81,11 @@ onMounted(async () => {
   if (route.params.provider === 'openai') {
     modelName.value = 'GPT by OpenAI'
   }
+
+  if (route.params.provider === 'mistral') {
+    modelName.value = 'Mistral by MistralAI'
+  }
+
   try {
     await llm.getLLMs();
     for (const model of llms()) {
@@ -84,9 +93,10 @@ onMounted(async () => {
         selectedModels.value.push(model.ID);
       }
     }
+
     await avatar.getActiveLLMs(route.params.avatar_id);
     for (const activeLLM of activeLLMs.value) {
-      if (activeLLM.llm.provider === 'OpenAI' && activeLLM.token) {
+      if (activeLLM.llm.provider.toLowerCase() === route.params.provider && activeLLM.token) {
         modelToken.value = activeLLM.token;
         break
       }
@@ -122,7 +132,7 @@ onMounted(async () => {
 
               <!-- This list needs to be properly loaded by checking with openai or other llm providers to see what llms the token has available -->
               <div class="col-6">
-                <div class="row" v-for="(llm, index) in llmRecords">
+                <div class="row" v-for="(llm, index) in filteredLLMs">
                   <div class="col-4">
                     <p>{{ llm.name }}</p>
                   </div>

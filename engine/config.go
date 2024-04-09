@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/AstroSynapseAI/app-service/engine/agents"
 	"github.com/AstroSynapseAI/app-service/engine/agents/email"
@@ -72,10 +73,12 @@ func (cnf *Config) GetAvatarLLM() llms.Model {
 		}
 	}
 
-	LLM, err := openai.New(
-		openai.WithModel(activeLLM.LLM.Slug),
-		openai.WithToken(activeLLM.Token),
-	)
+	LLM, err := loadActiveLLM(activeLLM)
+
+	// LLM, err := openai.New(
+	// 	openai.WithModel(activeLLM.LLM.Slug),
+	// 	openai.WithToken(activeLLM.Token),
+	// )
 
 	if err != nil {
 		fmt.Println("Error loading Avatar LLM:", err)
@@ -156,14 +159,20 @@ func loadActiveLLM(activeLLM models.ActiveLLM) (llms.Model, error) {
 	var LLM llms.Model
 	var err error
 
-	if activeLLM.LLM.Provider == "mistral" {
+	llmProvider := strings.ToLower(activeLLM.LLM.Provider)
+
+	if llmProvider == "mistral" {
+		fmt.Println("Loading Mistral LLM...")
+		fmt.Println("With token: " + activeLLM.Token)
 		LLM, err = mistral.New(
 			mistral.WithAPIKey(activeLLM.Token),
 			mistral.WithModel(activeLLM.LLM.Slug),
 		)
 	}
 
-	if activeLLM.LLM.Provider == "openai" {
+	if llmProvider == "openai" {
+		fmt.Println("Loading OpenAI LLM...")
+		fmt.Println("With token: " + activeLLM.Token)
 		LLM, err = openai.New(
 			openai.WithToken(activeLLM.Token),
 			openai.WithModel(activeLLM.LLM.Slug),
