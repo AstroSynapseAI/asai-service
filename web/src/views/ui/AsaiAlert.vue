@@ -57,6 +57,7 @@
     color: white !important;
     border: 1px solid white;
     border-radius: 3px;
+    z-index: 9999;
   }
 
   </style>
