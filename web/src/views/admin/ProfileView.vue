@@ -9,6 +9,7 @@ const newPassword = ref('');
 const confirmPassword = ref('');
 const firstName = ref('');
 const lastName = ref('');
+const email = ref('');
 const newEmail = ref('');
 const confirmEmail = ref('');
 const isLoading = ref(false);
@@ -119,7 +120,7 @@ onMounted(async () => {
       username.value = user.account.username ?? "";
       firstName.value = user.account.first_name;
       lastName.value = user.account.last_name;
-      newEmail.value = user.account.email;
+      email.value = user.account.email;
     }
   }
   catch (error) {
@@ -170,7 +171,7 @@ onMounted(async () => {
           </div>
           <hr>
 
-          <h3>Change Email</h3>
+          <h3>Change Email <span class="text-muted">({{ email }})</span></h3>
           <div class="row">
             <div class="col-6">
               <div class="form-floating mb-3">
