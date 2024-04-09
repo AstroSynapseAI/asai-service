@@ -8,6 +8,9 @@ import { useUserStore } from '@/stores/user.store.js';
 const user = useUserStore();
 const chatStore = useChatStore();
 const MAX_ROWS = 10;
+const INPUT_MIN_SIZE = 46;
+const CONVERSATION_SIZE_OFFSET = 300;
+const INPUT_PADDING = 4;
 
 const { isLoading } = storeToRefs(chatStore);
 
@@ -15,6 +18,10 @@ const { isLoading } = storeToRefs(chatStore);
 const props = defineProps({
   promptInput: {
     type: String,
+    required: false,
+  },
+  conversationContainer: {
+    type: Object,
     required: false,
   }
 });
@@ -27,6 +34,7 @@ let { resetForm, handleSubmit, defineField } = useForm({
 
 const [prompt, promptAttrs] = defineField('prompt');
 const promptElement = ref(null);
+let inputFieldLineHeight = ref(0);
 let inputRowNum = ref(0);
 
 watch(() => props.promptInput, (value) => {
@@ -43,17 +51,30 @@ watch(isLoading, (value, oldValue) => {
   }
 });
 
+function getInputLineHeight() {
+  return parseInt(window.getComputedStyle(promptElement.value.$el).getPropertyValue("line-height"));
+}
+
 function getInputRowNumber() {
-  const lineHeight = parseInt(window.getComputedStyle(promptElement.value.$el).getPropertyValue("line-height"));
-  return [Math.floor(promptElement.value.$el.scrollHeight / lineHeight), lineHeight];
+  return (promptElement.value.$el.value.match(/\n/g) || []).length;
+}
+
+function updateConversationContainerSize(heightDifference) {
+  let containerSizeOffset = CONVERSATION_SIZE_OFFSET + heightDifference;
+  containerSizeOffset = containerSizeOffset >= CONVERSATION_SIZE_OFFSET ? containerSizeOffset : CONVERSATION_SIZE_OFFSET;
+  props.conversationContainer.style.maxHeight = `calc(100vh - ${containerSizeOffset}px)`;
 }
 
 function resizeTextArea() {
-  let [currentRows, lineHeight] = getInputRowNumber();
+  let currentRows = getInputRowNumber();
   currentRows = currentRows > MAX_ROWS ? MAX_ROWS : currentRows;
+  
   if (currentRows != inputRowNum.value) {
     inputRowNum.value = currentRows;
-    promptElement.value.$el.style.height = `${currentRows * lineHeight}px`;
+    let newHeight = (currentRows * inputFieldLineHeight.value)+inputFieldLineHeight.value + INPUT_PADDING;
+    promptElement.value.$el.style.height = `${newHeight}px`;
+    let heightDifference = newHeight - INPUT_MIN_SIZE;
+    updateConversationContainerSize(heightDifference);
   }
 }
 
@@ -76,6 +97,7 @@ const onSubmit = handleSubmit((values, ctx) => {
 
 onMounted(() => {
   feather.replace();
+  inputFieldLineHeight.value = getInputLineHeight();
   inputRowNum.value = getInputRowNumber();
 });
 
@@ -135,6 +157,7 @@ textarea {
   color: white !important;
   z-index: 999;
   border: none;
+  min-height: 46px;
 }
 
 textarea:focus {
