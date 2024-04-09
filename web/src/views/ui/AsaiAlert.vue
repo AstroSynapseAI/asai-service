@@ -5,7 +5,7 @@
           <p class="mb-0">An error has occurred! Please refresh the page and try again.</p>
         </div>
         <div class="col-auto">
-          <button class="btn-close btn-close-white" @click="chatStore.closeError"></button>
+          <button class="btn-close btn-close-white" @click="closeError"></button>
         </div>
       </div>
     </div>
@@ -25,31 +25,31 @@
         this.connectionErr.active = false;
       }
     }
-  }
+  };
   </script>
-
-<style scoped>
-@font-face {
-  font-family: 'SF Pro Text';
-  src: url('./assets/fonts/SFProText-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'SF Pro Text';
-  src: url('./assets/fonts/SFProText-Bold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-}
-
-.error-container {
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 600px;
-  height: 60px;
-  background-color: black;
-}
-
-</style>
+  
+  <style scoped>
+  @font-face {
+    font-family: 'SF Pro Text';
+    src: url('./assets/fonts/SFProText-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'SF Pro Text';
+    src: url('./assets/fonts/SFProText-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+  }
+  
+  .error-container {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 60px;
+    background-color: black;
+  }
+  </style>
+  
