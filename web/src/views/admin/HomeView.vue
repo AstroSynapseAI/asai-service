@@ -139,7 +139,7 @@ const editPrompt = function editPrompt(index) {
 
               <div ref="promptContainer" class="prompt-container">
                 <hr class="border border-3 opacity-100">
-                <PromptInput v-bind:promptInput="promptInput" />
+                <PromptInput :promptInput="promptInput" :conversationContainer="conversationContainer" />
               </div>
             </div>
           </div>
@@ -151,15 +151,17 @@ const editPrompt = function editPrompt(index) {
 
 <style scoped>
 main {
-  display: block !important;
+  padding-bottom: 0 !important;
 }
 
 .container-fluid {
   color: white;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .conversation-container {
-  max-height: calc(90vh - 30px);
+  max-height: calc(100vh - 300px);
   padding: 1.25rem;
   scrollbar-width: none;
   /* Firefox */
@@ -173,13 +175,20 @@ main {
   padding: 1.5rem;
 }
 
+.card {
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+}
+
 .card-body .container {
-  min-height: 85vh;
+  min-height: 80vh;
 }
 
 .card-body {
   background-color: #19232E !important;
   color: white !important;
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 .retry-button {
@@ -228,4 +237,11 @@ main {
   height: 18px;
   margin-bottom: 5px;
 }
+
+@media (min-width: 992px) {
+  .content {
+      padding-bottom: 0 !important;
+  }
+}
+
 </style>
