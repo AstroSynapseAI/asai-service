@@ -1,5 +1,5 @@
 <template>
-    <div v-if="connectionErr.active" class="error-container text-white border border-1 border-white px-3">
+    <div v-if="error.active" class="error-container text-white border border-1 border-white px-3">
       <div class="row h-100 align-items-center justify-content-center text-center">
         <div class="col">
           <p class="mb-0">An error has occurred! Please refresh the page and try again.</p>
@@ -15,14 +15,14 @@
   export default {
     data() {
       return {
-        connectionErr: {
+        error: {
           active: true
         }
       };
     },
     methods: {
       closeError() {
-        this.connectionErr.active = false;
+        this.error.active = false;
       }
     }
   };
