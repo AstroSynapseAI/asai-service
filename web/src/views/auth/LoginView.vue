@@ -7,7 +7,7 @@ import { useAuthStore } from '@/stores/auth.store.js';
 import { useUserStore } from '@/stores/user.store.js';
 import { useToast } from 'vue-toastification';
 
-import AsaiAlert from '@/views/ui/AsaiAlert.vue'; // Adjust the path as needed
+import AsaiAlert from '@/views/ui/AsaiAlert.vue';
 
 import * as yup from 'yup';
 

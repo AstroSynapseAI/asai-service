@@ -16,7 +16,7 @@
     data() {
       return {
         connectionErr: {
-          active: true // Set to true if error is active
+          active: true
         }
       };
     },
