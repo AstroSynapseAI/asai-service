@@ -59,9 +59,7 @@ func (handler *StreamHandler) ReadFromEgress(ctx context.Context, callback func(
 }
 
 func (handler *StreamHandler) HandleChainStart(_ context.Context, inputs map[string]any) {
-	fmt.Println("Chain Started...")
 	// ugly tmp fix
-
 	chainID := "chain" + strconv.Itoa(len(handler.ChainsActive))
 	handler.ChainsActive = append(handler.ChainsActive, chainID)
 
@@ -76,14 +74,11 @@ func (handler *StreamHandler) HandleChainStart(_ context.Context, inputs map[str
 
 func (handler *StreamHandler) HandleChainEnd(_ context.Context, outputs map[string]any) {
 	// ugly tmp fix, need to do research into callbacks again
-	fmt.Println("Chain Ended...")
-	fmt.Println("Actve Chains", len(handler.ChainsActive))
 
 	finishedChainID := "chain" + strconv.Itoa(len(handler.ChainsFinished))
 	handler.ChainsFinished = append(handler.ChainsFinished, finishedChainID)
 
 	if len(handler.ChainsFinished) == len(handler.ChainsActive) {
-		fmt.Println("Final Chain end")
 		jsonPayload := map[string]any{
 			"step": "chain end",
 		}

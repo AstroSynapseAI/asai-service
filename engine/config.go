@@ -75,11 +75,6 @@ func (cnf *Config) GetAvatarLLM() llms.Model {
 
 	LLM, err := loadActiveLLM(activeLLM)
 
-	// LLM, err := openai.New(
-	// 	openai.WithModel(activeLLM.LLM.Slug),
-	// 	openai.WithToken(activeLLM.Token),
-	// )
-
 	if err != nil {
 		fmt.Println("Error loading Avatar LLM:", err)
 		return nil
@@ -110,11 +105,7 @@ func (cnf *Config) GetAgents() []tools.Tool {
 	for _, activeAgent := range activeAgents {
 		agent := agents.NewActiveAgent(cnf.Avatar, activeAgent)
 
-		fmt.Println("Loading agent..." + agent.GetAgentName())
-		fmt.Println("agent is active: " + fmt.Sprint(agent.IsAgentActive()))
-
 		if agent.GetAgentSlug() == "search-agent" && agent.IsAgentActive() {
-			fmt.Println("Loading search agent...")
 			searchAgent, err := search.NewSearchAgent(
 				search.WithPrimer(agent.GetAgentPrimer()),
 				search.WithLLM(agent.GetAgentLLM()),
@@ -130,7 +121,6 @@ func (cnf *Config) GetAgents() []tools.Tool {
 		}
 
 		if agent.GetAgentSlug() == "email-agent" && agent.IsAgentActive() {
-			fmt.Println("Loading email agent...")
 			emailAgent, err := email.NewEmailAgent(
 				email.WithPrimer(agent.GetAgentPrimer()),
 				email.WithLLM(agent.GetAgentLLM()),
@@ -162,8 +152,6 @@ func loadActiveLLM(activeLLM models.ActiveLLM) (llms.Model, error) {
 	llmProvider := strings.ToLower(activeLLM.LLM.Provider)
 
 	if llmProvider == "mistral" {
-		fmt.Println("Loading Mistral LLM...")
-		fmt.Println("With token: " + activeLLM.Token)
 		LLM, err = mistral.New(
 			mistral.WithAPIKey(activeLLM.Token),
 			mistral.WithModel(activeLLM.LLM.Slug),
@@ -171,8 +159,6 @@ func loadActiveLLM(activeLLM models.ActiveLLM) (llms.Model, error) {
 	}
 
 	if llmProvider == "openai" {
-		fmt.Println("Loading OpenAI LLM...")
-		fmt.Println("With token: " + activeLLM.Token)
 		LLM, err = openai.New(
 			openai.WithToken(activeLLM.Token),
 			openai.WithModel(activeLLM.LLM.Slug),
