@@ -27,7 +27,8 @@ const submitPasswordRecovery = async () => {
   formState.isSubmitting = true; 
   try {
     const user = await auth.sendRecoverPasswordLink(email.value)
-    toast.success("Email sent!");
+    apiErrorText.value = "Email sent!";
+    isAsaiAlertActive.value = true;
   }
   catch (error) {
     apiErrorText.value = error;
