@@ -1,5 +1,5 @@
 <template>
-    <div v-if="error.active" class="error-container text-white border border-1 border-white px-3">
+    <div v-if="isActive" class="error-container text-white border border-1 border-white px-3">
       <div class="row h-100 align-items-center justify-content-center text-center">
         <div class="col">
           <p class="mb-0">An error has occurred! Please refresh the page and try again.</p>
@@ -13,16 +13,15 @@
   
   <script>
   export default {
-    data() {
-      return {
-        error: {
-          active: true
-        }
-      };
+    props: {
+      isActive: {
+        type: Boolean,
+        required: true
+      }
     },
     methods: {
       closeError() {
-        this.error.active = false;
+        this.$emit('close');
       }
     }
   };

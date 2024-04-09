@@ -13,8 +13,6 @@ import * as yup from 'yup';
 
 const { handleSubmit } = useForm();
 
-const apiError = ref(false);
-
 const toast = useToast();
 const schema = yup.object({
   Username: yup.string().required(),
@@ -48,7 +46,8 @@ const submitLogin = handleSubmit(async values => {
     formState.isSubmitting = false;
   }
   catch (err) {
-    apiError.value = true;
+    console.log("err---", err)
+    isActive.value = true; // Show the error popup
     formState.isSubmitting = false;
   }
 });
@@ -57,10 +56,16 @@ onMounted(() => {
   feather.replace();
 });
 
+const isActive = ref(false); // Define isActive using the composition API
+
+const closeError = () => {
+  isActive.value = false;
+};
+
 </script>
 <template>
   <div class="container d-flex flex-column vh-100">
-    <asai-alert v-if="apiError"></asai-alert>
+    <AsaiAlert :is-active="isActive"  @close="closeError" />
     <nav class="navbar navbar-expand-md bg-dark bg-transparent">
       <div class="container-fluid">
         <div class="row w-100">
