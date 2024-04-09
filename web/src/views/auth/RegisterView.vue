@@ -5,10 +5,10 @@ import { onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth.store';
 import { useUserStore } from '@/stores/user.store.js';
 import { Form, Field, ErrorMessage } from 'vee-validate';
-import { useToast } from 'vue-toastification';
 import * as yup from 'yup';
 
-const toast = useToast();
+import AsaiAlert from '@/views/ui/AsaiAlert.vue';
+
 const schema = yup.object({
   Username: yup.string().required(),
   Password: yup.string().required().min(8),
@@ -23,10 +23,16 @@ const auth = useAuthStore();
 const username = ref('');
 const password = ref('');
 const confirmPassword = ref('');
+const isAsaiAlertActive = ref(false);
+const apiErrorText = ref('');
 
 const formState = reactive({
   isSubmitting: false,
 });
+
+const closeAsaiAlert = () => {
+  isAsaiAlertActive.value = false;
+};
 
 const register = async () => {
   formState.isSubmitting = true;
@@ -43,8 +49,11 @@ const register = async () => {
     }
   }
   catch (error) {
-    toast.error(error)
-    formState.isSubmitting = false;
+    apiErrorText.value = error;
+    isAsaiAlertActive.value = true;
+  }
+  finally {
+    formState.isSubmitting  = false
   }
 };
 
@@ -56,7 +65,8 @@ onMounted(async () => {
       username.value = user.username;
     }
     catch (error) {
-      console.log(error);
+      apiErrorText.value = error;
+      isAsaiAlertActive.value = true;
     }
   }
 });
@@ -64,6 +74,7 @@ onMounted(async () => {
 
 <template>
   <div class="container d-flex flex-column vh-100">
+    <AsaiAlert :is-active="isAsaiAlertActive" :errorText="apiErrorText" @close="closeAsaiAlert" />
     <nav class="navbar navbar-expand-md bg-dark bg-transparent">
       <div class="container-fluid">
         <div class="row w-100">

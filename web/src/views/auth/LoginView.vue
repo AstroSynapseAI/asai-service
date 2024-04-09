@@ -5,12 +5,12 @@ import { onMounted } from 'vue';
 import { Form, Field, useForm, ErrorMessage } from 'vee-validate';
 import { useAuthStore } from '@/stores/auth.store.js';
 import { useUserStore } from '@/stores/user.store.js';
-import { useToast } from 'vue-toastification';
 import * as yup from 'yup';
+
+import AsaiAlert from '@/views/ui/AsaiAlert.vue';
 
 const { handleSubmit } = useForm();
 
-const toast = useToast();
 const schema = yup.object({
   Username: yup.string().required(),
   Password: yup.string().required(),
@@ -22,10 +22,16 @@ const user = useUserStore();
 
 let username = ref('');
 let password = ref('');
+const isAsaiAlertActive = ref(false);
+const apiErrorText = ref('');
 
 const formState = reactive({
   isSubmitting: false,
 });
+
+const closeAsaiAlert = () => {
+  isAsaiAlertActive.value = false;
+};
 
 const submitLogin = handleSubmit(async values => {
   formState.isSubmitting = true;
@@ -43,9 +49,11 @@ const submitLogin = handleSubmit(async values => {
     formState.isSubmitting = false;
   }
   catch (err) {
-    console.log(err);
-    toast.error(err);
-    formState.isSubmitting = false;
+    apiErrorText.value = err;
+    isAsaiAlertActive.value = true;
+  }
+  finally {
+    formState.isSubmitting  = false
   }
 });
 
@@ -56,6 +64,7 @@ onMounted(() => {
 </script>
 <template>
   <div class="container d-flex flex-column vh-100">
+    <AsaiAlert :is-active="isAsaiAlertActive" :errorText="apiErrorText" @close="closeAsaiAlert" />
     <nav class="navbar navbar-expand-md bg-dark bg-transparent">
       <div class="container-fluid">
         <div class="row w-100">
