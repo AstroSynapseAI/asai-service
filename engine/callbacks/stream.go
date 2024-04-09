@@ -3,7 +3,6 @@ package callbacks
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"strings"
 
