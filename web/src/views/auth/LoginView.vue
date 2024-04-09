@@ -24,10 +24,15 @@ const user = useUserStore();
 let username = ref('');
 let password = ref('');
 const isAsaiAlertActive = ref(false);
+const apiErrorText = ref('');
 
 const formState = reactive({
   isSubmitting: false,
 });
+
+const closeAsaiAlert = () => {
+  isAsaiAlertActive.value = false;
+};
 
 const submitLogin = handleSubmit(async values => {
   formState.isSubmitting = true;
@@ -45,6 +50,7 @@ const submitLogin = handleSubmit(async values => {
     formState.isSubmitting = false;
   }
   catch (err) {
+    apiErrorText.value = err;
     isAsaiAlertActive.value = true;
     formState.isSubmitting = false;
   }
@@ -54,14 +60,10 @@ onMounted(() => {
   feather.replace();
 });
 
-const closeAsaiAlert = () => {
-  isAsaiAlertActive.value = false;
-};
-
 </script>
 <template>
   <div class="container d-flex flex-column vh-100">
-    <AsaiAlert :is-active="isAsaiAlertActive"  @close="closeAsaiAlert" />
+    <AsaiAlert :is-active="isAsaiAlertActive" :errorText="apiErrorText" @close="closeAsaiAlert" />
     <nav class="navbar navbar-expand-md bg-dark bg-transparent">
       <div class="container-fluid">
         <div class="row w-100">

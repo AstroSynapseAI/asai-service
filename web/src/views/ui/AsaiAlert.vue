@@ -2,7 +2,7 @@
     <div v-if="isActive" class="error-container text-white border border-1 border-white px-3">
       <div class="row h-100 align-items-center justify-content-center text-center">
         <div class="col">
-          <p class="mb-0">An error has occurred! Please refresh the page and try again.</p>
+          <p class="mb-0">{{ errorText }}</p>
         </div>
         <div class="col-auto">
           <button class="btn-close btn-close-white" @click="closeError"></button>
@@ -17,7 +17,11 @@
       isActive: {
         type: Boolean,
         required: true
-      }
+      },
+      errorText: {
+      type: String,
+      default: ''
+    }
     },
     methods: {
       closeError() {
