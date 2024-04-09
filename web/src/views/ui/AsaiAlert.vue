@@ -1,5 +1,5 @@
 <template>
-    <div v-if="isActive" class="error-container text-white border border-1 border-white px-3">
+    <div v-if="isActive" class="error-container px-3">
       <div class="row h-100 align-items-center justify-content-center text-center">
         <div class="col">
           <p class="mb-0">{{ errorText }}</p>
@@ -53,6 +53,10 @@
     width: 600px;
     height: 60px;
     background-color: black;
+    border-color: white !important;
+    color: white !important;
+    border: 1px solid white;
+    border-radius: 3px;
   }
   </style>
   
