@@ -64,8 +64,6 @@ func (repo *Repository[T]) Update(ID uint, data T) (T, error) {
 		return repo.Model, err
 	}
 
-	fmt.Println("CRUD Repo Update")
-
 	err = repo.DB.Model(&repo.Model).Where("id = ?", ID).Updates(data).Error
 	if err != nil {
 		return repo.Model, err

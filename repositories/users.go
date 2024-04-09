@@ -160,6 +160,20 @@ func (user *UsersRepository) ConfirmInvite(username string, password string, tok
 	return invitedUser, nil
 }
 
+func (user *UsersRepository) FetchUser(id uint) (models.User, error) {
+	var record models.User
+	query := user.Repo.DB
+	query = query.Preload("Roles").Preload("Roles.Role")
+	query = query.Preload("Roles.Avatar")
+	query = query.Preload("Accounts")
+
+	err := query.First(&record, id).Error
+	if err != nil {
+		return models.User{}, err
+	}
+	return record, nil
+}
+
 func (user *UsersRepository) GetAll() ([]models.User, error) {
 	var records []models.User
 
@@ -324,6 +338,28 @@ func (user *UsersRepository) SaveAccount(accountData models.Account) (models.Acc
 
 	return accountData, nil
 
+}
+
+func (user *UsersRepository) UpdateUsername(userID uint, username string) (models.User, error) {
+	var record models.User
+
+	query := user.Repo.DB
+	query = query.Preload("Roles").Preload("Roles.Role")
+	query = query.Preload("Roles.Avatar")
+	query = query.Preload("Accounts")
+
+	err := query.Where("id = ?", userID).First(&record).Error
+	if err != nil {
+		return models.User{}, err
+	}
+
+	record.Username = username
+	_, err = user.Repo.Update(userID, record)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	return record, nil
 }
 
 func (user *UsersRepository) UpdatePassword(userID uint, password string) (models.User, error) {

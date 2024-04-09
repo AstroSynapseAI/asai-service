@@ -547,14 +547,17 @@ func (ctrl *UsersController) SaveProfile(ctx *rest.Context) {
 		return
 	}
 
-	account := models.Account{
-		UserID:    userID,
-		Username:  reqData.Username,
-		FirstName: reqData.FirstName,
-		LastName:  reqData.LastName,
+	user, err := ctrl.User.FetchUser(userID)
+	if err != nil {
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Failed to fetch user"})
+		return
 	}
 
+	account := user.Accounts[0]
 	account.ID = reqData.AccountID
+	account.FirstName = reqData.FirstName
+	account.LastName = reqData.LastName
+	account.Username = reqData.Username
 
 	if account.UserID == 0 || account.FirstName == "" || account.LastName == "" || account.Username == "" {
 		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Account data is invalid"})
@@ -567,24 +570,14 @@ func (ctrl *UsersController) SaveProfile(ctx *rest.Context) {
 		return
 	}
 
-	user := models.User{
-		Username: reqData.Username,
-	}
-
-	user.ID = userID
-
-	if user.Username == "" {
-		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Username is required"})
-		return
-	}
-
-	userRecord, err := ctrl.User.Update(user)
+	user, err = ctrl.User.UpdateUsername(userID, reqData.Username)
 	if err != nil {
-		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Failed to update user"})
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Failed to update username"})
 		return
 	}
 
-	ctx.JsonResponse(http.StatusOK, userRecord)
+	ctx.JsonResponse(http.StatusOK, user)
+
 }
 
 func (ctrl *UsersController) ChangePassword(ctx *rest.Context) {
@@ -624,93 +617,119 @@ func (ctrl *UsersController) ChangePassword(ctx *rest.Context) {
 func (ctrl *UsersController) ChangeEmail(ctx *rest.Context) {
 	fmt.Println("UsersController.ChangeEmail")
 
-	userID := ctx.GetID()
-
 	var reqData struct {
-		Email string `json:"email"`
+		Email     string `json:"email,omitempty"`
+		AccountID uint   `json:"account_id,omitempty"`
 	}
 
-	account, err := ctrl.User.GetAccountByUserID(userID)
+	err := ctx.JsonDecode(&reqData)
 	if err != nil {
-		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Account not found"})
-		return
-	}
-
-	decodeErr := ctx.JsonDecode(&reqData)
-	if decodeErr != nil {
 		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Invalid request body"})
 		return
 	}
 
-	token, err := ctrl.User.CreateAndSendEmailConfirmation(account.ID, reqData.Email)
+	user, err := ctrl.User.FetchUser(ctx.GetID())
 	if err != nil {
-		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: err.Error()})
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Failed to fetch user"})
 		return
 	}
 
-	confirmEmailURL := ""
+	account := user.Accounts[0]
+	account.Email = reqData.Email
 
-	if os.Getenv("ENVIRONMENT") == "LOCAL DEV" {
-		confirmEmailURL = "http://localhost:5173/email_confirmation/?token=" + token + "&email=" + reqData.Email
-	}
-
-	if os.Getenv("ENVIRONMENT") == "HEROKU DEV" {
-		confirmEmailURL = "https://dev.asai.astrosynapse.ai/email_confirmation/?token=" + token + "&email=" + reqData.Email
-	}
-
-	if os.Getenv("ENVIRONMENT") == "AWS DEV" {
-		confirmEmailURL = "https://asai.astrosynapse.ai/email_confirmation/?token=" + token + "&email=" + reqData.Email
-	}
-
-	emailMessage := `
-		<p>Please click on the link below to confirm your email address:</p>
-		<a href='` + confirmEmailURL + `'>Confirm Email</a>
-		`
-	confirmationEmail := mail.NewMSG()
-	confirmationEmail.SetFrom("dispatch@astrosynapse.com")
-	confirmationEmail.AddTo(reqData.Email)
-	confirmationEmail.SetSubject("Confirm your AstroSynapse email")
-	confirmationEmail.SetBody(mail.TextPlain, emailMessage)
-
-	if confirmationEmail.Error != nil {
-		fmt.Println(confirmationEmail.Error)
-		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
-	}
-
-	host, err := getSMTPHost()
+	_, err = ctrl.User.SaveAccount(account)
 	if err != nil {
-		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
+		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Failed to save account"})
+		return
 	}
 
-	password, err := getSMTPPassword()
-	if err != nil {
-		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
-	}
+	ctx.JsonResponse(http.StatusOK, nil)
 
-	username, err := getSMTPUsername()
-	if err != nil {
-		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
-	}
-
-	smtp := mail.NewSMTPClient()
-	smtp.Host = host
-	// smtp.KeepAlive = false
-	// smtp.ConnectTimeout = 10 * time.Second
-	// smtp.SendTimeout = 10 * time.Second
-	smtp.Password = password
-	smtp.Username = username
-	smtp.Encryption = mail.EncryptionSSLTLS
-	smtp.Port = 465
-
-	smtpClient, err := smtp.Connect()
-	if err != nil {
-		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
-	}
-
-	err = confirmationEmail.Send(smtpClient)
-	if err != nil {
-		ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
-	}
-
-	ctx.JsonResponse(http.StatusOK, models.User{})
+	// var reqData struct {
+	// 	Email string `json:"email"`
+	// }
+	//
+	// account, err := ctrl.User.GetAccountByUserID(userID)
+	// if err != nil {
+	// 	ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Account not found"})
+	// 	return
+	// }
+	//
+	// decodeErr := ctx.JsonDecode(&reqData)
+	// if decodeErr != nil {
+	// 	ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Invalid request body"})
+	// 	return
+	// }
+	//
+	// token, err := ctrl.User.CreateAndSendEmailConfirmation(account.ID, reqData.Email)
+	// if err != nil {
+	// 	ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: err.Error()})
+	// 	return
+	// }
+	//
+	// confirmEmailURL := ""
+	//
+	// if os.Getenv("ENVIRONMENT") == "LOCAL DEV" {
+	// 	confirmEmailURL = "http://localhost:5173/email_confirmation/?token=" + token + "&email=" + reqData.Email
+	// }
+	//
+	// if os.Getenv("ENVIRONMENT") == "HEROKU DEV" {
+	// 	confirmEmailURL = "https://dev.asai.astrosynapse.ai/email_confirmation/?token=" + token + "&email=" + reqData.Email
+	// }
+	//
+	// if os.Getenv("ENVIRONMENT") == "AWS DEV" {
+	// 	confirmEmailURL = "https://asai.astrosynapse.ai/email_confirmation/?token=" + token + "&email=" + reqData.Email
+	// }
+	//
+	// emailMessage := `
+	// 	<p>Please click on the link below to confirm your email address:</p>
+	// 	<a href='` + confirmEmailURL + `'>Confirm Email</a>
+	// 	`
+	// confirmationEmail := mail.NewMSG()
+	// confirmationEmail.SetFrom("dispatch@astrosynapse.com")
+	// confirmationEmail.AddTo(reqData.Email)
+	// confirmationEmail.SetSubject("Confirm your email")
+	// confirmationEmail.SetBody(mail.TextPlain, emailMessage)
+	//
+	// if confirmationEmail.Error != nil {
+	// 	fmt.Println(confirmationEmail.Error)
+	// 	ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
+	// }
+	//
+	// host, err := getSMTPHost()
+	// if err != nil {
+	// 	ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
+	// }
+	//
+	// password, err := getSMTPPassword()
+	// if err != nil {
+	// 	ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
+	// }
+	//
+	// username, err := getSMTPUsername()
+	// if err != nil {
+	// 	ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
+	// }
+	//
+	// smtp := mail.NewSMTPClient()
+	// smtp.Host = host
+	// // smtp.KeepAlive = false
+	// // smtp.ConnectTimeout = 10 * time.Second
+	// // smtp.SendTimeout = 10 * time.Second
+	// smtp.Password = password
+	// smtp.Username = username
+	// smtp.Encryption = mail.EncryptionSSLTLS
+	// smtp.Port = 465
+	//
+	// smtpClient, err := smtp.Connect()
+	// if err != nil {
+	// 	ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
+	// }
+	//
+	// err = confirmationEmail.Send(smtpClient)
+	// if err != nil {
+	// 	ctx.JsonResponse(http.StatusInternalServerError, struct{ Error string }{Error: "Internal error"})
+	// }
+	//
+	// ctx.JsonResponse(http.StatusOK, models.User{})
 }

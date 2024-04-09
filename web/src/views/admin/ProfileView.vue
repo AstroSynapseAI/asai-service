@@ -9,22 +9,13 @@ const newPassword = ref('');
 const confirmPassword = ref('');
 const firstName = ref('');
 const lastName = ref('');
-const email = ref('');
+const newEmail = ref('');
 const confirmEmail = ref('');
 const isLoading = ref(false);
 const isTyping = ref(false);
-let emailModified = false;
-let userDataModified = false
 
 const toast = useToast();
 
-const onEmailChange = () => {
-  emailModified = true;
-};
-
-const onUserDataChange = () => {
-  userDataModified = true;
-};
 const checkPasswordMatch = () => {
   isTyping.value = true;
 };
@@ -33,7 +24,7 @@ const isSaveButtonDisabled = computed(() => {
   return !username.value.trim() || !firstName.value.trim() || !lastName.value.trim();
 });
 
-const isChangeButtonDisabled = computed(() => {
+const passwordBtnDisabled = computed(() => {
   if (!newPassword.value.trim() || !confirmPassword.value.trim() || confirmPassword.value.length < 8) {
     return true;
   }
@@ -43,17 +34,17 @@ const isChangeButtonDisabled = computed(() => {
   return false;
 });
 
-const isEmailChangeButtonDisabled = computed(() => {
-  return isValidEmail()
+const emailBtnDisabled = computed(() => {
+  return !isValidEmail()
 });
 
 const validateEmail = () => {
   const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return String(email.value).toLowerCase().match(emailRegex);
+  return String(newEmail.value).toLowerCase().match(emailRegex);
 };
 
 const confirmedEmail = () => {
-  return email.value === confirmEmail.value;
+  return newEmail.value === confirmEmail.value;
 };
 
 const isValidEmail = () => {
@@ -64,9 +55,6 @@ const isValidEmail = () => {
   return validEmail
 };
 
-const onSave = () => {
-  saveUserInfo();
-};
 
 const saveUserInfo = async () => {
   isLoading.value = true
@@ -87,9 +75,6 @@ const saveUserInfo = async () => {
   catch (error) {
     toast.error(error)
   }
-  finally {
-    isLoading.value = false
-  }
 }
 
 const updateEmail = async () => {
@@ -100,15 +85,13 @@ const updateEmail = async () => {
   }
   try {
     await user.changeEmail(user.current.ID, {
-      email: email.value,
+      account_id: user.account.ID,
+      email: newEmail.value,
     })
-    toast.success("Check your email for confirmation link!");
+    toast.success("Email updated successfully!");
   }
   catch (error) {
     toast.error(error)
-  }
-  finally {
-    isLoading.value = false
   }
 }
 
@@ -136,7 +119,7 @@ onMounted(async () => {
       username.value = user.account.username ?? "";
       firstName.value = user.account.first_name;
       lastName.value = user.account.last_name;
-      email.value = user.account.email;
+      newEmail.value = user.account.email;
     }
   }
   catch (error) {
@@ -148,7 +131,6 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="adminSpinner" v-if="isLoading"></div>
   <div class="container-fluid p-0">
     <h1 class="h3 mb-3">Account</h1>
     <div class="card">
@@ -163,13 +145,6 @@ onMounted(async () => {
                 <label for="username">Username</label>
               </div>
             </div>
-            <!-- <div class="col-6"> -->
-            <!--   <div class="form-floating mb-3"> -->
-            <!--     <input type="text" class="form-control" id="email" placeholder="Email" v-model="email" -->
-            <!--       @input="onEmailChange"> -->
-            <!--     <label for="email">Email</label> -->
-            <!--   </div> -->
-            <!-- </div> -->
           </div>
           <div class="row">
             <div class="col-6">
@@ -189,7 +164,8 @@ onMounted(async () => {
           </div>
           <div class="row">
             <div class="col-12">
-              <button class="btn btn-primary float-end" @click="onSave" :disabled="isSaveButtonDisabled">Save</button>
+              <button class="btn btn-primary float-end" @click="saveUserInfo"
+                :disabled="isSaveButtonDisabled">Save</button>
             </div>
           </div>
           <hr>
@@ -216,8 +192,8 @@ onMounted(async () => {
           </div>
           <div class="row">
             <div class="col-12">
-              <button class="btn btn-primary float-end" @click="updateEmail"
-                :disabled="isEmailChangeButtonDisabled">Change Email</button>
+              <button class="btn btn-primary float-end" @click="updateEmail" :disabled="emailBtnDisabled">Change
+                Email</button>
             </div>
           </div>
           <hr>
@@ -248,8 +224,8 @@ onMounted(async () => {
           </div>
           <div class="row">
             <div class="col-12">
-              <button class="btn btn-primary float-end" @click="changePassword"
-                :disabled="isChangeButtonDisabled">Change</button>
+              <button class="btn btn-primary float-end" @click="changePassword" :disabled="passwordBtnDisabled">Change
+                Password</button>
             </div>
           </div>
         </div>
