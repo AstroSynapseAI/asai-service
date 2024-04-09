@@ -13,6 +13,8 @@ import * as yup from 'yup';
 
 const { handleSubmit } = useForm();
 
+const apiError = ref(false);
+
 const toast = useToast();
 const schema = yup.object({
   Username: yup.string().required(),
@@ -46,8 +48,7 @@ const submitLogin = handleSubmit(async values => {
     formState.isSubmitting = false;
   }
   catch (err) {
-    console.log(err);
-    toast.error(err);
+    apiError.value = true;
     formState.isSubmitting = false;
   }
 });
@@ -59,7 +60,7 @@ onMounted(() => {
 </script>
 <template>
   <div class="container d-flex flex-column vh-100">
-    <asai-alert></asai-alert>
+    <asai-alert v-if="apiError"></asai-alert>
     <nav class="navbar navbar-expand-md bg-dark bg-transparent">
       <div class="container-fluid">
         <div class="row w-100">
