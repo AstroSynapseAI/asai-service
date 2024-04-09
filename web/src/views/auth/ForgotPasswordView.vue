@@ -2,12 +2,14 @@
 import { onMounted, ref, reactive } from 'vue';
 import { Form, Field, ErrorMessage } from 'vee-validate';
 import { useAuthStore } from '@/stores/auth.store.js'; 
-import { useToast } from 'vue-toastification';
 import * as yup from 'yup';
 
+import AsaiAlert from '@/views/ui/AsaiAlert.vue';
+
 const auth = useAuthStore();
-const toast = useToast();
 let email = ref('');
+const isAsaiAlertActive = ref(false);
+const apiErrorText = ref('');
 
 const schema = yup.object({
   Email: yup.string().email().required(),
@@ -17,6 +19,10 @@ const formState = reactive({
   isSubmitting: false, 
 });
 
+const closeAsaiAlert = () => {
+  isAsaiAlertActive.value = false;
+};
+
 const submitPasswordRecovery = async () => {
   formState.isSubmitting = true; 
   try {
@@ -24,7 +30,8 @@ const submitPasswordRecovery = async () => {
     toast.success("Email sent!");
   }
   catch (error) {
-    toast.error(error)
+    apiErrorText.value = error;
+    isAsaiAlertActive.value = true;
   }
   finally {
     formState.isSubmitting = false; 
@@ -38,6 +45,7 @@ onMounted(() => {
 </script>
 <template>
   <div class="container d-flex flex-column vh-100">
+    <AsaiAlert :is-active="isAsaiAlertActive" :errorText="apiErrorText" @close="closeAsaiAlert" />
     <nav class="navbar navbar-expand-md bg-dark bg-transparent">
       <div class="container-fluid">
         <div class="row w-100">
