@@ -5,10 +5,9 @@ import { onMounted } from 'vue';
 import { Form, Field, useForm, ErrorMessage } from 'vee-validate';
 import { useAuthStore } from '@/stores/auth.store.js';
 import { useUserStore } from '@/stores/user.store.js';
+import * as yup from 'yup';
 
 import AsaiAlert from '@/views/ui/AsaiAlert.vue';
-
-import * as yup from 'yup';
 
 const { handleSubmit } = useForm();
 
@@ -52,7 +51,9 @@ const submitLogin = handleSubmit(async values => {
   catch (err) {
     apiErrorText.value = err;
     isAsaiAlertActive.value = true;
-    formState.isSubmitting = false;
+  }
+  finally {
+    formState.isSubmitting  = false
   }
 });
 

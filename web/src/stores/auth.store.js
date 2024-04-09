@@ -93,7 +93,6 @@ export const useAuthStore = defineStore({
         }
         return false;
       } catch (error) {
-        console.error(error);
         this.user = {};
         this.isLoggedIn = false;
         this.apiToken = null;
