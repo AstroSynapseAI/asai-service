@@ -10,7 +10,7 @@ import (
 type AgentConfig interface {
 	GetAgentName() string
 	GetAgentSlug() string
-	GetAgentLLM() llms.LanguageModel
+	GetAgentLLM() llms.Model
 	GetAgentConfig() string
 	GetAgentPrimer() string
 	IsAgentPublic() bool
@@ -40,7 +40,7 @@ func (cnf *ActiveAgent) GetAgentSlug() string {
 	return cnf.ActiveAgent.Agent.Slug
 }
 
-func (cnf *ActiveAgent) GetAgentLLM() llms.LanguageModel {
+func (cnf *ActiveAgent) GetAgentLLM() llms.Model {
 	agentLLM := cnf.ActiveAgent.LLM
 	activeLLMs := cnf.Avatar.ActiveLLMs
 
@@ -52,7 +52,7 @@ func (cnf *ActiveAgent) GetAgentLLM() llms.LanguageModel {
 		}
 	}
 
-	LLM, err := openai.NewChat(
+	LLM, err := openai.New(
 		openai.WithModel(activeLLM.LLM.Slug),
 		openai.WithToken(activeLLM.Token),
 	)

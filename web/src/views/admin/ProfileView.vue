@@ -1,4 +1,4 @@
-<script setup> 
+<script setup>
 import { onMounted, ref, computed } from 'vue';
 import { useUserStore } from '@/stores/user.store';
 import { useToast } from 'vue-toastification';
@@ -10,8 +10,9 @@ const confirmPassword = ref('');
 const firstName = ref('');
 const lastName = ref('');
 const email = ref('');
+const newEmail = ref('');
 const confirmEmail = ref('');
-const isLoading = ref(false); 
+const isLoading = ref(false);
 const isTyping = ref(false);
 
 const toast = useToast();
@@ -24,7 +25,7 @@ const isSaveButtonDisabled = computed(() => {
   return !username.value.trim() || !firstName.value.trim() || !lastName.value.trim();
 });
 
-const isChangeButtonDisabled = computed(() => {
+const passwordBtnDisabled = computed(() => {
   if (!newPassword.value.trim() || !confirmPassword.value.trim() || confirmPassword.value.length < 8) {
     return true;
   }
@@ -34,13 +35,17 @@ const isChangeButtonDisabled = computed(() => {
   return false;
 });
 
+const emailBtnDisabled = computed(() => {
+  return !isValidEmail()
+});
+
 const validateEmail = () => {
   const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return String(email.value).toLowerCase().match(emailRegex);
+  return String(newEmail.value).toLowerCase().match(emailRegex);
 };
 
 const confirmedEmail = () => {
-  return email.value === confirmEmail.value;
+  return newEmail.value === confirmEmail.value;
 };
 
 const isValidEmail = () => {
@@ -50,6 +55,7 @@ const isValidEmail = () => {
 
   return validEmail
 };
+
 
 const saveUserInfo = async () => {
   isLoading.value = true
@@ -70,32 +76,30 @@ const saveUserInfo = async () => {
   catch (error) {
     toast.error(error)
   }
-  finally {
-    isLoading.value = false
-  }
 }
 
-
 const updateEmail = async () => {
+  isLoading.value = true
   if (!isValidEmail()) {
-    alert('Email is not valid or emails do not match.')
+    toast.error("Email is not valid or emails do not match.")
+    return
   }
-
   try {
-    user.changeEmail(user.current.ID, {
+    await user.changeEmail(user.current.ID, {
       account_id: user.account.ID,
-      email: email.value,
+      email: newEmail.value,
     })
+    toast.success("Email updated successfully!");
   }
   catch (error) {
-    console.error(error)
+    toast.error(error)
   }
 }
 
 const changePassword = async () => {
   isLoading.value = true
   try {
-    await user.changePassword(user.current.ID,{
+    await user.changePassword(user.current.ID, {
       password: newPassword.value
     })
     toast.success("Password changed successfully!");
@@ -127,10 +131,9 @@ onMounted(async () => {
 
 </script>
 
-<template>       
- <div class="adminSpinner" v-if="isLoading"></div>
-  <div class="container-fluid p-0">    
-    <h1 class="h3 mb-3">Account</h1>    
+<template>
+  <div class="container-fluid p-0">
+    <h1 class="h3 mb-3">Account</h1>
     <div class="card">
       <div class="card-body">
         <div class="container p-4">
@@ -138,48 +141,78 @@ onMounted(async () => {
           <div class="row">
             <div class="col-6">
               <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="username" placeholder="Username" v-model="username">
+                <input type="text" class="form-control" id="username" placeholder="Username" v-model="username"
+                  @input="onUserDataChange">
                 <label for="username">Username</label>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="email" placeholder="Email" v-model="email">
-                <label for="email">Email</label>
               </div>
             </div>
           </div>
           <div class="row">
             <div class="col-6">
               <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="firstName" placeholder="First Name" v-model="firstName">
+                <input type="text" class="form-control" id="firstName" placeholder="First Name" v-model="firstName"
+                  @input="onUserDataChange">
                 <label for="firstName">First Name</label>
               </div>
             </div>
             <div class="col-6">
               <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="lastName" placeholder="Last Name" v-model="lastName">
+                <input type="text" class="form-control" id="lastName" placeholder="Last Name" v-model="lastName"
+                  @input="onUserDataChange">
                 <label for="lastName">Last Name</label>
               </div>
             </div>
           </div>
-          <div class="row"> 
+          <div class="row">
             <div class="col-12">
-              <button class="btn btn-primary float-end" @click="saveUserInfo" :disabled="isSaveButtonDisabled">Save</button>
+              <button class="btn btn-primary float-end" @click="saveUserInfo"
+                :disabled="isSaveButtonDisabled">Save</button>
             </div>
           </div>
           <hr>
+
+          <h3>Change Email <span class="text-muted">({{ email }})</span></h3>
+          <div class="row">
+            <div class="col-6">
+              <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="newEmail" placeholder="New Email" v-model="newEmail"
+                  @input="onEmailChange">
+                <label for="newEmail">New Email</label>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="confirmEmail" placeholder="Confirm Email"
+                  v-model="confirmEmail" @input="onEmailChange">
+                <label for="confirmPassword">Confirm Email</label>
+                <div v-if="isTyping && newEmail !== confirmEmail">
+                  Emails do not match
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <button class="btn btn-primary float-end" @click="updateEmail" :disabled="emailBtnDisabled">Change
+                Email</button>
+            </div>
+          </div>
+          <hr>
+
+
           <h3>Change Password</h3>
           <div class="row">
             <div class="col-6">
               <div class="form-floating mb-3">
-                <input type="password" class="form-control" id="newPassword" placeholder="New Password" v-model="newPassword" @input="checkPasswordMatch">
+                <input type="password" class="form-control" id="newPassword" placeholder="New Password"
+                  v-model="newPassword" @input="checkPasswordMatch">
                 <label for="newPassword">New Password</label>
               </div>
             </div>
             <div class="col-6">
               <div class="form-floating mb-3">
-                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" v-model="confirmPassword" @input="checkPasswordMatch">
+                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password"
+                  v-model="confirmPassword" @input="checkPasswordMatch">
                 <label for="confirmPassword">Confirm Password</label>
                 <div v-if="isTyping && newPassword !== confirmPassword">
                   Passwords do not match
@@ -190,13 +223,14 @@ onMounted(async () => {
               </div>
             </div>
           </div>
-          <div class="row"> 
+          <div class="row">
             <div class="col-12">
-              <button class="btn btn-primary float-end" @click="changePassword" :disabled="isChangeButtonDisabled">Change</button>
-            </div>            
+              <button class="btn btn-primary float-end" @click="changePassword" :disabled="passwordBtnDisabled">Change
+                Password</button>
+            </div>
           </div>
         </div>
-      </div>      
-    </div>  
-  </div>      
+      </div>
+    </div>
+  </div>
 </template>

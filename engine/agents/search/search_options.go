@@ -43,7 +43,7 @@ func WithPrimer(primer string) SearchAgentOptions {
 	}
 }
 
-func WithLLM(llm llms.LanguageModel) SearchAgentOptions {
+func WithLLM(llm llms.Model) SearchAgentOptions {
 	return func(agent *SearchAgent) {
 		agent.LLM = llm
 	}

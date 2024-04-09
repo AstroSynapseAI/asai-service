@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/tmc/langchaingo/llms/openai"
+	"github.com/tmc/langchaingo/llms"
 	"github.com/xhit/go-simple-mail/v2"
 )
 
@@ -28,7 +28,7 @@ func WithPrimer(primer string) EmailAgentOptions {
 	}
 }
 
-func WithLLM(llm *openai.Chat) EmailAgentOptions {
+func WithLLM(llm llms.Model) EmailAgentOptions {
 	return func(emailAgent *EmailAgent) {
 		emailAgent.LLM = llm
 	}

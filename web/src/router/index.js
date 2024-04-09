@@ -10,6 +10,7 @@ import RegisterView from '@/views/auth/RegisterView.vue'
 import ForgotPasswordView from '@/views/auth/ForgotPasswordView.vue'
 import PasswordResetView from "../views/auth/PasswordResetView.vue";
 import onboardingView from '@/views/onboarding/OnboardingView.vue';
+import EmailConfirmationView from "../views/auth/EmailConfirmationView.vue";
 
 import adminRoutes from "./admin.router";
 import onboardingRoutes from "./onboarding.router";
@@ -54,7 +55,14 @@ const router = createRouter({
       path: "/password_reset/:reset_token?",
       name: "password_reset",
       meta: { requiresAuth: false },
-      component: PasswordResetView,
+      component: PasswordResetView
+    },
+
+    {
+      path: "/email_confirmation/:token?:email?",
+      name: "email_confirmation",
+      meta: { requiresAuth: false },
+      component: EmailConfirmationView
     },
     // {
     //   path: '/chat',

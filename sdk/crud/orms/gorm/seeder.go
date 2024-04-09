@@ -32,16 +32,18 @@ func (s *GormSeeder) Run() error {
 
 			if result.Error == gorm.ErrRecordNotFound {
 				err := action.Execute(s.db)
+
 				if err != nil {
 					fmt.Printf("Failed to seed model: %s\n", err)
 					return err
 				}
+
+				if result := s.gorm.Create(&DBSeeder{SeederName: action.ID}); result.Error != nil {
+					fmt.Printf("Failed to seed model: %s\n", result.Error)
+					return result.Error
+				}
 			}
 
-			if result := s.gorm.Create(&DBSeeder{SeederName: action.ID}); result.Error != nil {
-				fmt.Printf("Failed to seed model: %s\n", result.Error)
-				return result.Error
-			}
 		}
 	}
 	return nil

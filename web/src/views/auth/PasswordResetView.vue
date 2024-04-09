@@ -5,10 +5,10 @@ import { onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth.store';
 import { useUserStore } from '@/stores/user.store.js';
 import { Form, Field, ErrorMessage } from 'vee-validate';
-import { useToast } from 'vue-toastification';
 import * as yup from 'yup';
 
-const toast = useToast();
+import AsaiAlert from '@/views/ui/AsaiAlert.vue';
+
 const schema = yup.object({
   Password: yup.string().required().min(8),
   ConfirmPassword: yup.string().required('Please confirm your password').min(8)
@@ -21,10 +21,16 @@ const auth = useAuthStore();
 const fetchedUser = ref({});
 const password = ref('');
 const confirmPassword = ref('');
+const isAsaiAlertActive = ref(false);
+const apiErrorText = ref('');
 
 const formState = reactive({
   isSubmitting: false, 
 });
+
+const closeAsaiAlert = () => {
+  isAsaiAlertActive.value = false;
+};
 
 const resetPassword = async () => {
   formState.isSubmitting = true
@@ -35,7 +41,8 @@ const resetPassword = async () => {
     toast.success("Password changed successfully, you can login now");
   }
   catch (error) {
-    toast.error(error)
+    apiErrorText.value = error;
+    isAsaiAlertActive.value = true;
   }
   finally {
     formState.isSubmitting  = false
@@ -43,20 +50,24 @@ const resetPassword = async () => {
 };
 
 onMounted(async () => {
-      try {
-        const user = await auth.validateRecoveryToken(route.params.reset_token);
-        self.fetchedUser = user
-      }
-      catch (error) {
-        //disable action on view
-        formState.isSubmitting = true
-        toast.error(error)
+    try {
+      const user = await auth.validateRecoveryToken(route.params.reset_token);
+      self.fetchedUser = user
     }
+    catch (error) {
+      formState.isSubmitting = true;//disable btn if err 
+      apiErrorText.value = error;
+      isAsaiAlertActive.value = true;
+    }
+    finally {
+      formState.isSubmitting  = false
+  }
 });
 </script>
 
 <template>
   <div class="container d-flex flex-column vh-100">
+    <AsaiAlert :is-active="isAsaiAlertActive" :errorText="apiErrorText" @close="closeAsaiAlert" />
     <nav class="navbar navbar-expand-md bg-dark bg-transparent">
       <div class="container-fluid">
         <div class="row w-100">

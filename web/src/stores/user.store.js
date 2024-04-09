@@ -80,17 +80,18 @@ export const useUserStore = defineStore({
     async saveProfile(user_id, formData) {
       try {
         const user = await fetchWrapper.post(`${usersURL}/${user_id}/save/profile`, formData);
-        localStorage.setItem('user', JSON.stringify(user));
+        this.current = user
       } catch (error) {
         throw error.Error // Rethrow the error to be handled in the component
       }
     }, 
 
     async changeEmail(user_id, formData) {
+
       try {
         await fetchWrapper.put(`${usersURL}/${user_id}/change/email`, formData);
       } catch (error) {
-        console.error(error);
+        throw error.Error
       }
     },
 
