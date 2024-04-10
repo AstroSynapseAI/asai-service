@@ -85,30 +85,32 @@ const createAvatar = async () => {
 
       await agent.getAgents();
 
-      for (let i = 0; i < onbaordingData.avatar_agents.length; i++) {
-        selectedAgent.value = agentRecords.value.find(agent => agent.slug === onbaordingData.avatar_agents[i]);
-        if (selectedAgent.value.slug === 'email-agent') {
-          agentConfig.value = config.value;
-        }
+      if (onbaordingData.avatar_agents) {
+        for (let i = 0; i < onbaordingData.avatar_agents.length; i++) {
+          selectedAgent.value = agentRecords.value.find(agent => agent.slug === onbaordingData.avatar_agents[i]);
+          if (selectedAgent.value.slug === 'email-agent') {
+            agentConfig.value = config.value;
+          }
 
-        if (selectedAgent.value.slug === 'search-agent') {
-          agentConfig.value = searchConfig.value;
-        }
+          if (selectedAgent.value.slug === 'search-agent') {
+            agentConfig.value = searchConfig.value;
+          }
 
 
-        let agent_data = {
-          "is_active": true,
-          "is_public": false,
-          "primer": selectedAgent.value.primer,
-          "llm_id": selectedLLM.value.ID,
-          "avatar_id": avatar.userAvatar.ID,
-          "agent_id": selectedAgent.value.ID
-        }
+          let agent_data = {
+            "is_active": true,
+            "is_public": false,
+            "primer": selectedAgent.value.primer,
+            "llm_id": selectedLLM.value.ID,
+            "avatar_id": avatar.userAvatar.ID,
+            "agent_id": selectedAgent.value.ID
+          }
 
-        if (agentConfig) {
-          agent_data['config'] = JSON.stringify(agentConfig.value);
+          if (agentConfig) {
+            agent_data['config'] = JSON.stringify(agentConfig.value);
+          }
+          await agent.saveActiveAgent(agent_data);
         }
-        await agent.saveActiveAgent(agent_data);
       }
 
       localStorage.removeItem('onboarding_data');
