@@ -49,6 +49,7 @@
   .error-container {
     position: fixed;
     left: 50%;
+    top: 20px;
     transform: translateX(-50%);
     width: 600px;
     height: 60px;
