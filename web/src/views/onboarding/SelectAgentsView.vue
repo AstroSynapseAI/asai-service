@@ -59,29 +59,31 @@ const createAvatar = async () => {
         // if GPT family of models is selected set GPT-4 as default
         selectedLLM.value = llmRecords.value.find(llm => llm.slug === 'gpt-4');
       }
-      else {
-        console.log('missing LLM');
+
+      if (onbaordingData.avatar_llm === 'mistral') {
+        selectedLLM.value = llmRecords.value.find(llm => llm.slug === 'open-mixtral-8x7b');
       }
 
-      const avatarData = {
-        "user_id": user.current.ID,
-        "name": onbaordingData.avatar_name,
-        "primer": onbaordingData.avatar_primer,
-        "llm": selectedLLM.value.ID,
+      if (selectedLLM.value != '') {
+        const avatarData = {
+          "user_id": user.current.ID,
+          "name": onbaordingData.avatar_name,
+          "primer": onbaordingData.avatar_primer,
+          "llm": selectedLLM.value.ID,
+        }
+
+        await avatar.saveAvatar(avatarData);
+
+        const activeLLMData = {
+          "token": onbaordingData.openai_token,
+          "is_active": true,
+          "is_public": false,
+          "llm_id": selectedLLM.value.ID,
+          "avatar_id": avatar.userAvatar.ID
+        }
+
+        await llm.saveLLM(activeLLMData);
       }
-
-      await avatar.saveAvatar(avatarData);
-
-      const activeLLMData = {
-        "token": onbaordingData.openai_token,
-        "is_active": true,
-        "is_public": false,
-        "llm_id": selectedLLM.value.ID,
-        "avatar_id": avatar.userAvatar.ID
-      }
-
-
-      await llm.saveLLM(activeLLMData);
 
       await agent.getAgents();
 
