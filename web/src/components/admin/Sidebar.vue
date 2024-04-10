@@ -80,6 +80,8 @@ onMounted(() => {
 				</li>
 			</ul>
 
+			<hr>
+			<span class="sidebar-item">ASAI v0.1.0-beta</span>
 		</div>
 	</nav>
 </template>

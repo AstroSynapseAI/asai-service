@@ -15,7 +15,7 @@ const isActive = (ID) => {
   const activeTool = activeTools.value.find(activeTool => {
     return activeTool.tool.ID == ID;
   });
-  
+
   return activeTool ? activeTool.is_active : false;
 }
 
@@ -23,8 +23,8 @@ const toggleActive = async (ID) => {
   const activeTool = activeTools.value.find(activeTool => {
     return activeTool.tool.ID == ID;
   });
-  
-  if(activeTool){
+
+  if (activeTool) {
     activeTool.is_active = !activeTool.is_active;
   }
 
@@ -32,7 +32,7 @@ const toggleActive = async (ID) => {
     is_active: activeTool ? activeTool.is_active : false,
     avatar_id: user.avatar.ID
   }
-  try {    
+  try {
     await tool.toggleAvatarTool(ID, formData)
   }
   catch (error) {
@@ -45,7 +45,7 @@ const getActiveToolID = (ToolID) => {
   return activeTool ? activeTool.ID : null;
 }
 
-onMounted( async () => {
+onMounted(async () => {
   try {
     await tool.getTools();
     await avatar.getActiveTools(user.avatar.ID);
@@ -59,28 +59,32 @@ onMounted( async () => {
 </script>
 
 <template>
-          
+
   <div class="container-fluid p-0">
-    
+
     <h1 class="h3 mb-3">Tools</h1>
     <div class="row">
       <div class="col-12">
         <div class="container">
-          
+
           <div class="row">
             <div class="row" v-for="(tool, index) in toolsRecords" :key="'row' + index">
-              
-              
+
+
               <div class="card">
-                  
+
                 <div class="card-header">
                   <div class="row">
                     <div class="col">
-                      <h5 class="card-title">{{ tool.name }}</h5>
+                      <h5 class="card-title">
+                        {{ tool.name }}
+                        <span class="badge bg-success ms-5">Releasing in v.0.2.0</span>
+                      </h5>
                     </div>
                     <div class="col-auto">
                       <div class="form-check form-switch d-flex align-items-center" v-if="getActiveToolID(tool.ID)">
-                        <input class="form-check-input me-2" type="checkbox" id="flexSwitchCheckDefault" :checked="isActive(tool.ID)" @click="toggleActive(tool.ID)">
+                        <input class="form-check-input me-2" type="checkbox" id="flexSwitchCheckDefault"
+                          :checked="isActive(tool.ID)" @click="toggleActive(tool.ID)">
                         <label style="margin-bottom: -5px;" for="flexSwitchCheckDefault">Active</label>
                       </div>
                     </div>
@@ -90,17 +94,18 @@ onMounted( async () => {
                 <div class="card-body">
                   <p>{{ tool.description }}</p>
                   <div>
-                    <router-link 
-                    :to="{name: 'tool-config', params: {avatar_id: user.avatar.ID, tool_id: tool.ID, active_tool_id: getActiveToolID(tool.ID)}}" 
-                    class="btn 
-                    btn-primary">
-                      Configure
-                    </router-link>
+                    <button class="btn btn-primary">Configure</button>
+                    <!-- <router-link  -->
+                    <!-- :to="{name: 'tool-config', params: {avatar_id: user.avatar.ID, tool_id: tool.ID, active_tool_id: getActiveToolID(tool.ID)}}"  -->
+                    <!-- class="btn  -->
+                    <!-- btn-primary"> -->
+                    <!--   Configure -->
+                    <!-- </router-link> -->
                   </div>
                 </div>
-              
+
               </div>
-              
+
             </div>
           </div>
 
@@ -109,5 +114,5 @@ onMounted( async () => {
       </div>
     </div>
   </div>
-      
+
 </template>

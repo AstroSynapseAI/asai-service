@@ -74,7 +74,8 @@ const saveUserInfo = async () => {
     toast.success("Profile updated successfully!");
   }
   catch (error) {
-    toast.error(error)
+    console.error(error)
+    toast.error("Error while updating profile. Please try again later.")
   }
 }
 
@@ -92,7 +93,8 @@ const updateEmail = async () => {
     toast.success("Email updated successfully!");
   }
   catch (error) {
-    toast.error(error)
+    console.error(error)
+    toast.error("Error while updating email. Please try again later.")
   }
 }
 
@@ -105,7 +107,8 @@ const changePassword = async () => {
     toast.success("Password changed successfully!");
   }
   catch (error) {
-    toast.error(error)
+    console.error(error)
+    toast.error("Error while changing password. Please try again later.")
   }
   finally {
     isLoading.value = false
@@ -171,7 +174,7 @@ onMounted(async () => {
           </div>
           <hr>
 
-          <h3>Change Email <span class="text-muted">({{ email }})</span></h3>
+          <h3>Change Email <span class="text-muted" v-if="email != ''">({{ email }})</span></h3>
           <div class="row">
             <div class="col-6">
               <div class="form-floating mb-3">

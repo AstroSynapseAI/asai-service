@@ -23,7 +23,6 @@ export const useAgentStore = defineStore({
         console.error(error);
       }
     },
-
     async getAgent(agent_id) {
       try {
         const agent = await fetchWrapper.get(`${agentsURL}/${agent_id}`);
@@ -31,16 +30,6 @@ export const useAgentStore = defineStore({
       } catch (error) {
         console.error(error);
       }
-    },
-    async saveActiveAgent(formData) {
-      try {
-        const activeAgent = await fetchWrapper.post(`${agentsURL}/save/active`, formData);
-        this.activeAgent = activeAgent;
-      } catch (error) {
-        console.error(error);
-      }
-
-
     },
     async getActiveTools(agent_id) {
       try {
@@ -50,12 +39,20 @@ export const useAgentStore = defineStore({
         console.error(error);
       }
     },
-
+    async saveActiveAgent(formData) {
+      try {
+        const activeAgent = await fetchWrapper.post(`${agentsURL}/save/active`, formData);
+        this.activeAgent = activeAgent;
+      } catch (error) {
+        throw error
+      }
+    },
     async toggleActiveAgent(ID, formData) {
       try {
         await fetchWrapper.post(`${agentsURL}/${ID}/toggle/active`, formData);
       } catch (error) {
         console.error(error);
+        throw error
       }
     }
   }

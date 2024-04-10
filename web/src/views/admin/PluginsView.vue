@@ -78,7 +78,10 @@ onMounted(async () => {
                   <div class="card-header">
                     <div class="row">
                       <div class="col">
-                        <h5 class="card-title">{{ plugin.name }}</h5>
+                        <h5 class="card-title">
+                          {{ plugin.name }}
+                          <span class="badge bg-success ms-5">Releasing in v.0.2.0</span>
+                        </h5>
                       </div>
                       <div class="col-auto">
                         <div class="form-check form-switch d-flex align-items-center"
@@ -94,12 +97,13 @@ onMounted(async () => {
                   <div class="card-body">
                     <p>{{ plugin.description }}</p>
                     <div>
-                      <router-link
-                        :to="{ name: 'plugin-config', params: { avatar_id: user.avatar.ID, plugin_id: plugin.ID, active_plugin_id: getActivePluginID(plugin.ID) } }"
-                        class="btn 
-                      btn-primary">
-                        Configure
-                      </router-link>
+                      <button class="btn btn-primary">Configure</button>
+                      <!-- <router-link -->
+                      <!--   :to="{ name: 'plugin-config', params: { avatar_id: user.avatar.ID, plugin_id: plugin.ID, active_plugin_id: getActivePluginID(plugin.ID) } }" -->
+                      <!--   class="btn  -->
+                      <!-- btn-primary"> -->
+                      <!--   Configure -->
+                      <!-- </router-link> -->
                     </div>
                   </div>
                 </div>

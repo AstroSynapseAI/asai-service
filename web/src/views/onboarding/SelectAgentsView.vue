@@ -59,56 +59,60 @@ const createAvatar = async () => {
         // if GPT family of models is selected set GPT-4 as default
         selectedLLM.value = llmRecords.value.find(llm => llm.slug === 'gpt-4');
       }
-      else {
-        console.log('missing LLM');
+
+      if (onbaordingData.avatar_llm === 'mistral') {
+        selectedLLM.value = llmRecords.value.find(llm => llm.slug === 'open-mixtral-8x7b');
       }
 
-      const avatarData = {
-        "user_id": user.current.ID,
-        "name": onbaordingData.avatar_name,
-        "primer": onbaordingData.avatar_primer,
-        "llm": selectedLLM.value.ID,
+      if (selectedLLM.value != '') {
+        const avatarData = {
+          "user_id": user.current.ID,
+          "name": onbaordingData.avatar_name,
+          "primer": onbaordingData.avatar_primer,
+          "llm": selectedLLM.value.ID,
+        }
+
+        await avatar.saveAvatar(avatarData);
+
+        const activeLLMData = {
+          "token": onbaordingData.openai_token,
+          "is_active": true,
+          "is_public": false,
+          "llm_id": selectedLLM.value.ID,
+          "avatar_id": avatar.userAvatar.ID
+        }
+
+        await llm.saveLLM(activeLLMData);
       }
-
-      await avatar.saveAvatar(avatarData);
-
-      const activeLLMData = {
-        "token": onbaordingData.openai_token,
-        "is_active": true,
-        "is_public": false,
-        "llm_id": selectedLLM.value.ID,
-        "avatar_id": avatar.userAvatar.ID
-      }
-
-
-      await llm.saveLLM(activeLLMData);
 
       await agent.getAgents();
 
-      for (let i = 0; i < onbaordingData.avatar_agents.length; i++) {
-        selectedAgent.value = agentRecords.value.find(agent => agent.slug === onbaordingData.avatar_agents[i]);
-        if (selectedAgent.value.slug === 'email-agent') {
-          agentConfig.value = config.value;
-        }
+      if (onbaordingData.avatar_agents) {
+        for (let i = 0; i < onbaordingData.avatar_agents.length; i++) {
+          selectedAgent.value = agentRecords.value.find(agent => agent.slug === onbaordingData.avatar_agents[i]);
+          if (selectedAgent.value.slug === 'email-agent') {
+            agentConfig.value = config.value;
+          }
 
-        if (selectedAgent.value.slug === 'search-agent') {
-          agentConfig.value = searchConfig.value;
-        }
+          if (selectedAgent.value.slug === 'search-agent') {
+            agentConfig.value = searchConfig.value;
+          }
 
 
-        let agent_data = {
-          "is_active": true,
-          "is_public": false,
-          "primer": selectedAgent.value.primer,
-          "llm_id": selectedLLM.value.ID,
-          "avatar_id": avatar.userAvatar.ID,
-          "agent_id": selectedAgent.value.ID
-        }
+          let agent_data = {
+            "is_active": true,
+            "is_public": false,
+            "primer": selectedAgent.value.primer,
+            "llm_id": selectedLLM.value.ID,
+            "avatar_id": avatar.userAvatar.ID,
+            "agent_id": selectedAgent.value.ID
+          }
 
-        if (agentConfig) {
-          agent_data['config'] = JSON.stringify(agentConfig.value);
+          if (agentConfig) {
+            agent_data['config'] = JSON.stringify(agentConfig.value);
+          }
+          await agent.saveActiveAgent(agent_data);
         }
-        await agent.saveActiveAgent(agent_data);
       }
 
       localStorage.removeItem('onboarding_data');
