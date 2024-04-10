@@ -553,11 +553,21 @@ func (ctrl *UsersController) SaveProfile(ctx *rest.Context) {
 		return
 	}
 
-	account := user.Accounts[0]
-	account.ID = reqData.AccountID
-	account.FirstName = reqData.FirstName
-	account.LastName = reqData.LastName
-	account.Username = reqData.Username
+	var account models.Account
+	if len(user.Accounts) == 0 {
+		account = models.Account{
+			UserID:    userID,
+			FirstName: reqData.FirstName,
+			LastName:  reqData.LastName,
+			Username:  reqData.Username,
+		}
+	} else {
+		account = user.Accounts[0]
+		account.ID = reqData.AccountID
+		account.FirstName = reqData.FirstName
+		account.LastName = reqData.LastName
+		account.Username = reqData.Username
+	}
 
 	if account.UserID == 0 || account.FirstName == "" || account.LastName == "" || account.Username == "" {
 		ctx.JsonResponse(http.StatusBadRequest, struct{ Error string }{Error: "Account data is invalid"})
