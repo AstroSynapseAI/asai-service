@@ -2,16 +2,22 @@ package dnb
 
 import (
 	"context"
+	"fmt"
+
+	util "github.com/AstroSynapseAI/app-service/engine/tools"
 	"github.com/tmc/langchaingo/agents"
+	"github.com/tmc/langchaingo/chains"
 	"github.com/tmc/langchaingo/llms"
+	"github.com/tmc/langchaingo/prompts"
 	"github.com/tmc/langchaingo/tools"
 )
 
 type DNBAgent struct {
 	Primer   string
 	LLM      llms.Model
-	Executor agents.Executor
+	Executor *agents.Executor
 	Config   config
+	Tools    []tools.Tool
 }
 
 var _ tools.Tool = &DNBAgent{}
@@ -23,17 +29,54 @@ func NewDNBAgent(options ...DNBAgentOptions) (*DNBAgent, error) {
 		option(dnbAgent)
 	}
 
+	dnbAgent.Tools = []tools.Tool{
+		NewDocummentTool(),
+		NewApiTool(),
+	}
+
+	agent := agents.NewOneShotAgent(
+		dnbAgent.LLM,
+		dnbAgent.Tools,
+		agents.WithPrompt(dnbAgent.loadTemplate()),
+		agents.WithMaxIterations(5),
+	)
+
+	dnbAgent.Executor = agents.NewExecutor(agent, dnbAgent.Tools)
+
 	return dnbAgent, nil
 }
 
-func (DNBAgent) Name() string {
+func (dnbAgent DNBAgent) Name() string {
 	return "DNB"
 }
 
-func (DNBAgent) Description() string {
+func (dnbAgent DNBAgent) Description() string {
 	return "DNB agent"
 }
 
-func (DNBAgent) Call(ctx context.Context, input string) (string, error) {
-	return "", nil
+func (dnbAgent DNBAgent) Call(ctx context.Context, input string) (string, error) {
+	fmt.Println("DNB Agent Running...")
+
+	response, err := chains.Run(ctx, dnbAgent.Executor, input)
+	if err != nil {
+		return "DNB Agent encountered an error: " + err.Error(), nil
+	}
+
+	return response, nil
+}
+
+func (dnbAgent *DNBAgent) loadTemplate() prompts.PromptTemplate {
+	// load template
+	return prompts.PromptTemplate{
+		Template:       dnbAgent.Primer,
+		TemplateFormat: prompts.TemplateFormatGoTemplate,
+		InputVariables: []string{"input", "agent_scratchpad", "today"},
+		PartialVariables: map[string]interface{}{
+			"today":             "2023-01-01",
+			"tool_names":        util.Names(dnbAgent.Tools),
+			"tool_descriptions": util.Descriptions(dnbAgent.Tools),
+			"history":           "",
+		},
+	}
+
 }
