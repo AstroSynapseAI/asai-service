@@ -3,7 +3,10 @@ package dnb
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
 
+	"github.com/AstroSynapseAI/app-service/engine/agents/dnb/api"
 	util "github.com/AstroSynapseAI/app-service/engine/tools"
 	"github.com/tmc/langchaingo/agents"
 	"github.com/tmc/langchaingo/chains"
@@ -29,9 +32,14 @@ func NewDNBAgent(options ...DNBAgentOptions) (*DNBAgent, error) {
 		option(dnbAgent)
 	}
 
+	apiTool := api.NewTool(
+		api.WithActiveLLM(dnbAgent.LLM),
+		dnbAgent.loadAPIDocs(""),
+	)
+
 	dnbAgent.Tools = []tools.Tool{
 		NewDocummentTool(),
-		NewApiTool(),
+		apiTool,
 	}
 
 	agent := agents.NewOneShotAgent(
@@ -78,5 +86,12 @@ func (dnbAgent *DNBAgent) loadTemplate() prompts.PromptTemplate {
 			"history":           "",
 		},
 	}
+}
 
+func (dnbAgent *DNBAgent) loadAPIDocs(file string) string {
+	path := ''
+	docs, err := os.ReadFile(path)
+	if err != nil {
+		log.Println("Error reading api docs: ", err)
+	}
 }

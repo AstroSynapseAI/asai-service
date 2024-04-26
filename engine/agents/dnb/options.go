@@ -10,8 +10,9 @@ import (
 type DNBAgentOptions func(*DNBAgent)
 
 type config struct {
-	DNBAPISecret string `json:"dnba_api_secret,omitempty"`
-	DNBAPIKey    string `json:"dnba_api_key,omitempty"`
+	DNBAPISecret string `json:"dnb_api_secret,omitempty"`
+	DNBAPIKey    string `json:"dnb_api_key,omitempty"`
+	DNBAPIToken  string `json:"dnb_api_token,omitempty"`
 }
 
 func WithPrimer(primer string) DNBAgentOptions {
