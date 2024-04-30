@@ -34,7 +34,7 @@ func NewDNBAgent(options ...DNBAgentOptions) (*DNBAgent, error) {
 
 	apiTool := api.NewTool(
 		api.WithActiveLLM(dnbAgent.LLM),
-		dnbAgent.loadAPIDocs(""),
+		api.WithApiDocs(dnbAgent.loadAPIDocs(""))
 	)
 
 	dnbAgent.Tools = []tools.Tool{
@@ -89,9 +89,11 @@ func (dnbAgent *DNBAgent) loadTemplate() prompts.PromptTemplate {
 }
 
 func (dnbAgent *DNBAgent) loadAPIDocs(file string) string {
-	path := ''
+	path := ""
 	docs, err := os.ReadFile(path)
 	if err != nil {
 		log.Println("Error reading api docs: ", err)
 	}
+
+	return string(docs)
 }
