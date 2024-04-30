@@ -10,20 +10,16 @@ import (
 	"github.com/tmc/langchaingo/llms"
 )
 
-type APITool struct {
+type Client struct {
 	apiChain  chains.Chain
 	client    APIClient
 	ActiveLLM llms.Model
 	APIDocs   string
-	APISecret string
-	APIKey    string
 	APIToken  string
 }
 
 type APIClient struct {
-	Secret string
-	Key    string
-	Token  string
+	Token string
 }
 
 func (client *APIClient) Do(req *http.Request) (*http.Response, error) {
@@ -32,27 +28,29 @@ func (client *APIClient) Do(req *http.Request) (*http.Response, error) {
 	return http.DefaultClient.Do(req)
 }
 
-func NewTool(options ...ApiOptions) *APITool {
-	tool := &APITool{}
+func NewClient(options ...ClientOptions) *Client {
+	tool := &Client{}
 
 	for _, option := range options {
 		option(tool)
 	}
 
-	tool.apiChain = chains.NewAPIChain(tool.ActiveLLM, http.DefaultClient)
+	HTTPAPIClient := &APIClient{Token: tool.APIToken}
+
+	tool.apiChain = chains.NewAPIChain(tool.ActiveLLM, HTTPAPIClient)
 
 	return tool
 }
 
-func (tool *APITool) Name() string {
+func (tool *Client) Name() string {
 	return "DNB API Tool"
 }
 
-func (tool *APITool) Description() string {
+func (tool *Client) Description() string {
 	return "DNB API Tool"
 }
 
-func (tool *APITool) Call(ctx context.Context, query string) (string, error) {
+func (tool *Client) Call(ctx context.Context, query string) (string, error) {
 	fmt.Println("DNB Agent api tool running...")
 
 	input := map[string]any{

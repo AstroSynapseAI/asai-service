@@ -32,14 +32,23 @@ func NewDNBAgent(options ...DNBAgentOptions) (*DNBAgent, error) {
 		option(dnbAgent)
 	}
 
-	apiTool := api.NewTool(
+	err := dnbAgent.validateAPIToken()
+	if err != nil {
+		return dnbAgent, err
+	}
+
+	apiTool := api.NewClient(
 		api.WithActiveLLM(dnbAgent.LLM),
-		api.WithApiDocs(dnbAgent.loadAPIDocs(""))
+		api.WithApiDocs(dnbAgent.loadAPIDocs("")),
+		api.WithAPIToken(dnbAgent.Config.DNBAPIToken),
 	)
+
+	searchTool := api.NewSearch()
 
 	dnbAgent.Tools = []tools.Tool{
 		NewDocummentTool(),
 		apiTool,
+		searchTool,
 	}
 
 	agent := agents.NewOneShotAgent(
@@ -96,4 +105,8 @@ func (dnbAgent *DNBAgent) loadAPIDocs(file string) string {
 	}
 
 	return string(docs)
+}
+
+func (dnbAgent *DNBAgent) validateAPIToken() error {
+	return nil
 }

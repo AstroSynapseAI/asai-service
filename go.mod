@@ -10,7 +10,7 @@ require (
 	github.com/gorilla/handlers v1.5.2
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/websocket v1.5.0
-	github.com/sendgrid/sendgrid-go v3.14.0+incompatible
+	github.com/struki84/dnbclient v0.0.0-20240423132221-8cefe4da61f9
 	github.com/thanhpk/randstr v1.0.6
 	github.com/tmc/langchaingo v0.1.8
 	github.com/xhit/go-simple-mail/v2 v2.16.0
@@ -70,7 +70,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pkoukk/tiktoken-go v0.1.6 // indirect
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d // indirect
-	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
