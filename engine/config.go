@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/AstroSynapseAI/app-service/engine/agents"
+	"github.com/AstroSynapseAI/app-service/engine/agents/dnb"
 	"github.com/AstroSynapseAI/app-service/engine/agents/email"
 	"github.com/AstroSynapseAI/app-service/engine/agents/search"
 	"github.com/AstroSynapseAI/app-service/models"
@@ -133,6 +134,22 @@ func (cnf *Config) GetAgents() []tools.Tool {
 			}
 
 			loadedAgents = append(loadedAgents, emailAgent)
+		}
+
+		if agent.GetAgentSlug() == "dnb-search-agent" && agent.IsAgentActive() {
+			dnbAgent, err := dnb.NewDNBAgent(
+				dnb.WithPrimer(agent.GetAgentPrimer()),
+				dnb.WithLLM(agent.GetAgentLLM()),
+				dnb.WithConfig(agent.GetAgentConfig()),
+				dnb.WithActiveAgentID(agent.ActiveAgent.ID),
+			)
+
+			if err != nil {
+				fmt.Println("Error loading dnb agent:", err)
+				return nil
+			}
+
+			loadedAgents = append(loadedAgents, dnbAgent)
 		}
 	}
 	return loadedAgents
