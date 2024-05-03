@@ -1,0 +1,15 @@
+version: '3'
+
+services: 
+  asai-app:
+    environment:
+      - ENVIRONMENT=LOCAL DEV
+      - CGO_CFLAGS=-D_LARGEFILE64_SOURCE
+
+  asai-db:
+    environment:
+      - POSTGRES_USER=asai-admin
+      - POSTGRES_PASSWORD=asai-password
+      - POSTGRES_DB=asai-db
+      - POSTGRES_PORT=5432
+
