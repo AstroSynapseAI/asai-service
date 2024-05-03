@@ -86,7 +86,22 @@ func (cnf *Config) LoadEnvironment() {
 		return
 	}
 
+	if cnf.ENV == "AWS PROD" {
+		cnf.setupAWSProd()
+		return
+	}
+
 	fmt.Println("Unknown Environment")
+}
+
+func (cnf *Config) setupAWSProd() {
+	username := os.Getenv("POSTGRES_USER")
+	password := os.Getenv("POSTGRES_PASSWORD")
+	database := os.Getenv("POSTGRES_DB")
+	host := os.Getenv("POSTGRES_HOST")
+	port := os.Getenv("POSTGRES_PORT")
+
+	cnf.DSN = fmt.Sprintf("postgres://%s:%s@%s:%s/%s", username, password, host, port, database)
 }
 
 func (cnf *Config) setupAWS() {
