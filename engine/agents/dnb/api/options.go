@@ -2,16 +2,22 @@ package api
 
 import "github.com/tmc/langchaingo/llms"
 
-type ApiOptions func(*APITool)
+type ClientOptions func(*APITool)
 
-func WithActiveLLM(llm llms.Model) ApiOptions {
-	return func(apiTool *APITool) {
-		apiTool.ActiveLLM = llm
+func WithActiveLLM(llm llms.Model) ClientOptions {
+	return func(apiClient *APITool) {
+		apiClient.ActiveLLM = llm
 	}
 }
 
-func WithApiDocs(data string) ApiOptions {
-	return func(apiTool *APITool) {
-		apiTool.APIDocs = data
+func WithApiDocs(data string) ClientOptions {
+	return func(apiClent *APITool) {
+		apiClent.APIDocs = data
+	}
+}
+
+func WithAPIToken(token string) ClientOptions {
+	return func(apiClient *APITool) {
+		apiClient.APIToken = token
 	}
 }

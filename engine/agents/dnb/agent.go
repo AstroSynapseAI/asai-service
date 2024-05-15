@@ -2,12 +2,19 @@ package dnb
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/AstroSynapseAI/app-service/engine/agents/dnb/api"
+	"github.com/AstroSynapseAI/app-service/engine/agents/dnb/search"
 	util "github.com/AstroSynapseAI/app-service/engine/tools"
+	"github.com/AstroSynapseAI/app-service/models"
+	"github.com/AstroSynapseAI/app-service/repositories"
+	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
+	"github.com/struki84/dnbclient"
 	"github.com/tmc/langchaingo/agents"
 	"github.com/tmc/langchaingo/chains"
 	"github.com/tmc/langchaingo/llms"
@@ -16,11 +23,13 @@ import (
 )
 
 type DNBAgent struct {
-	Primer   string
-	LLM      llms.Model
-	Executor *agents.Executor
-	Config   config
-	Tools    []tools.Tool
+	DB            *database.Database
+	ActiveAgentID uint
+	Primer        string
+	LLM           llms.Model
+	Executor      *agents.Executor
+	Config        config
+	Tools         []tools.Tool
 }
 
 var _ tools.Tool = &DNBAgent{}
@@ -32,14 +41,25 @@ func NewDNBAgent(options ...DNBAgentOptions) (*DNBAgent, error) {
 		option(dnbAgent)
 	}
 
+	err := dnbAgent.validateAPIToken()
+	if err != nil {
+		return dnbAgent, err
+	}
+
 	apiTool := api.NewTool(
 		api.WithActiveLLM(dnbAgent.LLM),
-		api.WithApiDocs(dnbAgent.loadAPIDocs(""))
+		api.WithApiDocs(dnbAgent.loadAPIDocs("")),
+		api.WithAPIToken(dnbAgent.Config.DNBAPIToken),
 	)
 
+	searchTool := search.NewSearch(dnbAgent.Config.DNBAPIToken)
+
+	docTool := NewDocummentTool()
+
 	dnbAgent.Tools = []tools.Tool{
-		NewDocummentTool(),
+		docTool,
 		apiTool,
+		searchTool,
 	}
 
 	agent := agents.NewOneShotAgent(
@@ -96,4 +116,52 @@ func (dnbAgent *DNBAgent) loadAPIDocs(file string) string {
 	}
 
 	return string(docs)
+}
+
+func (dnbAgent *DNBAgent) validateAPIToken() error {
+	if dnbAgent.Config.DNBAPIKey == "" || dnbAgent.Config.DNBAPISecret == "" {
+		return fmt.Errorf("DNB API key and secret are required")
+	}
+
+	dnbClient, err := dnbclient.NewClient(
+		dnbclient.WithTokens(
+			dnbAgent.Config.DNBAPIKey,
+			dnbAgent.Config.DNBAPISecret,
+		),
+	)
+
+	if err != nil {
+		return err
+	}
+
+	if dnbAgent.Config.DNBAPIToken == "" || dnbAgent.expiredToken() {
+		repo := repositories.NewAgentsRepository(dnbAgent.DB)
+
+		apiToken, err := dnbClient.GetToken(context.Background())
+		if err != nil {
+			return err
+		}
+
+		dnbAgent.Config.DNBAPIToken = apiToken
+		dnbAgent.Config.TokenAge = time.Now().Unix()
+
+		jsonConfig, err := json.Marshal(dnbAgent.Config)
+		if err != nil {
+			return err
+		}
+
+		var agentData models.ActiveAgent
+		agentData.ID = dnbAgent.ActiveAgentID
+		agentData.Config = string(jsonConfig)
+
+		_, err = repo.Active.Update(dnbAgent.ActiveAgentID, agentData)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (dnbAgent *DNBAgent) expiredToken() bool {
+	return dnbAgent.Config.TokenAge < time.Now().Add(-24*time.Hour).Unix()
 }
