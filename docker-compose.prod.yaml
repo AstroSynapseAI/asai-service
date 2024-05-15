@@ -1,16 +1,22 @@
+
 version: '3'
 
 services:
   asai-app:
     container_name: asai-app
     environment:
-      - ENVIRONMENT=LOCAL DEV
+      - ENVIRONMENT=AWS PROD
       - CGO_CFLAGS=-D_LARGEFILE64_SOURCE
+      - POSTGRES_DB=asai-db
+      - POSTGRES_USER=asai-admin
+      - POSTGRES_PASSWORD=asai-password
+      - DATABASE_PORT=5432
+      - POSTGRES_HOST=asai-db
     build:
       context: .
       dockerfile: ./env/docker/Dockerfile
     ports:
-      - 8082:8082
+      - 80:8082
     volumes:
       - .:/app
     depends_on:
@@ -55,4 +61,4 @@ volumes:
 
 networks:
   asai-network:
-    driver: bridge
+    external: true
