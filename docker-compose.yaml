@@ -17,8 +17,8 @@ services:
       - asai-db
     networks:
       - asai-network
-    # extra_hosts:
-    #   - host.docker.internal:host-gateway
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   asai-db:
     image: postgres:9.6.12
@@ -28,7 +28,6 @@ services:
       - POSTGRES_USER=asai-admin
       - POSTGRES_PASSWORD=asai-password
       - DATABASE_PORT=5432
-      - POSTGRES_HOST=asai-db
     volumes:
       - db-data:/var/lib/postgresql/data
     ports:

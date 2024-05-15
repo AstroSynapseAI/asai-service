@@ -14,6 +14,5 @@ WORKDIR /app
 # Copy the source code
 COPY . .
 
-ENV GOFLAGS=-buildvcs=false
 # Set the command that will be ran when container is started
-CMD ["sh", "-c", "GOFLAGS=-buildvcs=false air"]
+CMD ["air"]
