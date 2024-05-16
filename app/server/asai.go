@@ -59,8 +59,8 @@ func (server *AsaiServer) Run(db *database.Database) error {
 		return nil
 	}
 
-	// If PORT is defined, server is running on Heroku
-	// Create a TCP listener with heroku port
+	// If PORT is defined, server is running on a server
+	// Create a TCP listener with PORT
 	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		fmt.Println("Failed to listen:", err)
