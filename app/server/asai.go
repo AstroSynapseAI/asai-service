@@ -8,8 +8,7 @@ import (
 
 	"github.com/AstroSynapseAI/app-service/app"
 	"github.com/AstroSynapseAI/app-service/controllers"
-	"github.com/AstroSynapseAI/app-service/controllers/ws"
-	"github.com/AstroSynapseAI/app-service/engine/plugins"
+	"github.com/AstroSynapseAI/app-service/plugins"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/AstroSynapseAI/app-service/sdk/rest"
 	"github.com/bwmarrin/discordgo"
@@ -38,8 +37,8 @@ func (server *AsaiServer) Run(db *database.Database) error {
 	router.Load(app.NewRoutes(db))
 
 	// Serve WebSocket
-	wsManager := ws.NewManager(db)
-	router.Mux.HandleFunc("/ws/chat", wsManager.Handler)
+	// wsManager := ws.NewManager(db)
+	// router.Mux.HandleFunc("/ws/chat", wsManager.Handler)
 
 	// Serve Websites
 	webCtrl := controllers.NewWebController(router)
@@ -51,7 +50,7 @@ func (server *AsaiServer) Run(db *database.Database) error {
 
 	// If PORT is not defined, server is running locally
 	if port == "" {
-		err := http.ListenAndServe(":8082", router.Mux)
+		err := http.ListenAndServe(":8080", router.Mux)
 		if err != nil {
 			fmt.Println("Failed to listen:", err)
 			return err

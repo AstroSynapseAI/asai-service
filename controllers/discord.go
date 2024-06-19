@@ -1,12 +1,8 @@
 package controllers
 
 import (
-	"context"
-	"fmt"
 	"os"
-	"strings"
 
-	"github.com/AstroSynapseAI/app-service/engine/chains"
 	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/bwmarrin/discordgo"
 )
@@ -28,24 +24,24 @@ func NewDiscordController(db *database.Database) *DiscordController {
 }
 
 func (ctrl *DiscordController) MsgHandler(session *discordgo.Session, msg *discordgo.MessageCreate) {
-	asaiChain := chains.NewAsaiChain(ctrl.db)
-
-	if msg.Author.ID == session.State.User.ID {
-		return
-	}
-
-	avatarID := uint(1) //tmp hardcoded need to find a way to have a refernce for each plugin to know what avatar is connected to it
-	asaiChain.LoadAvatar(avatarID, msg.Author.ID, ctrl.ClientType)
-
-	if strings.Contains(msg.Content, "@"+session.State.User.ID) {
-		response, err := asaiChain.Prompt(context.Background(), msg.Content)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		_, _ = session.ChannelMessageSend(msg.ChannelID, response)
-	}
+	// asaiChain := chains.NewAsaiChain(ctrl.db)
+	//
+	// if msg.Author.ID == session.State.User.ID {
+	// 	return
+	// }
+	//
+	// avatarID := uint(1) //tmp hardcoded need to find a way to have a refernce for each plugin to know what avatar is connected to it
+	// asaiChain.LoadAvatar(avatarID, msg.Author.ID, ctrl.ClientType)
+	//
+	// if strings.Contains(msg.Content, "@"+session.State.User.ID) {
+	// 	response, err := asaiChain.Prompt(context.Background(), msg.Content)
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 		return
+	// 	}
+	//
+	// 	_, _ = session.ChannelMessageSend(msg.ChannelID, response)
+	// }
 }
 
 func (ctrl *DiscordController) NewMemberHandler(session *discordgo.Session, addEvent *discordgo.GuildMemberAdd) {
