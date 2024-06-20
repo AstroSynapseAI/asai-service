@@ -9,8 +9,8 @@ import (
 	"github.com/AstroSynapseAI/app-service/app"
 	"github.com/AstroSynapseAI/app-service/controllers"
 	"github.com/AstroSynapseAI/app-service/plugins"
-	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/AstroSynapseAI/app-service/sdk/rest"
+	"github.com/GoLangWebSDK/crud/database"
 	"github.com/bwmarrin/discordgo"
 )
 

@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
+	"github.com/GoLangWebSDK/crud/database"
 	"gorm.io/gorm"
 )
 

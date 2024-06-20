@@ -3,7 +3,7 @@ package plugins
 import (
 	"github.com/AstroSynapseAI/app-service/plugins/discord"
 	"github.com/AstroSynapseAI/app-service/repositories"
-	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
+	"github.com/GoLangWebSDK/crud/database"
 )
 
 type PluginLoader struct {

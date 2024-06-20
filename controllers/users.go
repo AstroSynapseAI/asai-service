@@ -8,14 +8,14 @@ import (
 
 	"github.com/AstroSynapseAI/app-service/models"
 	"github.com/AstroSynapseAI/app-service/repositories"
-	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/AstroSynapseAI/app-service/sdk/rest"
+	"github.com/GoLangWebSDK/crud/database"
 	mail "github.com/xhit/go-simple-mail/v2"
 
 	"github.com/thanhpk/randstr"
 	"gopkg.in/yaml.v2"
 
-	"github.com/AstroSynapseAI/app-service/sdk/crud/orms/gorm"
+	"github.com/GoLangWebSDK/crud/orms/gorm"
 )
 
 type UsersController struct {

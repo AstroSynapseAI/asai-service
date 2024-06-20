@@ -3,7 +3,7 @@ package controllers
 import (
 	"os"
 
-	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
+	"github.com/GoLangWebSDK/crud/database"
 	"github.com/bwmarrin/discordgo"
 )
 

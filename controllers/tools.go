@@ -6,8 +6,8 @@ import (
 
 	"github.com/AstroSynapseAI/app-service/models"
 	"github.com/AstroSynapseAI/app-service/repositories"
-	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
 	"github.com/AstroSynapseAI/app-service/sdk/rest"
+	"github.com/GoLangWebSDK/crud/database"
 )
 
 type ToolsController struct {

@@ -1,7 +1,7 @@
 package plugins
 
 import (
-	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
+	"github.com/GoLangWebSDK/crud/database"
 )
 
 type Plugins interface {

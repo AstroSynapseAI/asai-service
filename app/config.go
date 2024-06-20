@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/AstroSynapseAI/app-service/models"
-	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
-	"github.com/AstroSynapseAI/app-service/sdk/crud/database/adapters"
-	"github.com/AstroSynapseAI/app-service/sdk/crud/orms/gorm"
+	"github.com/GoLangWebSDK/crud/database"
+	"github.com/GoLangWebSDK/crud/database/adapters"
+	"github.com/GoLangWebSDK/crud/orms/gorm"
 )
 
 const (
