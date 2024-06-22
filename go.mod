@@ -1,4 +1,4 @@
-module github.com/AstroSynapseAI/app-service
+module github.com/AstroSynapseAI/asai-service
 
 go 1.22.0
 

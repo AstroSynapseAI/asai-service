@@ -1,8 +1,8 @@
 package plugins
 
 import (
-	"github.com/AstroSynapseAI/app-service/plugins/discord"
-	"github.com/AstroSynapseAI/app-service/repositories"
+	"github.com/AstroSynapseAI/asai-service/plugins/discord"
+	"github.com/AstroSynapseAI/asai-service/repositories"
 	"github.com/GoLangWebSDK/crud/database"
 )
 

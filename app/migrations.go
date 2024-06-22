@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/AstroSynapseAI/app-service/models"
-	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
+	"github.com/AstroSynapseAI/asai-service/models"
+	"github.com/AstroSynapseAI/asai-service/sdk/crud/database"
 	"github.com/go-gormigrate/gormigrate/v2"
 )
 

@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/AstroSynapseAI/app-service/sdk/rest"
+	"github.com/AstroSynapseAI/asai-service/sdk/rest"
 )
 
 const (

@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"github.com/AstroSynapseAI/app-service/models"
+	"github.com/AstroSynapseAI/asai-service/models"
 	"github.com/GoLangWebSDK/crud/database"
 	"github.com/GoLangWebSDK/crud/orms/gorm"
 )

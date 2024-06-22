@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/AstroSynapseAI/app-service/app"
-	"github.com/AstroSynapseAI/app-service/controllers"
-	"github.com/AstroSynapseAI/app-service/plugins"
-	"github.com/AstroSynapseAI/app-service/sdk/rest"
+	"github.com/AstroSynapseAI/asai-service/app"
+	"github.com/AstroSynapseAI/asai-service/controllers"
+	"github.com/AstroSynapseAI/asai-service/plugins"
+	"github.com/AstroSynapseAI/asai-service/sdk/rest"
 	"github.com/GoLangWebSDK/crud/database"
 	"github.com/bwmarrin/discordgo"
 )

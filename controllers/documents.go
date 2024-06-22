@@ -3,8 +3,8 @@ package controllers
 import (
 	"fmt"
 
-	"github.com/AstroSynapseAI/app-service/repositories"
-	"github.com/AstroSynapseAI/app-service/sdk/rest"
+	"github.com/AstroSynapseAI/asai-service/repositories"
+	"github.com/AstroSynapseAI/asai-service/sdk/rest"
 	"github.com/GoLangWebSDK/crud/database"
 )
 

@@ -6,9 +6,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/AstroSynapseAI/app-service/models"
-	"github.com/AstroSynapseAI/app-service/repositories"
-	"github.com/AstroSynapseAI/app-service/sdk/rest"
+	"github.com/AstroSynapseAI/asai-service/models"
+	"github.com/AstroSynapseAI/asai-service/repositories"
+	"github.com/AstroSynapseAI/asai-service/sdk/rest"
 	"github.com/GoLangWebSDK/crud/database"
 )
 
