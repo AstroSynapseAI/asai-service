@@ -3,7 +3,7 @@ package rest
 import (
 	"net/http"
 
-	"github.com/AstroSynapseAI/asai-service/sdk/crud"
+	"github.com/GoLangWebSDK/crud"
 )
 
 type CRUDController[T any] struct {
@@ -82,4 +82,3 @@ func (ctrl *CRUDController[T]) Destroy(ctx *Context) {
 
 	ctx.Response.WriteHeader(http.StatusOK)
 }
-
