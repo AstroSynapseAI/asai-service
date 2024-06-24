@@ -3,7 +3,6 @@ package ws
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -31,43 +30,18 @@ func NewClient(conn *websocket.Conn, manager *Manager) *Client {
 		egress:     make(chan []byte),
 		connection: conn,
 		manager:    manager,
-		ragClient:  NewRAGClient("ws://localhost:8080/ws/chat"),
+		ragClient:  NewRAGClient("ws://asai-rag:8081/ws/chat"),
 	}
 }
 
 func (client *Client) MaintainConnection(ctx context.Context) {
-	ticker := time.NewTicker(pingInterval)
+	client.ragClient.Conn.SetPingHandler(func(msg string) error {
+		return client.connection.WriteMessage(websocket.PingMessage, []byte(msg))
+	})
 
-	// Configure Wait time for Pong response, use Current time + pongWait
-	// This has to be done here to set the first initial timer.
-	if err := client.connection.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
-		log.Println("Failed to set read deadline:", err)
-		return
-	}
-
-	client.connection.SetPongHandler(client.PongHandler)
-
-	for {
-		err := client.connection.WriteMessage(websocket.PingMessage, []byte{})
-		if err != nil {
-			fmt.Println("Ping failed:", err)
-			return
-		}
-		// Wait for next tick
-		<-ticker.C
-	}
-}
-
-func (client *Client) PongHandler(pongMsg string) error {
-	// Current time + Pong Wait time
-
-	err := client.connection.SetReadDeadline(time.Now().Add(pongWait))
-	if err != nil {
-		fmt.Println("Failed to set read deadline in pong handler:", err)
-		return err
-	}
-
-	return nil
+	client.connection.SetPongHandler(func(msg string) error {
+		return client.ragClient.Conn.WriteMessage(websocket.PongMessage, []byte(msg))
+	})
 }
 
 func (client *Client) ReadMsgs(ctx context.Context) {

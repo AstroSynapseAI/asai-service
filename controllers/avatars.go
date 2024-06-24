@@ -10,6 +10,8 @@ import (
 	"github.com/AstroSynapseAI/asai-service/repositories"
 	"github.com/AstroSynapseAI/asai-service/sdk/rest"
 	"github.com/GoLangWebSDK/crud/database"
+
+	"gorm.io/gorm"
 )
 
 type AvatarsController struct {
@@ -134,9 +136,14 @@ func (ctrl *AvatarsController) GetSession(ctx *rest.Context) {
 	var history *models.ChatHistory
 
 	err := ctrl.DB.Adapter.Gorm().Where(models.ChatHistory{SessionID: sessionID}).Find(&history).Error
-	if err != nil {
-		ctx.SetStatus(http.StatusInternalServerError)
-		return
+	if err != nil && err == gorm.ErrRecordNotFound {
+		history = &models.ChatHistory{SessionID: sessionID}
+
+		err = ctrl.DB.Adapter.Gorm().Create(&history).Error
+		if err != nil {
+			ctx.SetStatus(http.StatusInternalServerError)
+			return
+		}
 	}
 
 	ctx.JsonResponse(http.StatusOK, history.ChatHistory)
