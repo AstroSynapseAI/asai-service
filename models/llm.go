@@ -21,9 +21,16 @@ func (*LLM) SeedModel(db *database.Database) []database.SeedAction {
 			ID: "seed_llms",
 			Execute: func(db *database.Database) error {
 				llms := []LLM{
+
 					{
-						Name:        "GPT-4 Turbo Preview",
-						Slug:        "gpt-4-turbo-preview",
+						Name:        "GPT-4o",
+						Slug:        "gpt-4o",
+						Description: "OpenAI is a large-scale, open-source AI research project.",
+						Provider:    "OpenAI",
+					},
+					{
+						Name:        "GPT-4 Turbo",
+						Slug:        "gpt-4-turbo",
 						Description: "OpenAI is a large-scale, open-source AI research project.",
 						Provider:    "OpenAI",
 					},
