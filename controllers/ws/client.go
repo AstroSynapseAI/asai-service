@@ -3,6 +3,7 @@ package ws
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -30,7 +31,7 @@ func NewClient(conn *websocket.Conn, manager *Manager) *Client {
 		egress:     make(chan []byte),
 		connection: conn,
 		manager:    manager,
-		ragClient:  NewRAGClient("ws://asai-rag:8081/ws/chat"),
+		ragClient:  NewRAGClient(os.Getenv("RAG_SERVICE_URL")),
 	}
 }
 

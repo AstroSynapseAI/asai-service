@@ -5,11 +5,17 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+const DefaultRagURL = "ws://asai-rag:8081/ws/chat"
+
 type RAGClient struct {
 	Conn *websocket.Conn
 }
 
 func NewRAGClient(url string) *RAGClient {
+	if url == "" {
+		url = DefaultRagURL
+	}
+
 	conn, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
 		fmt.Println("Failed to connect to RAG server:", err)
