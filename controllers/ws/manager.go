@@ -49,7 +49,7 @@ func (m *Manager) Handler(w http.ResponseWriter, r *http.Request) {
 
 	ctx := context.Background()
 
-	go client.MaintainConnection(ctx)
+	// go client.MaintainConnection(ctx)
 	go client.ReadMsgs(ctx)
 	go client.SendMsgs(ctx)
 }

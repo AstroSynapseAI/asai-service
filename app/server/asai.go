@@ -7,7 +7,6 @@ import (
 
 	"github.com/AstroSynapseAI/asai-service/app"
 	"github.com/AstroSynapseAI/asai-service/controllers"
-	"github.com/AstroSynapseAI/asai-service/controllers/ws"
 	"github.com/AstroSynapseAI/asai-service/plugins"
 	"github.com/AstroSynapseAI/asai-service/sdk/rest"
 	"github.com/GoLangWebSDK/crud/database"
@@ -37,8 +36,8 @@ func (server *AsaiServer) Run(db *database.Database) error {
 	router.Load(app.NewRoutes(db))
 
 	// Serve WebSocket
-	wsManager := ws.NewManager(db)
-	router.Mux.HandleFunc("/ws/chat", wsManager.Handler)
+	// wsManager := ws.NewManager(db)
+	// router.Mux.HandleFunc("/ws/chat", wsManager.Handler)
 
 	// Serve Websites
 	webCtrl := controllers.NewWebController(router)
