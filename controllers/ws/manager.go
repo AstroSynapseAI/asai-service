@@ -64,6 +64,7 @@ func (m *Manager) addClient(client *Client) {
 }
 
 func (m *Manager) removeClient(client *Client) {
+	fmt.Println("Removing client")
 	m.Lock()
 	defer m.Unlock()
 

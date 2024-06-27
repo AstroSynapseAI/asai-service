@@ -21,6 +21,7 @@ func (*Migrations) Models() []interface{} {
 		&models.Agent{},
 		&models.Avatar{},
 		&models.AvatarRole{},
+		&models.ChatHistory{},
 		&models.Document{},
 		&models.LLM{},
 		&models.Plugin{},

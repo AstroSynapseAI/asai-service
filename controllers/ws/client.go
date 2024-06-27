@@ -37,10 +37,12 @@ func NewClient(conn *websocket.Conn, manager *Manager) *Client {
 
 func (client *Client) MaintainConnection(ctx context.Context) {
 	client.ragClient.Conn.SetPingHandler(func(msg string) error {
+		// fmt.Println("Ping on asai service!")
 		return client.connection.WriteMessage(websocket.PingMessage, []byte(msg))
 	})
 
 	client.connection.SetPongHandler(func(msg string) error {
+		// fmt.Println("Pong on asai service!")
 		return client.ragClient.Conn.WriteMessage(websocket.PongMessage, []byte(msg))
 	})
 }
