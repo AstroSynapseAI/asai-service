@@ -3,7 +3,7 @@ package rest
 import (
 	"net/http"
 
-	"github.com/AstroSynapseAI/app-service/sdk/crud"
+	"github.com/GoLangWebSDK/crud"
 )
 
 type CRUDController[T any] struct {

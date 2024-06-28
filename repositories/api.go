@@ -3,8 +3,8 @@ package repositories
 import (
 	"fmt"
 
-	"github.com/AstroSynapseAI/app-service/models"
-	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
+	"github.com/AstroSynapseAI/asai-service/models"
+	"github.com/GoLangWebSDK/crud/database"
 	"gorm.io/gorm"
 )
 

@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/AstroSynapseAI/app-service/app"
-	"github.com/AstroSynapseAI/app-service/app/server"
+	"github.com/AstroSynapseAI/asai-service/app"
+	"github.com/AstroSynapseAI/asai-service/app/server"
 )
 
 func main() {

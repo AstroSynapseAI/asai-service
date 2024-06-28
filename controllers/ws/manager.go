@@ -7,7 +7,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
+	"github.com/GoLangWebSDK/crud/database"
 	"github.com/gorilla/websocket"
 )
 
@@ -49,7 +49,7 @@ func (m *Manager) Handler(w http.ResponseWriter, r *http.Request) {
 
 	ctx := context.Background()
 
-	go client.MaintainConnection(ctx)
+	// go client.MaintainConnection(ctx)
 	go client.ReadMsgs(ctx)
 	go client.SendMsgs(ctx)
 }
@@ -64,6 +64,7 @@ func (m *Manager) addClient(client *Client) {
 }
 
 func (m *Manager) removeClient(client *Client) {
+	fmt.Println("Removing client")
 	m.Lock()
 	defer m.Unlock()
 

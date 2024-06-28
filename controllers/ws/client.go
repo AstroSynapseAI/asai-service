@@ -2,12 +2,10 @@ package ws
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"log"
+	"os"
 	"time"
 
-	"github.com/AstroSynapseAI/app-service/engine/chains"
 	"github.com/gorilla/websocket"
 )
 
@@ -25,7 +23,7 @@ type Client struct {
 	egress     chan []byte
 	connection *websocket.Conn
 	manager    *Manager
-	asaiChain  *chains.AsaiChain
+	ragClient  *RAGClient
 }
 
 func NewClient(conn *websocket.Conn, manager *Manager) *Client {
@@ -33,44 +31,20 @@ func NewClient(conn *websocket.Conn, manager *Manager) *Client {
 		egress:     make(chan []byte),
 		connection: conn,
 		manager:    manager,
-		asaiChain:  chains.NewAsaiChain(manager.db),
+		ragClient:  NewRAGClient(os.Getenv("RAG_SERVICE_URL")),
 	}
 }
 
 func (client *Client) MaintainConnection(ctx context.Context) {
-	ticker := time.NewTicker(pingInterval)
+	client.ragClient.Conn.SetPingHandler(func(msg string) error {
+		// fmt.Println("Ping on asai service!")
+		return client.connection.WriteMessage(websocket.PingMessage, []byte(msg))
+	})
 
-	// Configure Wait time for Pong response, use Current time + pongWait
-	// This has to be done here to set the first initial timer.
-	if err := client.connection.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
-		log.Println("Failed to set read deadline:", err)
-		return
-	}
-
-	client.connection.SetPongHandler(client.PongHandler)
-
-	for {
-		// fmt.Println("Ping...")
-		err := client.connection.WriteMessage(websocket.PingMessage, []byte{})
-		if err != nil {
-			fmt.Println("Ping failed:", err)
-			return
-		}
-		// Wait for next tick
-		<-ticker.C
-	}
-}
-
-func (client *Client) PongHandler(pongMsg string) error {
-	// Current time + Pong Wait time
-
-	err := client.connection.SetReadDeadline(time.Now().Add(pongWait))
-	if err != nil {
-		fmt.Println("Failed to set read deadline in pong handler:", err)
-		return err
-	}
-
-	return nil
+	client.connection.SetPongHandler(func(msg string) error {
+		// fmt.Println("Pong on asai service!")
+		return client.ragClient.Conn.WriteMessage(websocket.PongMessage, []byte(msg))
+	})
 }
 
 func (client *Client) ReadMsgs(ctx context.Context) {
@@ -87,37 +61,12 @@ func (client *Client) ReadMsgs(ctx context.Context) {
 			break
 		}
 
-		var request struct {
-			AvatarID   uint   `json:"avatar_id"`
-			SessionID  string `json:"session_id"`
-			UserPrompt string `json:"user_prompt"`
-		}
-
-		if err = json.Unmarshal(payload, &request); err != nil {
-			fmt.Println("error marshalling message: ", err)
-			break
-		}
-
-		client.asaiChain.LoadAvatar(request.AvatarID, request.SessionID, "Web Browser")
-
-		client.asaiChain.SetStream(func(ctx context.Context, chunk []byte) {
-			client.egress <- chunk
-		})
-
 		go func() {
-			if err = client.asaiChain.Run(ctx, request.UserPrompt); err != nil {
-				fmt.Println("error Asai running chain: ", err)
-
-				// Send an error message
-				errMessage, _ := json.Marshal(map[string]string{
-					"step": "error",
-				})
-
-				client.egress <- errMessage
-				return
-			}
+			client.ragClient.RelayMsg(payload, func(chunk []byte) {
+				// Send message to egress
+				client.egress <- chunk
+			})
 		}()
-
 	}
 }
 

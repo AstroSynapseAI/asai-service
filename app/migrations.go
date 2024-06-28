@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/AstroSynapseAI/app-service/models"
-	"github.com/AstroSynapseAI/app-service/sdk/crud/database"
+	"github.com/AstroSynapseAI/asai-service/models"
+	"github.com/GoLangWebSDK/crud/database"
 	"github.com/go-gormigrate/gormigrate/v2"
 )
 
@@ -21,6 +21,7 @@ func (*Migrations) Models() []interface{} {
 		&models.Agent{},
 		&models.Avatar{},
 		&models.AvatarRole{},
+		&models.ChatHistory{},
 		&models.Document{},
 		&models.LLM{},
 		&models.Plugin{},
