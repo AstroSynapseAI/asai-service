@@ -6,8 +6,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "docker": "env-cmd -f .env.docker vite build",
-    "heroku-dev": "env-cmd -f .env.dev vite build"
+    "test": "env-cmd -f .env.test build",
   },
   "dependencies": {
     "@vueuse/core": "^10.9.0",
