@@ -30,15 +30,13 @@ func (client *Client) ProxyConnection(ctx context.Context) {
 		for {
 			messageTpe, payload, err := client.clientConn.ReadMessage()
 			if err != nil {
-				if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-					fmt.Printf("error reading message: %v", err)
-				}
-				break
+				fmt.Printf("error reading message from client: %v", err)
+				return
 			}
 
 			err = client.ragConn.WriteMessage(messageTpe, payload)
 			if err != nil {
-				fmt.Println("Failed to send message to RAG server:", err)
+				fmt.Println("failed to send message to RAG server:", err)
 				return
 			}
 		}
@@ -47,15 +45,13 @@ func (client *Client) ProxyConnection(ctx context.Context) {
 	for {
 		messageType, msg, err := client.ragConn.ReadMessage()
 		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				fmt.Printf("error reading message: %v", err)
-			}
-			break
+			fmt.Printf("error reading message from RAG server: %v", err)
+			return
 		}
 
 		err = client.clientConn.WriteMessage(messageType, msg)
 		if err != nil {
-			fmt.Println("Failed to send message to client:", err)
+			fmt.Println("failed to send message to client:", err)
 			return
 		}
 	}
