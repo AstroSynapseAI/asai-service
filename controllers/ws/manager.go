@@ -19,13 +19,11 @@ var websocketUpgrader = websocket.Upgrader{
 type Manager struct {
 	sync.RWMutex
 	clients map[*Client]bool
-	db      *database.Database
 }
 
 func NewManager(db *database.Database) *Manager {
 	mng := &Manager{
 		clients: make(map[*Client]bool),
-		db:      db,
 	}
 
 	return mng
@@ -38,41 +36,39 @@ func (m *Manager) Handler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	conn, err := websocketUpgrader.Upgrade(w, r, nil)
+	clinetConn, err := websocketUpgrader.Upgrade(w, r, nil)
 	if err != nil {
 		fmt.Println("Failed to initate socket:", err)
 		return
 	}
 
-	client := NewClient(conn, m)
+	ragURL := "ws://localhost:8080"
+	ragConn, _, err := websocket.DefaultDialer.Dial(ragURL, nil)
+	if err != nil {
+		fmt.Println("Failed to connect to RAG server:", err)
+		return
+	}
+
+	client := NewClient(clinetConn, ragConn, m)
 	m.addClient(client)
 
 	ctx := context.Background()
-
-	// go client.MaintainConnection(ctx)
-	go client.ReadMsgs(ctx)
-	go client.SendMsgs(ctx)
+	go client.ProxyConnection(ctx)
 }
 
 func (m *Manager) addClient(client *Client) {
-	// Lock so we can manipulate
 	m.Lock()
 	defer m.Unlock()
-
-	// Add Client
 	m.clients[client] = true
 }
 
 func (m *Manager) removeClient(client *Client) {
-	fmt.Println("Removing client")
 	m.Lock()
 	defer m.Unlock()
 
-	// Check if Client exists, then delete it
 	if _, ok := m.clients[client]; ok {
-		// close connection
-		client.connection.Close()
-		// remove
+		client.clientConn.Close()
+		client.ragConn.Close()
 		delete(m.clients, client)
 	}
 }

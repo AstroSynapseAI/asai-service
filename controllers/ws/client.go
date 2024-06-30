@@ -3,57 +3,49 @@ package ws
 import (
 	"context"
 	"fmt"
-	"os"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
 
-var (
-	// pongWait is how long we will await a pong response from client
-	pongWait = 10 * time.Second
-	// pingInterval has to be less than pongWait, We cant multiply by 0.9 to get 90% of time
-	// Because that can make decimals, so instead *9 / 10 to get 90%
-	// The reason why it has to be less than PingRequency is becuase otherwise it will
-	// send a new Ping before getting response
-	pingInterval = (pongWait * 9) / 10
-)
-
 type Client struct {
-	egress     chan []byte
-	connection *websocket.Conn
 	manager    *Manager
-	ragClient  *RAGClient
+	clientConn *websocket.Conn
+	ragConn    *websocket.Conn
 }
 
-func NewClient(conn *websocket.Conn, manager *Manager) *Client {
+func NewClient(clientConn *websocket.Conn, ragConn *websocket.Conn, manager *Manager) *Client {
 	return &Client{
-		egress:     make(chan []byte),
-		connection: conn,
 		manager:    manager,
-		ragClient:  NewRAGClient(os.Getenv("RAG_SERVICE_URL")),
+		clientConn: clientConn,
+		ragConn:    ragConn,
 	}
 }
 
-func (client *Client) MaintainConnection(ctx context.Context) {
-	client.ragClient.Conn.SetPingHandler(func(msg string) error {
-		// fmt.Println("Ping on asai service!")
-		return client.connection.WriteMessage(websocket.PingMessage, []byte(msg))
-	})
+func (client *Client) ProxyConnection(ctx context.Context) {
+	fmt.Println("Proxying connection on asai service!")
 
-	client.connection.SetPongHandler(func(msg string) error {
-		// fmt.Println("Pong on asai service!")
-		return client.ragClient.Conn.WriteMessage(websocket.PongMessage, []byte(msg))
-	})
-}
+	defer client.manager.removeClient(client)
 
-func (client *Client) ReadMsgs(ctx context.Context) {
-	defer func() {
-		client.manager.removeClient(client)
+	go func() {
+		for {
+			messageTpe, payload, err := client.clientConn.ReadMessage()
+			if err != nil {
+				if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+					fmt.Printf("error reading message: %v", err)
+				}
+				break
+			}
+
+			err = client.ragConn.WriteMessage(messageTpe, payload)
+			if err != nil {
+				fmt.Println("Failed to send message to RAG server:", err)
+				return
+			}
+		}
 	}()
 
 	for {
-		_, payload, err := client.connection.ReadMessage()
+		messageType, msg, err := client.ragConn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				fmt.Printf("error reading message: %v", err)
@@ -61,24 +53,9 @@ func (client *Client) ReadMsgs(ctx context.Context) {
 			break
 		}
 
-		go func() {
-			client.ragClient.RelayMsg(payload, func(chunk []byte) {
-				// Send message to egress
-				client.egress <- chunk
-			})
-		}()
-	}
-}
-
-func (client *Client) SendMsgs(ctx context.Context) {
-	defer func() {
-		client.manager.removeClient(client)
-	}()
-
-	for msg := range client.egress {
-		// Write a Regular text message to the connection
-		if err := client.connection.WriteMessage(websocket.TextMessage, msg); err != nil {
-			fmt.Println("Sending message failed:", err)
+		err = client.clientConn.WriteMessage(messageType, msg)
+		if err != nil {
+			fmt.Println("Failed to send message to client:", err)
 			return
 		}
 	}
