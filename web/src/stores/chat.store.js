@@ -3,7 +3,7 @@ import { fetchWrapper }  from '../helpers/fetch-wrapper.js';
 import { useUserStore } from './user.store.js';
 
 const chatURL = `${import.meta.env.VITE_API_URL}/chat`;
-const wsURL = `${import.meta.env.VITE_WS_URL}/ws/chat`;
+const wsURL = `${import.meta.env.VITE_WS_URL}/chat`;
 const apiUrl = import.meta.env.VITE_API_URL;
 
 export const useChatStore = defineStore({
