@@ -14,6 +14,20 @@ import (
 var websocketUpgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		allowedOrigins := []string{
+			"http://localhost:5173",
+			"https://asai.astrosynapse.ai",
+			"https:/test.astrosynapse.ai",
+		}
+
+		for _, v := range allowedOrigins {
+			if r.Header.Get("Origin") == v {
+				return true
+			}
+		}
+		return false
+	},
 }
 
 type Manager struct {
@@ -30,19 +44,19 @@ func NewManager(db *database.Database) *Manager {
 }
 
 func (m *Manager) Handler(w http.ResponseWriter, r *http.Request) {
-	if os.Getenv("ENVIRONMENT") == "LOCAL DEV" {
-		websocketUpgrader.CheckOrigin = func(r *http.Request) bool {
-			return r.Header.Get("Origin") == "http://localhost:5173"
-		}
-	}
+	fmt.Println("Initiating app socket...")
 
 	clinetConn, err := websocketUpgrader.Upgrade(w, r, nil)
 	if err != nil {
-		fmt.Println("Failed to initate socket:", err)
+		fmt.Println("Failed to initate app socket:", err)
 		return
 	}
 
-	ragURL := "ws://localhost:8080"
+	ragURL := os.Getenv("RAG_SERVICE_URL")
+	if ragURL == "" {
+		ragURL = "ws://localhost:8080/ws/chat"
+	}
+
 	ragConn, _, err := websocket.DefaultDialer.Dial(ragURL, nil)
 	if err != nil {
 		fmt.Println("Failed to connect to RAG server:", err)
@@ -70,5 +84,17 @@ func (m *Manager) removeClient(client *Client) {
 		client.clientConn.Close()
 		client.ragConn.Close()
 		delete(m.clients, client)
+	}
+}
+
+func (m *Manager) checkOrigin(allowed []string) {
+	websocketUpgrader.CheckOrigin = func(r *http.Request) bool {
+		for _, v := range allowed {
+			if r.Header.Get("Origin") == v {
+				return true
+			}
+		}
+
+		return false
 	}
 }
