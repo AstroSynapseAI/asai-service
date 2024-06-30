@@ -17,9 +17,8 @@ var websocketUpgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		allowedOrigins := []string{
 			"http://localhost:5173",
-			"http://localhost:5174",
 			"https://asai.astrosynapse.ai",
-			"https://test.astrosynapse.ai",
+			"https:/test.astrosynapse.ai",
 		}
 
 		for _, v := range allowedOrigins {

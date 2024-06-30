@@ -6,8 +6,8 @@ import (
 	"os"
 
 	"github.com/AstroSynapseAI/asai-service/app"
+	"github.com/AstroSynapseAI/asai-service/app/ws"
 	"github.com/AstroSynapseAI/asai-service/controllers"
-	"github.com/AstroSynapseAI/asai-service/controllers/ws"
 	"github.com/AstroSynapseAI/asai-service/plugins"
 	"github.com/AstroSynapseAI/asai-service/sdk/rest"
 	"github.com/GoLangWebSDK/crud/database"
