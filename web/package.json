@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "env-cmd -f .env.test build"
+    "test": "env-cmd -f .env.test vite build"
   },
   "dependencies": {
     "@vueuse/core": "^10.9.0",

@@ -18,7 +18,7 @@ var websocketUpgrader = websocket.Upgrader{
 		allowedOrigins := []string{
 			"http://localhost:5173",
 			"https://asai.astrosynapse.ai",
-			"https:/test.astrosynapse.ai",
+			"https://test.astrosynapse.ai",
 		}
 
 		for _, v := range allowedOrigins {
