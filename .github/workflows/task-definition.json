@@ -1,0 +1,133 @@
+{
+  "family": "${ECS_TASK_FAMILY}",
+  "containerDefinitions": [
+    {
+      "name": "${APP_CONTAINER_NAME}",
+      "image": "${ECR_URL}/${ECR_APP_REPOSITORY}:latest",
+      "cpu": 1024,
+      "memory": 2048,
+      "memoryReservation": 2048,
+      "portMappings": [
+        {
+          "name": "main-port",
+          "containerPort": 80,
+          "hostPort": 80,
+          "protocol": "tcp",
+          "appProtocol": "http"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "RDS_HOST",
+          "value": "${RDS_HOST}"
+        },
+        {
+          "name": "RDS_DBNAME",
+          "value": "${RDS_DBNAME}"
+        },
+        {
+          "name": "RDS_PASSWORD",
+          "value": "${RDS_PASSWORD}"
+        },
+        {
+          "name": "PORT",
+          "value": "80"
+        },
+        {
+          "name": "RDS_PORT",
+          "value": "${RDS_PORT}"
+        },
+        {
+          "name": "ENVIRONMENT",
+          "value": "${ENVIRONMENT}"
+        },
+        {
+          "name": "RDS_USERNAME",
+          "value": "${RDS_USERNAME}"
+        },
+        {
+          "name": "RAG_SERVICE_URL",
+          "value": "ws://localhost:8080/ws/chat"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/${ECS_CLUSTER}",
+          "awslogs-create-group": "true",
+          "awslogs-region": "${AWS_REGION}",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    },
+    {
+      "name": "${RAG_CONTAINER_NAME}",
+      "image": "${ECR_URL}/${ECR_RAG_REPOSITORY}:latest",
+      "cpu": 1024,
+      "memory": 2048,
+      "memoryReservation": 2048,
+      "portMappings": [
+        {
+          "name": "chat-port",
+          "containerPort": 8080,
+          "hostPort": 8080,
+          "protocol": "tcp",
+          "appProtocol": "http"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "RDS_HOST",
+          "value": "${RDS_HOST}"
+        },
+        {
+          "name": "RDS_DBNAME",
+          "value": "${RDS_DBNAME}"
+        },
+        {
+          "name": "RDS_PASSWORD",
+          "value": "${RDS_PASSWORD}"
+        },
+        {
+          "name": "PORT",
+          "value": "8080"
+        },
+        {
+          "name": "RDS_PORT",
+          "value": "${RDS_PORT}"
+        },
+        {
+          "name": "ENVIRONMENT",
+          "value": "${ENVIRONMENT}"
+        },
+        {
+          "name": "RDS_USERNAME",
+          "value": "${RDS_USERNAME}"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/${ECS_CLUSTER}",
+          "awslogs-create-group": "true",
+          "awslogs-region": "${AWS_REGION}",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "taskRoleArn": "${TASK_ROLE_ARN}",
+  "executionRoleArn": "${TASK_ROLE_ARN}",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "2048",
+  "memory": "4096",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  }
+}

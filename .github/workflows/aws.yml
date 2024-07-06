@@ -1,0 +1,87 @@
+name: Deploy to Amazon ECS
+on:
+  push:
+    branches:
+      - deploy-dev
+      - deploy-prod
+env:
+  ECS_TASK_DEFINITION: .github/workflows/task-definition.json
+permissions:
+  contents: read
+  id-token: write
+    
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
+      
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with: 
+        node-version: '20'
+      
+    - name: Build vue frontend
+      run: |
+        cd web/
+        npm install -g yarn
+        yarn install
+        yarn build
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+        aws-region: ${{ secrets.AWS_REGION }}
+          
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+        
+    - name: Build, and push image to registry
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ secrets.ECR_APP_REPOSITORY }}
+        IMAGE_TAG: latest
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f deploys/Dockerfile .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+        
+    - name: Configure task definition
+      id: task-def
+      run: |
+        jq '.containerDefinitions[1].image = "${{ secrets.ECR_URL }}/${{ secrets.ECR_RAG_REPOSITORY }}:latest" |
+        .containerDefinitions[0].image = "${{ secrets.ECR_URL }}/${{ secrets.ECR_APP_REPOSITORY }}:latest" |
+        .containerDefinitions[0].name = "${{ secrets.APP_CONTAINER_NAME }}" |
+        .containerDefinitions[1].name = "${{ secrets.RAG_CONTAINER_NAME }}" |
+        .containerDefinitions[0].environment += [{"name": "PORT", "value": "80"}] |
+        .containerDefinitions[1].environment += [{"name": "PORT", "value": "8080"}] |
+        .containerDefinitions[].environment += [
+          {"name": "RDS_HOST", "value": "${{ secrets.RDS_HOST }}"},
+          {"name": "RDS_DBNAME", "value": "${{ secrets.RDS_DBNAME }}"},
+          {"name": "RDS_USERNAME", "value": "${{ secrets.RDS_USERNAME }}"},
+          {"name": "RDS_PASSWORD", "value": "${{ secrets.RDS_PASSWORD }}"},
+          {"name": "RDS_PORT", "value": "${{ secrets.RDS_PORT }}"},
+          {"name": "RAG_SERVICE_URL", "value": "ws://localhost:8080/ws/chat"},
+          {"name": "ENVIRONMENT", "value": "${{ secrets.ENVIRONMENT }}"}
+        ] |
+        .containerDefinitions[].logConfiguration.options."awslogs-group" = "/ecs/${{ secrets.ECS_TASK_FAMILY }}" |
+        .containerDefinitions[].logConfiguration.options."awslogs-region" = "${{ secrets.AWS_REGION }}" |
+        .taskRoleArn = "${{ secrets.TASK_ROLE_ARN }}" |
+        .family = "${{ secrets.ECS_TASK_FAMILY }}" |
+        .executionRoleArn = "${{ secrets.TASK_ROLE_ARN }}"' ${{ env.ECS_TASK_DEFINITION }} > updated-task-def.json
+        echo "task-definition=updated-task-def.json" >> $GITHUB_OUTPUT
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ secrets.ECS_SERVICE }}
+        cluster: ${{ secrets.ECS_CLUSTER }}
+        wait-for-service-stability: true
